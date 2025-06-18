@@ -54,23 +54,90 @@
                     <div class="card-body p-5">
                         <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
                             <div class="mb-4">
-                                <label for="file" class="form-label h5">Select Documents</label>
-                                <div class="upload-area border border-2 border-dashed rounded p-4 text-center" id="uploadArea">
-                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                    <p class="mb-3">Drag and drop your files here or click to browse</p>
-                                    <input type="file" 
-                                           name="file" 
-                                           id="file" 
-                                           class="form-control d-none" 
-                                           multiple 
-                                           accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png">
-                                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('file').click()">
-                                        <i class="fas fa-folder-open me-2"></i>Choose Files
-                                    </button>
+                                <label for="file" class="form-label h5">Upload Documents</label>
+                                
+                                <!-- Upload Options Tabs -->
+                                <ul class="nav nav-pills mb-3" id="uploadTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="file-tab" data-bs-toggle="pill" data-bs-target="#file-upload" type="button" role="tab">
+                                            <i class="fas fa-folder-open me-2"></i>Upload Files
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="camera-tab" data-bs-toggle="pill" data-bs-target="#camera-scan" type="button" role="tab">
+                                            <i class="fas fa-camera me-2"></i>Scan with Camera
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content" id="uploadTabContent">
+                                    <!-- File Upload Tab -->
+                                    <div class="tab-pane fade show active" id="file-upload" role="tabpanel">
+                                        <div class="upload-area border border-2 border-dashed rounded p-4 text-center" id="uploadArea">
+                                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                            <p class="mb-3">Drag and drop your files here or click to browse</p>
+                                            <input type="file" 
+                                                   name="file" 
+                                                   id="file" 
+                                                   class="form-control d-none" 
+                                                   multiple 
+                                                   accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png">
+                                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('file').click()">
+                                                <i class="fas fa-folder-open me-2"></i>Choose Files
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Camera Scan Tab -->
+                                    <div class="tab-pane fade" id="camera-scan" role="tabpanel">
+                                        <div class="camera-section">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Use your device's camera to scan documents directly
+                                            </div>
+                                            
+                                            <div class="text-center mb-3">
+                                                <button type="button" class="btn btn-primary" id="startCameraBtn" onclick="startCamera()">
+                                                    <i class="fas fa-camera me-2"></i>Start Camera
+                                                </button>
+                                            </div>
+
+                                            <div id="cameraContainer" style="display: none;">
+                                                <div class="camera-view bg-dark rounded p-3 mb-3">
+                                                    <video id="cameraVideo" autoplay playsinline class="w-100 rounded"></video>
+                                                </div>
+                                                <div class="text-center mb-3">
+                                                    <button type="button" class="btn btn-success me-2" onclick="captureDocument()">
+                                                        <i class="fas fa-camera me-2"></i>Capture Document
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" onclick="stopCamera()">
+                                                        <i class="fas fa-stop me-2"></i>Stop Camera
+                                                    </button>
+                                                </div>
+                                                <canvas id="captureCanvas" style="display: none;"></canvas>
+                                            </div>
+
+                                            <div id="capturedPreview" style="display: none;" class="text-center mb-3">
+                                                <div class="alert alert-success">
+                                                    <i class="fas fa-check-circle me-2"></i>Document captured successfully!
+                                                </div>
+                                                <img id="previewImage" class="img-thumbnail" style="max-width: 300px;">
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="captureAnother()">
+                                                        <i class="fas fa-camera me-2"></i>Capture Another
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                
                                 <div class="form-text">
                                     <strong>Supported formats:</strong> PDF, DOCX, DOC, TXT, JPG, PNG (Max 16MB per file)
                                 </div>
+                                
+                                <!-- Hidden field for scanned image -->
+                                <input type="hidden" name="scannedImage" id="scannedImage">
                             </div>
                             
                             <div id="fileList" class="mb-4" style="display: none;">
@@ -150,27 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle file selection display
     fileInput.addEventListener('change', function() {
         const files = Array.from(this.files);
-        if (files.length > 0) {
-            fileList.style.display = 'block';
-            selectedFiles.innerHTML = '';
-            
-            files.forEach(file => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                li.innerHTML = `
-                    <span>
-                        <i class="fas fa-file me-2"></i>${file.name}
-                    </span>
-                    <span class="badge bg-secondary rounded-pill">${formatFileSize(file.size)}</span>
-                `;
-                selectedFiles.appendChild(li);
-            });
-            
-            submitBtn.disabled = false;
-        } else {
-            fileList.style.display = 'none';
-            submitBtn.disabled = true;
-        }
+        updateFileDisplay(files);
     });
 
     // Drag and drop functionality
@@ -193,6 +240,30 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.dispatchEvent(new Event('change'));
     });
 
+    function updateFileDisplay(files) {
+        if (files.length > 0) {
+            fileList.style.display = 'block';
+            selectedFiles.innerHTML = '';
+            
+            files.forEach(file => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>
+                        <i class="fas fa-file me-2"></i>${file.name}
+                    </span>
+                    <span class="badge bg-secondary rounded-pill">${formatFileSize(file.size)}</span>
+                `;
+                selectedFiles.appendChild(li);
+            });
+            
+            submitBtn.disabled = false;
+        } else {
+            fileList.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+    }
+
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -200,6 +271,158 @@ document.addEventListener('DOMContentLoaded', function() {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
+
+    // Check if scanned document is available on load
+    checkScannedDocument();
+
+    function checkScannedDocument() {
+        const scannedImage = document.getElementById('scannedImage');
+        if (scannedImage && scannedImage.value) {
+            submitBtn.disabled = false;
+            showScannedDocumentStatus();
+        }
+    }
+
+    function showScannedDocumentStatus() {
+        fileList.style.display = 'block';
+        selectedFiles.innerHTML = '';
+        
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center list-group-item-success';
+        li.innerHTML = `
+            <span>
+                <i class="fas fa-camera me-2"></i>Scanned Document
+            </span>
+            <span class="badge bg-success rounded-pill">Ready</span>
+        `;
+        selectedFiles.appendChild(li);
+    }
+
+    // Expose function globally for camera functionality
+    window.updateSubmitButton = function() {
+        const hasFiles = fileInput.files && fileInput.files.length > 0;
+        const hasScannedImage = document.getElementById('scannedImage').value;
+        submitBtn.disabled = !(hasFiles || hasScannedImage);
+        
+        if (hasScannedImage && !hasFiles) {
+            showScannedDocumentStatus();
+        }
+    };
 });
+
+// Camera functionality
+let cameraStream = null;
+
+function startCamera() {
+    const video = document.getElementById('cameraVideo');
+    const cameraContainer = document.getElementById('cameraContainer');
+    const startBtn = document.getElementById('startCameraBtn');
+    
+    // Request camera access with back camera preference for mobile
+    const constraints = {
+        video: {
+            facingMode: { ideal: 'environment' }, // Prefer back camera
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+        }
+    };
+    
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+            cameraStream = stream;
+            video.srcObject = stream;
+            cameraContainer.style.display = 'block';
+            startBtn.style.display = 'none';
+        })
+        .catch(function(error) {
+            console.error('Camera access error:', error);
+            alert('Camera access denied or not available. Please check your browser permissions or try uploading a file instead.');
+        });
+}
+
+function captureDocument() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('captureCanvas');
+    const scannedImageInput = document.getElementById('scannedImage');
+    const capturedPreview = document.getElementById('capturedPreview');
+    const previewImage = document.getElementById('previewImage');
+    
+    // Set canvas size to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw video frame to canvas
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convert to base64 data URL
+    const dataURL = canvas.toDataURL('image/png');
+    scannedImageInput.value = dataURL;
+    
+    // Show preview
+    previewImage.src = dataURL;
+    capturedPreview.style.display = 'block';
+    
+    // Update submit button state
+    window.updateSubmitButton();
+    
+    // Stop camera after capture
+    stopCamera();
+    
+    // Show success message
+    showSuccessMessage('Document captured successfully! You can now proceed to payment.');
+}
+
+function stopCamera() {
+    const cameraContainer = document.getElementById('cameraContainer');
+    const startBtn = document.getElementById('startCameraBtn');
+    
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    
+    cameraContainer.style.display = 'none';
+    startBtn.style.display = 'block';
+}
+
+function captureAnother() {
+    const capturedPreview = document.getElementById('capturedPreview');
+    const scannedImageInput = document.getElementById('scannedImage');
+    
+    // Clear previous capture
+    capturedPreview.style.display = 'none';
+    scannedImageInput.value = '';
+    
+    // Restart camera
+    startCamera();
+    
+    // Update submit button state
+    window.updateSubmitButton();
+}
+
+function showSuccessMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.minWidth = '300px';
+    
+    alertDiv.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
 </script>
 {% endblock %}

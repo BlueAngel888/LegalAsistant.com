@@ -14,7 +14,12 @@ app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_devel
 
 # Configure Stripe
 stripe.api_key = STRIPE_SECRET_KEY
-YOUR_DOMAIN = os.environ.get('REPLIT_DEV_DOMAIN', 'http://localhost:5000')
+
+# Configure domain for Stripe redirects
+if os.environ.get('REPLIT_DEPLOYMENT'):
+    YOUR_DOMAIN = f"https://{os.environ.get('REPLIT_DEV_DOMAIN')}"
+else:
+    YOUR_DOMAIN = f"https://{os.environ.get('REPLIT_DOMAINS', 'localhost:5000').split(',')[0]}"
 
 @app.route('/')
 def index():
@@ -23,29 +28,55 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
+        # Handle scanned image from camera
+        scanned_base64 = request.form.get('scannedImage')
         files = request.files.getlist('file')
-        if not files or all(file.filename == '' for file in files):
-            flash('No files selected. Please choose at least one document.', 'error')
-            return redirect(url_for('index'))
-        
         texts = []
         processed_files = []
+
+        # Process scanned image if provided
+        if scanned_base64:
+            try:
+                from base64 import b64decode
+                from io import BytesIO
+                from PIL import Image
+                import pytesseract
+                
+                # Decode base64 image
+                image_data = b64decode(scanned_base64.split(",")[1])
+                image = Image.open(BytesIO(image_data))
+                
+                # Extract text using OCR
+                text = pytesseract.image_to_string(image, lang='eng')
+                if text.strip():
+                    texts.append(text)
+                    processed_files.append('Scanned Document')
+                    logging.info("Successfully processed scanned document")
+                else:
+                    flash('Could not extract text from scanned document. Please try again or upload a clearer image.', 'warning')
+                    
+            except Exception as e:
+                logging.error(f"Error processing scanned image: {str(e)}")
+                flash('Error processing scanned document. Please try again.', 'error')
+
+        # Process uploaded files
+        if files and not all(file.filename == '' for file in files):
+            for file in files:
+                if file.filename != '':
+                    try:
+                        text = extract_text_from_file(file)
+                        if text.strip():
+                            texts.append(text)
+                            processed_files.append(file.filename)
+                        else:
+                            flash(f'Could not extract text from {file.filename}', 'warning')
+                    except Exception as e:
+                        logging.error(f"Error processing file {file.filename}: {str(e)}")
+                        flash(f'Error processing {file.filename}: {str(e)}', 'error')
         
-        for file in files:
-            if file.filename != '':
-                try:
-                    text = extract_text_from_file(file)
-                    if text.strip():
-                        texts.append(text)
-                        processed_files.append(file.filename)
-                    else:
-                        flash(f'Could not extract text from {file.filename}', 'warning')
-                except Exception as e:
-                    logging.error(f"Error processing file {file.filename}: {str(e)}")
-                    flash(f'Error processing {file.filename}: {str(e)}', 'error')
-        
+        # Check if any text was extracted
         if not texts:
-            flash('No text could be extracted from the uploaded files. Please check your documents and try again.', 'error')
+            flash('No text could be extracted from the uploaded files or scanned document. Please check your documents and try again.', 'error')
             return redirect(url_for('index'))
         
         # Store document text and file info in session

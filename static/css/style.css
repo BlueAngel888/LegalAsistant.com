@@ -355,6 +355,73 @@ footer {
     border: 1px solid rgba(5, 150, 105, 0.1);
 }
 
+/* Camera Functionality Styles */
+.camera-section {
+    padding: 1rem;
+}
+
+.camera-view {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#cameraVideo {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-pills .nav-link {
+    border-radius: 25px;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.nav-pills .nav-link:not(.active) {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.nav-pills .nav-link:not(.active):hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--primary-color);
+}
+
+.tab-content {
+    min-height: 300px;
+}
+
+#capturedPreview img {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile camera optimizations */
+@media (max-width: 768px) {
+    .camera-view {
+        padding: 1rem;
+    }
+    
+    #cameraVideo {
+        max-height: 300px;
+        object-fit: cover;
+    }
+    
+    .nav-pills {
+        justify-content: center;
+    }
+    
+    .nav-pills .nav-link {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+
 /* Animation for loading states */
 @keyframes pulse {
     0% {
@@ -370,4 +437,30 @@ footer {
 
 .loading {
     animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Camera button animations */
+.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+/* Success state for scanned documents */
+.list-group-item-success {
+    background-color: rgba(5, 150, 105, 0.1);
+    border-color: rgba(5, 150, 105, 0.2);
+}
+
+/* Ensure proper tab switching */
+.tab-pane {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tab-pane.active {
+    opacity: 1;
 }
