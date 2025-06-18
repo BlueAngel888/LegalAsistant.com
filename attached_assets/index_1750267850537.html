@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Language Selector Demo</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; margin: 0; }
+    header {
+      background: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .language-select {
+      font-size: 1rem;
+      padding: 0.4rem;
+    }
+    main { padding: 2rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div><strong>LegalAsistant.com</strong></div>
+    <form action="/set-language" method="POST">
+      <select class="language-select" name="language" onchange="this.form.submit()">
+        <option value="en" {% if session.get('language') == 'en' %}selected{% endif %}>English</option>
+        <option value="ro" {% if session.get('language') == 'ro' %}selected{% endif %}>Română</option>
+        <option value="de" {% if session.get('language') == 'de' %}selected{% endif %}>Deutsch</option>
+        <option value="it" {% if session.get('language') == 'it' %}selected{% endif %}>Italiano</option>
+        <option value="es" {% if session.get('language') == 'es' %}selected{% endif %}>Español</option>
+        <option value="ar" {% if session.get('language') == 'ar' %}selected{% endif %}>العربية</option>
+      </select>
+    </form>
+  </header>
+
+  <main>
+    <h2>Welcome</h2>
+    <p>Selected language: <strong>{{ session.get('language', 'en') }}</strong></p>
+  </main>
+
+</body>
+</html>

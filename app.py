@@ -25,6 +25,14 @@ else:
 def index():
     return render_template('index.html', stripe_public_key=STRIPE_PUBLIC_KEY)
 
+@app.route('/set-language', methods=['POST'])
+def set_language():
+    selected_lang = request.form.get('language')
+    if selected_lang in ['en', 'ro', 'de', 'it', 'es', 'ar']:
+        session['language'] = selected_lang
+        logging.info(f"Language set to: {selected_lang}")
+    return redirect(url_for('index'))
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
@@ -46,8 +54,18 @@ def upload_file():
                 image_data = b64decode(scanned_base64.split(",")[1])
                 image = Image.open(BytesIO(image_data))
                 
-                # Extract text using OCR
-                text = pytesseract.image_to_string(image, lang='eng')
+                # Extract text using OCR with selected language
+                user_lang = session.get('language', 'en')
+                ocr_lang_map = {
+                    'en': 'eng',
+                    'ro': 'ron', 
+                    'de': 'deu',
+                    'it': 'ita',
+                    'es': 'spa',
+                    'ar': 'ara'
+                }
+                ocr_lang = ocr_lang_map.get(user_lang, 'eng')
+                text = pytesseract.image_to_string(image, lang=ocr_lang)
                 if text.strip():
                     texts.append(text)
                     processed_files.append('Scanned Document')
@@ -137,8 +155,9 @@ def success():
             flash('No document found. Please start over.', 'error')
             return redirect(url_for('index'))
         
-        # Analyze the document with GPT-4
-        analysis = analyze_with_gpt4(doc_text)
+        # Analyze the document with GPT-4 in user's preferred language
+        user_lang = session.get('language', 'en')
+        analysis = analyze_with_gpt4(doc_text, user_lang)
         
         return render_template('result.html', analysis=analysis, files=processed_files)
         
