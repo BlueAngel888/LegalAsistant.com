@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Legal Assistant{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Progress Indicator -->
+                <div class="progress-steps mb-5">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="step completed">
+                                <i class="fas fa-check-circle"></i>
+                                <p class="mt-2">Upload</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="step active">
+                                <i class="fas fa-credit-card"></i>
+                                <p class="mt-2">Payment</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="step">
+                                <i class="fas fa-file-alt"></i>
+                                <p class="mt-2">Analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white py-4">
+                        <h2 class="text-center mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Complete Your Order
+                        </h2>
+                    </div>
+                    <div class="card-body p-5">
+                        <!-- Order Summary -->
+                        <div class="order-summary bg-light rounded p-4 mb-4">
+                            <h4 class="mb-3">
+                                <i class="fas fa-file-invoice me-2"></i>
+                                Order Summary
+                            </h4>
+                            
+                            {% if files %}
+                            <div class="mb-3">
+                                <h6>Documents to Analyze:</h6>
+                                <ul class="list-unstyled mb-0">
+                                    {% for file in files %}
+                                    <li class="mb-1">
+                                        <i class="fas fa-file me-2 text-muted"></i>{{ file }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="service-details">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Legal Document Analysis</span>
+                                    <span class="fw-bold">€100.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Tax included</span>
+                                    <span class="text-muted">VAT: €0.00</span>
+                                </div>
+                                <hr class="my-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h5 mb-0">Total</span>
+                                    <span class="h4 mb-0 text-primary fw-bold">€100.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Features -->
+                        <div class="service-features mb-4">
+                            <h5 class="mb-3">What's included:</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Comprehensive document analysis
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Risk assessment
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Legal recommendations
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Compliance review
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Missing elements identification
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fas fa-check text-success me-2"></i>
+                                            Professional report format
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <form action="{{ url_for('create_checkout_session') }}" method="POST">
+                            <button type="submit" class="btn btn-success btn-lg w-100 py-3" id="checkout-button">
+                                <i class="fas fa-lock me-2"></i>
+                                Secure Payment with Stripe - €100.00
+                            </button>
+                        </form>
+
+                        <div class="security-info text-center mt-4">
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Secure payment processing powered by Stripe
+                            </p>
+                            <div class="payment-methods">
+                                <i class="fab fa-cc-visa fa-2x text-muted me-2"></i>
+                                <i class="fab fa-cc-mastercard fa-2x text-muted me-2"></i>
+                                <i class="fab fa-cc-amex fa-2x text-muted me-2"></i>
+                                <i class="fas fa-credit-card fa-2x text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back Button -->
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Back to Upload
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkoutButton = document.getElementById('checkout-button');
+    
+    checkoutButton.addEventListener('click', function() {
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecting to Stripe...';
+    });
+});
+</script>
+{% endblock %}

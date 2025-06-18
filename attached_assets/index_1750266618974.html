@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Legal Assistant – Upload</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 2rem; }
+    #camera { display: none; }
+    video, canvas { max-width: 100%; height: auto; }
+    select { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h2>Upload Legal Document(s)</h2>
+
+  <label for="language">Select language:</label>
+  <select id="language" name="language">
+    <option value="en">English</option>
+    <option value="ro">Română</option>
+    <option value="de">Deutsch</option>
+    <option value="it">Italiano</option>
+    <option value="es">Español</option>
+    <option value="ar">العربية</option>
+  </select>
+
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <label>Select file(s):</label><br>
+    <input type="file" name="file" multiple accept=".pdf,.docx,.jpg,.png"><br><br>
+
+    <label>Or scan with your phone:</label><br>
+    <button type="button" onclick="openCamera()">📷 Scan Document</button><br><br>
+
+    <div id="camera">
+      <video id="video" autoplay></video><br>
+      <button type="button" onclick="capturePhoto()">📸 Capture</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+
+    <input type="hidden" name="scannedImage" id="scannedImage">
+    <br><br>
+    <button type="submit">Continue to Payment</button>
+  </form>
+
+  <script>
+    function openCamera() {
+      document.getElementById('camera').style.display = 'block';
+      const video = document.getElementById('video');
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => alert("Camera access denied."));
+    }
+
+    function capturePhoto() {
+      const canvas = document.getElementById('canvas');
+      const video = document.getElementById('video');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/png');
+      document.getElementById('scannedImage').value = dataUrl;
+      alert("Document captured! Click 'Continue to Payment' to upload.");
+    }
+  </script>
+</body>
+</html>

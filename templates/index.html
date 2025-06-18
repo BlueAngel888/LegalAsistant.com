@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Document - Legal Assistant{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Professional Legal Document Analysis
+                </h1>
+                <p class="lead mb-4">
+                    Get comprehensive AI-powered analysis of your legal documents. 
+                    Upload contracts, agreements, or any legal document for detailed insights and recommendations.
+                </p>
+                <div class="features-list">
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Comprehensive legal analysis
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Risk assessment and recommendations
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Secure and confidential processing
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-file-contract display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upload Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-white py-4">
+                        <h2 class="text-center mb-0">
+                            <i class="fas fa-upload text-primary me-2"></i>
+                            Upload Your Legal Documents
+                        </h2>
+                    </div>
+                    <div class="card-body p-5">
+                        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                            <div class="mb-4">
+                                <label for="file" class="form-label h5">Select Documents</label>
+                                <div class="upload-area border border-2 border-dashed rounded p-4 text-center" id="uploadArea">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <p class="mb-3">Drag and drop your files here or click to browse</p>
+                                    <input type="file" 
+                                           name="file" 
+                                           id="file" 
+                                           class="form-control d-none" 
+                                           multiple 
+                                           accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png">
+                                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('file').click()">
+                                        <i class="fas fa-folder-open me-2"></i>Choose Files
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    <strong>Supported formats:</strong> PDF, DOCX, DOC, TXT, JPG, PNG (Max 16MB per file)
+                                </div>
+                            </div>
+                            
+                            <div id="fileList" class="mb-4" style="display: none;">
+                                <h6>Selected Files:</h6>
+                                <ul class="list-group" id="selectedFiles"></ul>
+                            </div>
+                            
+                            <div class="pricing-info bg-light rounded p-4 mb-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h5 class="mb-2">
+                                            <i class="fas fa-star text-warning me-2"></i>
+                                            Premium Analysis
+                                        </h5>
+                                        <p class="mb-0 text-muted">
+                                            Comprehensive legal document analysis with detailed insights and recommendations
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 text-md-end">
+                                        <span class="h3 text-primary fw-bold">€100</span>
+                                        <small class="text-muted d-block">per analysis</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn" disabled>
+                                <i class="fas fa-arrow-right me-2"></i>
+                                Continue to Payment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-box">
+                    <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                    <h4>AI-Powered Analysis</h4>
+                    <p class="text-muted">Advanced GPT-4 technology provides comprehensive legal document analysis</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-box">
+                    <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                    <h4>Secure Processing</h4>
+                    <p class="text-muted">Your documents are processed securely and never stored on our servers</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="feature-box">
+                    <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                    <h4>Fast Results</h4>
+                    <p class="text-muted">Get detailed analysis results within minutes of payment completion</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileList = document.getElementById('fileList');
+    const selectedFiles = document.getElementById('selectedFiles');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Handle file selection display
+    fileInput.addEventListener('change', function() {
+        const files = Array.from(this.files);
+        if (files.length > 0) {
+            fileList.style.display = 'block';
+            selectedFiles.innerHTML = '';
+            
+            files.forEach(file => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>
+                        <i class="fas fa-file me-2"></i>${file.name}
+                    </span>
+                    <span class="badge bg-secondary rounded-pill">${formatFileSize(file.size)}</span>
+                `;
+                selectedFiles.appendChild(li);
+            });
+            
+            submitBtn.disabled = false;
+        } else {
+            fileList.style.display = 'none';
+            submitBtn.disabled = true;
+        }
+    });
+
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-primary');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-primary');
+        
+        const files = e.dataTransfer.files;
+        fileInput.files = files;
+        fileInput.dispatchEvent(new Event('change'));
+    });
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+});
+</script>
+{% endblock %}

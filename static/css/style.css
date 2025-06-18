@@ -1,0 +1,373 @@
+/* Legal Assistant - Custom Styles */
+
+:root {
+    --primary-color: #1e3a8a;
+    --secondary-color: #64748b;
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --light-bg: #f8fafc;
+    --dark-bg: #1e293b;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #334155;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.features-list .feature-item {
+    font-size: 1.1rem;
+}
+
+/* Cards and Shadows */
+.card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Upload Area */
+.upload-area {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: rgba(59, 130, 246, 0.02);
+}
+
+.upload-area:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--primary-color) !important;
+}
+
+.upload-area.border-primary {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--primary-color) !important;
+}
+
+/* Progress Steps */
+.progress-steps .step {
+    position: relative;
+}
+
+.progress-steps .step i {
+    font-size: 2rem;
+    color: #cbd5e1;
+    transition: all 0.3s ease;
+}
+
+.progress-steps .step.completed i {
+    color: var(--success-color);
+}
+
+.progress-steps .step.active i {
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.progress-steps .step p {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+}
+
+.progress-steps .step.completed p {
+    color: var(--success-color);
+}
+
+.progress-steps .step.active p {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Feature Boxes */
+.feature-box {
+    padding: 2rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+}
+
+.feature-box h4 {
+    color: var(--dark-bg);
+    margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #3b82f6 100%);
+    box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #10b981 100%);
+    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* Pricing Info */
+.pricing-info {
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.pricing-info:hover {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.02) !important;
+}
+
+/* Order Summary */
+.order-summary {
+    border: 1px solid #e2e8f0;
+}
+
+.service-details hr {
+    border-color: #cbd5e1;
+    margin: 1rem 0;
+}
+
+/* Analysis Content */
+.analysis-content {
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.formatted-analysis {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.formatted-analysis strong,
+.formatted-analysis b {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Payment Methods */
+.payment-methods i {
+    margin: 0 0.5rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.payment-methods i:hover {
+    opacity: 1;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+    color: var(--success-color);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+    color: var(--warning-color);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    color: var(--danger-color);
+}
+
+/* Footer */
+footer {
+    background: var(--dark-bg) !important;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.navbar-brand i {
+    color: #fbbf24;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 3rem 0 !important;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem !important;
+    }
+    
+    .features-list .feature-item {
+        font-size: 1rem;
+    }
+    
+    .card-body {
+        padding: 2rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.625rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .progress-steps .step i {
+        font-size: 1.5rem;
+    }
+    
+    .progress-steps .step p {
+        font-size: 0.8rem;
+    }
+    
+    .hero-section h1 {
+        font-size: 1.75rem !important;
+    }
+    
+    .display-4 {
+        font-size: 2rem !important;
+    }
+}
+
+/* Loading States */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* File List Styling */
+.list-group-item {
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 0.5rem;
+}
+
+.list-group-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .btn,
+    footer,
+    .card-header,
+    .alert {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .analysis-content {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+    
+    body {
+        font-size: 12px;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        color: #000 !important;
+    }
+}
+
+/* Error Page Styling */
+.error-container {
+    padding: 3rem 1rem;
+}
+
+.error-container i {
+    opacity: 0.7;
+}
+
+/* Security Info */
+.security-info {
+    padding: 1rem;
+    background: rgba(5, 150, 105, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(5, 150, 105, 0.1);
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}

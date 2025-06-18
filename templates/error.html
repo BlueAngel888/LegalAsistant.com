@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_title or 'Error' }} - Legal Assistant{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div class="error-container">
+                    <i class="fas fa-exclamation-triangle fa-5x text-warning mb-4"></i>
+                    
+                    <h1 class="display-4 mb-3">{{ error_title or 'Oops!' }}</h1>
+                    
+                    <p class="lead text-muted mb-4">
+                        {{ error_message or 'Something went wrong. Please try again later.' }}
+                    </p>
+                    
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>
+                            Back to Home
+                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Go Back
+                        </button>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <p class="text-muted">
+                            If this problem persists, please contact our support team.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
