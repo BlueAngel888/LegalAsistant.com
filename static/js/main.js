@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // File Upload Functionality
 function initializeFileUpload() {
     const fileInput = document.getElementById('file');
-    const uploadArea = document.getElementById('uploadArea');
     const fileList = document.getElementById('fileList');
     const selectedFiles = document.getElementById('selectedFiles');
     const submitBtn = document.getElementById('submitBtn');
@@ -24,12 +23,9 @@ function initializeFileUpload() {
         updateFileDisplay(files);
     });
 
-    // Drag and drop functionality
-    if (uploadArea) {
-        uploadArea.addEventListener('click', function() {
-            fileInput.click();
-        });
-
+    // Simple drag and drop for desktop only
+    const uploadArea = document.getElementById('uploadArea');
+    if (uploadArea && window.innerWidth >= 768) {
         uploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -125,96 +121,7 @@ function initializeFileUpload() {
     }
 }
 
-// Desktop file input trigger
-function triggerFileInput() {
-    document.getElementById('file').click();
-}
-
-// Mobile file handling functions
-function handleMobileFiles(input) {
-    if (input.files && input.files.length > 0) {
-        const mainFileInput = document.getElementById('file');
-        const dt = new DataTransfer();
-        
-        // Keep existing files
-        for (let i = 0; i < mainFileInput.files.length; i++) {
-            dt.items.add(mainFileInput.files[i]);
-        }
-        
-        // Add new files
-        for (let i = 0; i < input.files.length; i++) {
-            dt.items.add(input.files[i]);
-        }
-        
-        mainFileInput.files = dt.files;
-        mainFileInput.dispatchEvent(new Event('change'));
-        
-        showSuccessMessage(`${input.files.length} file(s) added successfully!`);
-        
-        // Clear the mobile input for next use
-        input.value = '';
-    }
-}
-
-function handleMobilePhoto(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        
-        // Add to main file input
-        const mainFileInput = document.getElementById('file');
-        const dt = new DataTransfer();
-        
-        // Keep existing files
-        for (let i = 0; i < mainFileInput.files.length; i++) {
-            dt.items.add(mainFileInput.files[i]);
-        }
-        
-        // Add new photo
-        dt.items.add(file);
-        mainFileInput.files = dt.files;
-        
-        // Trigger change event to update display
-        mainFileInput.dispatchEvent(new Event('change'));
-        
-        showSuccessMessage('Photo captured successfully!');
-        
-        // Clear the mobile input for next use
-        input.value = '';
-    }
-}
-
-// Add more files functionality for all devices
-document.addEventListener('DOMContentLoaded', function() {
-    const fileList = document.getElementById('fileList');
-    if (fileList) {
-        const addMoreBtn = document.createElement('button');
-        addMoreBtn.type = 'button';
-        addMoreBtn.className = 'btn btn-outline-secondary btn-sm mt-2';
-        addMoreBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add More Files';
-        addMoreBtn.style.display = 'none';
-        addMoreBtn.onclick = function() {
-            // Determine which input to trigger based on screen size
-            if (window.innerWidth < 768) {
-                document.getElementById('mobileFiles').click();
-            } else {
-                document.getElementById('file').click();
-            }
-        };
-        
-        fileList.appendChild(addMoreBtn);
-        
-        // Show the button when files are selected
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' || mutation.type === 'attributes') {
-                    const isVisible = fileList.style.display !== 'none';
-                    addMoreBtn.style.display = isVisible ? 'block' : 'none';
-                }
-            });
-        });
-        observer.observe(fileList, { attributes: true, childList: true, subtree: true });
-    }
-});
+// Basic file upload - no complex mobile handling
 
 // Form Validation
 function initializeFormValidation() {

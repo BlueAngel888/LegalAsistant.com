@@ -52,6 +52,7 @@ def upload_file():
         # Handle scanned image from camera
         scanned_base64 = request.form.get('scannedImage')
         files = request.files.getlist('file')
+        camera_files = request.files.getlist('camera')
         texts = []
         processed_files = []
 
@@ -91,8 +92,9 @@ def upload_file():
                 flash('Error processing scanned document. Please try again.', 'error')
 
         # Process uploaded files
-        if files and not all(file.filename == '' for file in files):
-            for file in files:
+        all_files = files + camera_files  # Combine regular files and camera files
+        if all_files and not all(file.filename == '' for file in all_files):
+            for file in all_files:
                 if file.filename != '':
                     try:
                         text = extract_text_from_file(file)
