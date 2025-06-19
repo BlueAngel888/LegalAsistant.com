@@ -80,10 +80,24 @@
                                                    id="file" 
                                                    class="form-control d-none" 
                                                    multiple 
-                                                   accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png">
-                                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('file').click()">
+                                                   accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png"
+                                                   capture="environment">
+                                            <button type="button" class="btn btn-outline-primary btn-lg w-100 mb-3" onclick="document.getElementById('file').click()">
                                                 <i class="fas fa-folder-open me-2"></i>Choose Files
                                             </button>
+                                            
+                                            <!-- Mobile-specific buttons -->
+                                            <div class="d-block d-md-none">
+                                                <button type="button" class="btn btn-success btn-lg w-100 mb-2" onclick="openMobileCamera()">
+                                                    <i class="fas fa-camera me-2"></i>Take Photo
+                                                </button>
+                                                <input type="file" 
+                                                       id="mobileCamera" 
+                                                       class="d-none" 
+                                                       accept="image/*" 
+                                                       capture="environment"
+                                                       onchange="handleMobilePhoto(this)">
+                                            </div>
                                         </div>
                                     </div>
 
@@ -132,7 +146,8 @@
                                 </div>
                                 
                                 <div class="form-text">
-                                    <strong>Supported formats:</strong> PDF, DOCX, DOC, TXT, JPG, PNG (Max 16MB per file)
+                                    <strong>Supported formats:</strong> PDF, DOCX, DOC, TXT, JPG, PNG (Max 16MB per file)<br>
+                                    <small class="text-muted">You can select multiple files at once or add them one by one</small>
                                 </div>
                                 
                                 <!-- Hidden field for scanned image -->

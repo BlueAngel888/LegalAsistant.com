@@ -125,6 +125,88 @@ function initializeFileUpload() {
     }
 }
 
+// Mobile Camera Functions
+function openMobileCamera() {
+    const mobileCamera = document.getElementById('mobileCamera');
+    if (mobileCamera) {
+        mobileCamera.click();
+    }
+}
+
+function handleMobilePhoto(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Add to main file input
+        const mainFileInput = document.getElementById('file');
+        const dt = new DataTransfer();
+        
+        // Keep existing files
+        for (let i = 0; i < mainFileInput.files.length; i++) {
+            dt.items.add(mainFileInput.files[i]);
+        }
+        
+        // Add new photo
+        dt.items.add(file);
+        mainFileInput.files = dt.files;
+        
+        // Trigger change event to update display
+        mainFileInput.dispatchEvent(new Event('change'));
+        
+        showSuccessMessage('Photo captured successfully!');
+    }
+}
+
+// Enhanced mobile file handling
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Improve file input for mobile
+if (isMobileDevice()) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('file');
+        if (fileInput) {
+            // Make file input more responsive on mobile
+            fileInput.addEventListener('click', function() {
+                // Small delay to ensure mobile browsers properly handle the file picker
+                setTimeout(() => {
+                    this.style.display = 'block';
+                    this.style.opacity = '0';
+                    this.style.position = 'absolute';
+                    this.style.left = '-9999px';
+                }, 10);
+            });
+        }
+        
+        // Add support for adding multiple files incrementally
+        const addMoreBtn = document.createElement('button');
+        addMoreBtn.type = 'button';
+        addMoreBtn.className = 'btn btn-outline-secondary btn-sm mt-2';
+        addMoreBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add More Files';
+        addMoreBtn.style.display = 'none';
+        addMoreBtn.onclick = function() {
+            document.getElementById('file').click();
+        };
+        
+        const fileList = document.getElementById('fileList');
+        if (fileList) {
+            fileList.appendChild(addMoreBtn);
+            
+            // Show the button when files are selected
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                        const isVisible = fileList.style.display !== 'none';
+                        addMoreBtn.style.display = isVisible ? 'block' : 'none';
+                    }
+                });
+            });
+            observer.observe(fileList, { attributes: true, childList: true, subtree: true });
+        }
+    });
+}
+
 // Form Validation
 function initializeFormValidation() {
     const forms = document.querySelectorAll('form');
