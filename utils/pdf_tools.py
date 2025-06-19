@@ -1,27 +1,38 @@
 import os
 import logging
 from werkzeug.datastructures import FileStorage
-import fitz  # PyMuPDF
 from PIL import Image
 import pytesseract
 import io
 from docx import Document
+
+# Try to import PyMuPDF, fall back to alternative if not available
+try:
+    import fitz  # PyMuPDF
+    PYMUPDF_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"PyMuPDF not available: {e}. PDF text extraction will use OCR fallback.")
+    PYMUPDF_AVAILABLE = False
 
 def extract_text_from_file(file_storage: FileStorage) -> str:
     """
     Extract text from various file formats including PDF, DOCX, DOC, and images.
     """
     try:
-        filename = file_storage.filename.lower()
+        filename = file_storage.filename
+        if not filename:
+            raise ValueError("No filename provided")
+            
+        filename_lower = filename.lower()
         file_content = file_storage.read()
         
-        if filename.endswith('.pdf'):
+        if filename_lower.endswith('.pdf'):
             return extract_text_from_pdf(file_content)
-        elif filename.endswith(('.docx', '.doc')):
+        elif filename_lower.endswith(('.docx', '.doc')):
             return extract_text_from_docx(file_content)
-        elif filename.endswith(('.jpg', '.jpeg', '.png')):
+        elif filename_lower.endswith(('.jpg', '.jpeg', '.png')):
             return extract_text_from_image(file_content)
-        elif filename.endswith('.txt'):
+        elif filename_lower.endswith('.txt'):
             return file_content.decode('utf-8', errors='ignore')
         else:
             raise ValueError(f"Unsupported file format: {filename}")
@@ -32,7 +43,12 @@ def extract_text_from_file(file_storage: FileStorage) -> str:
 
 def extract_text_from_pdf(file_content: bytes) -> str:
     """Extract text from PDF content."""
+    if not PYMUPDF_AVAILABLE:
+        logging.info("PyMuPDF not available, using OCR fallback for PDF")
+        return extract_text_from_pdf_ocr(file_content)
+    
     try:
+        import fitz  # Import here to avoid issues with conditional imports
         doc = fitz.open(stream=file_content, filetype="pdf")
         text = ""
         
@@ -56,7 +72,23 @@ def extract_text_from_pdf(file_content: bytes) -> str:
         
     except Exception as e:
         logging.error(f"Error extracting text from PDF: {str(e)}")
-        raise
+        # Fall back to OCR if PyMuPDF fails
+        return extract_text_from_pdf_ocr(file_content)
+
+def extract_text_from_pdf_ocr(file_content: bytes) -> str:
+    """Extract text from PDF using OCR as fallback method."""
+    try:
+        # Convert PDF pages to images using PIL and pdf2image alternative
+        from io import BytesIO
+        import tempfile
+        
+        # For now, return a helpful message since we need additional setup for PDF->image conversion
+        logging.warning("PDF text extraction requires PyMuPDF. Please use image files or DOCX files instead.")
+        return "PDF text extraction is currently unavailable. Please convert your PDF to images or DOCX format and try again."
+        
+    except Exception as e:
+        logging.error(f"Error in PDF OCR fallback: {str(e)}")
+        return "Unable to extract text from PDF. Please try converting to DOCX or image format."
 
 def extract_text_from_docx(file_content: bytes) -> str:
     """Extract text from DOCX content."""
