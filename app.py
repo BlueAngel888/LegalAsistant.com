@@ -5,6 +5,7 @@ import stripe
 from utils.pdf_tools import extract_text_from_file
 from utils.ai_analyzer import analyze_with_gpt4
 from config import STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY
+from translations import get_translation
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -23,7 +24,9 @@ else:
 
 @app.route('/')
 def index():
-    return render_template('index.html', stripe_public_key=STRIPE_PUBLIC_KEY)
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('index.html', stripe_public_key=STRIPE_PUBLIC_KEY, t=t, lang=lang)
 
 @app.route('/set-language', methods=['POST'])
 def set_language():
@@ -114,8 +117,10 @@ def checkout():
         flash('No document found. Please upload a document first.', 'error')
         return redirect(url_for('index'))
     
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
     processed_files = session.get('processed_files', [])
-    return render_template('checkout.html', files=processed_files)
+    return render_template('checkout.html', files=processed_files, t=t, lang=lang)
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -140,7 +145,10 @@ def create_checkout_session():
             success_url=YOUR_DOMAIN + '/success',
             cancel_url=YOUR_DOMAIN + '/checkout',
         )
-        return redirect(checkout_session.url, code=303)
+        if checkout_session.url:
+            return redirect(checkout_session.url, code=303)
+        else:
+            return redirect(url_for('checkout'))
     except Exception as e:
         logging.error(f"Stripe session creation error: {str(e)}")
         return jsonify(error=str(e)), 403
@@ -156,16 +164,20 @@ def success():
             return redirect(url_for('index'))
         
         # Analyze the document with GPT-4 in user's preferred language
-        user_lang = session.get('language', 'en')
-        analysis = analyze_with_gpt4(doc_text, user_lang)
+        lang = session.get('language', 'en')
+        t = get_translation(lang)
+        analysis = analyze_with_gpt4(doc_text, lang)
         
-        return render_template('result.html', analysis=analysis, files=processed_files)
+        return render_template('result.html', analysis=analysis, files=processed_files, t=t, lang=lang)
         
     except Exception as e:
         logging.error(f"Analysis error: {str(e)}")
+        lang = session.get('language', 'en')
+        t = get_translation(lang)
         return render_template('error.html', 
-                             error_title='Analysis Failed',
-                             error_message='We encountered an error while analyzing your document. Please contact support if this issue persists.')
+                             error_title=t.get('error_occurred', 'Analysis Failed'),
+                             error_message='We encountered an error while analyzing your document. Please contact support if this issue persists.',
+                             t=t, lang=lang)
 
 @app.route('/clear-session')
 def clear_session():
@@ -174,13 +186,19 @@ def clear_session():
 
 @app.errorhandler(404)
 def not_found_error(error):
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
     return render_template('error.html', 
                          error_title='Page Not Found',
-                         error_message='The page you are looking for does not exist.'), 404
+                         error_message='The page you are looking for does not exist.',
+                         t=t, lang=lang), 404
 
 @app.errorhandler(500)
 def internal_error(error):
     logging.error(f"Internal server error: {str(error)}")
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
     return render_template('error.html',
-                         error_title='Internal Server Error',
-                         error_message='An internal server error occurred. Please try again later.'), 500
+                         error_title=t.get('error_occurred', 'Internal Server Error'),
+                         error_message='An internal server error occurred. Please try again later.',
+                         t=t, lang=lang), 500

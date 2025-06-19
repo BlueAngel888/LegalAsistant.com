@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ t['site_title'] }} – {{ t['upload_title'] }}</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; margin: 0; }
+    header {
+      background: #ffffff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .language-select {
+      font-size: 1rem;
+      padding: 0.4rem;
+    }
+    main { padding: 2rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div><strong>{{ t['site_title'] }}</strong></div>
+    <form action="/set-language" method="POST">
+      <label>{{ t['language'] }}:</label>
+      <select class="language-select" name="language" onchange="this.form.submit()">
+        <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+        <option value="ro" {% if lang == 'ro' %}selected{% endif %}>Română</option>
+        <option value="de" {% if lang == 'de' %}selected{% endif %}>Deutsch</option>
+        <option value="it" {% if lang == 'it' %}selected{% endif %}>Italiano</option>
+        <option value="es" {% if lang == 'es' %}selected{% endif %}>Español</option>
+        <option value="ar" {% if lang == 'ar' %}selected{% endif %}>العربية</option>
+      </select>
+    </form>
+  </header>
+
+  <main>
+    <h2>{{ t['upload_title'] }}</h2>
+    <form>
+      <label>{{ t['select_file'] }}</label><br>
+      <input type="file" name="file"><br><br>
+
+      <label>{{ t['or_scan'] }}</label><br>
+      <button type="button">{{ t['capture'] }}</button><br><br>
+
+      <button type="submit">{{ t['continue'] }}</button>
+    </form>
+  </main>
+
+</body>
+</html>
