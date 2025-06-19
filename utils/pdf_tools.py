@@ -6,13 +6,8 @@ import pytesseract
 import io
 from docx import Document
 
-# Try to import PyMuPDF, fall back to alternative if not available
-try:
-    import fitz  # PyMuPDF
-    PYMUPDF_AVAILABLE = True
-except ImportError as e:
-    logging.warning(f"PyMuPDF not available: {e}. PDF text extraction will use OCR fallback.")
-    PYMUPDF_AVAILABLE = False
+# Import PyPDF2 for PDF processing
+import PyPDF2
 
 def extract_text_from_file(file_storage: FileStorage) -> str:
     """
@@ -42,53 +37,31 @@ def extract_text_from_file(file_storage: FileStorage) -> str:
         raise
 
 def extract_text_from_pdf(file_content: bytes) -> str:
-    """Extract text from PDF content."""
-    if not PYMUPDF_AVAILABLE:
-        logging.info("PyMuPDF not available, using OCR fallback for PDF")
-        return extract_text_from_pdf_ocr(file_content)
-    
+    """Extract text from PDF content using PyPDF2."""
     try:
-        import fitz  # Import here to avoid issues with conditional imports
-        doc = fitz.open(stream=file_content, filetype="pdf")
+        pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_content))
         text = ""
         
-        for page_num in range(doc.page_count):
-            page = doc[page_num]
-            page_text = page.get_text()
-            
-            # If no text found, try OCR on the page
-            if not page_text.strip():
-                try:
-                    pix = page.get_pixmap()
-                    img_data = pix.tobytes("png")
-                    page_text = extract_text_from_image(img_data)
-                except Exception as ocr_error:
-                    logging.warning(f"OCR failed for page {page_num + 1}: {str(ocr_error)}")
-            
-            text += f"\n--- Page {page_num + 1} ---\n{page_text}\n"
+        for page_num, page in enumerate(pdf_reader.pages):
+            try:
+                page_text = page.extract_text()
+                
+                # If no text found, try OCR on the page (would need pdf2image for this)
+                if not page_text.strip():
+                    logging.warning(f"No text found on page {page_num + 1}, OCR might be needed")
+                    page_text = f"[Page {page_num + 1} appears to be an image or has no extractable text]"
+                
+                text += f"\n--- Page {page_num + 1} ---\n{page_text}\n"
+                
+            except Exception as page_error:
+                logging.warning(f"Error extracting text from page {page_num + 1}: {str(page_error)}")
+                text += f"\n--- Page {page_num + 1} ---\n[Error extracting text from this page]\n"
         
-        doc.close()
-        return text
+        return text if text.strip() else "No text could be extracted from this PDF."
         
     except Exception as e:
         logging.error(f"Error extracting text from PDF: {str(e)}")
-        # Fall back to OCR if PyMuPDF fails
-        return extract_text_from_pdf_ocr(file_content)
-
-def extract_text_from_pdf_ocr(file_content: bytes) -> str:
-    """Extract text from PDF using OCR as fallback method."""
-    try:
-        # Convert PDF pages to images using PIL and pdf2image alternative
-        from io import BytesIO
-        import tempfile
-        
-        # For now, return a helpful message since we need additional setup for PDF->image conversion
-        logging.warning("PDF text extraction requires PyMuPDF. Please use image files or DOCX files instead.")
-        return "PDF text extraction is currently unavailable. Please convert your PDF to images or DOCX format and try again."
-        
-    except Exception as e:
-        logging.error(f"Error in PDF OCR fallback: {str(e)}")
-        return "Unable to extract text from PDF. Please try converting to DOCX or image format."
+        return f"Error processing PDF: {str(e)}. Please try converting to DOCX or image format."
 
 def extract_text_from_docx(file_content: bytes) -> str:
     """Extract text from DOCX content."""
