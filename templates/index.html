@@ -9,11 +9,10 @@
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-4">
-                    Professional Legal Document Analysis
+                    {{ t.upload_title }}
                 </h1>
                 <p class="lead mb-4">
-                    Get comprehensive AI-powered analysis of your legal documents. 
-                    Upload contracts, agreements, or any legal document for detailed insights and recommendations.
+                    {{ t.upload_description }}
                 </p>
                 <div class="features-list">
                     <div class="feature-item mb-2">
@@ -48,7 +47,7 @@
                     <div class="card-header bg-white py-4">
                         <h2 class="text-center mb-0">
                             <i class="fas fa-upload text-primary me-2"></i>
-                            Upload Your Legal Documents
+                            {{ t.upload_title }}
                         </h2>
                     </div>
                     <div class="card-body p-5">
@@ -75,7 +74,7 @@
                                     <div class="tab-pane fade show active" id="file-upload" role="tabpanel">
                                         <div class="upload-area border border-2 border-dashed rounded p-4 text-center" id="uploadArea">
                                             <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                            <p class="mb-3">Drag and drop your files here or click to browse</p>
+                                            <p class="mb-3">{{ t.drag_drop }}</p>
                                             <input type="file" 
                                                    name="file" 
                                                    id="file" 
@@ -165,7 +164,7 @@
                             
                             <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn" disabled>
                                 <i class="fas fa-arrow-right me-2"></i>
-                                Continue to Payment
+                                {{ t.continue }}
                             </button>
                         </form>
                     </div>
