@@ -75,28 +75,53 @@
                                         <div class="upload-area border border-2 border-dashed rounded p-4 text-center" id="uploadArea">
                                             <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
                                             <p class="mb-3">{{ t.drag_drop }}</p>
+                                            
+                                            <!-- Main file input for desktop -->
                                             <input type="file" 
                                                    name="file" 
                                                    id="file" 
                                                    class="form-control d-none" 
                                                    multiple 
-                                                   accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png"
-                                                   capture="environment">
-                                            <button type="button" class="btn btn-outline-primary btn-lg w-100 mb-3" onclick="document.getElementById('file').click()">
-                                                <i class="fas fa-folder-open me-2"></i>Choose Files
-                                            </button>
+                                                   accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png">
                                             
-                                            <!-- Mobile-specific buttons -->
-                                            <div class="d-block d-md-none">
-                                                <button type="button" class="btn btn-success btn-lg w-100 mb-2" onclick="openMobileCamera()">
-                                                    <i class="fas fa-camera me-2"></i>Take Photo
+                                            <!-- Desktop upload button -->
+                                            <div class="d-none d-md-block">
+                                                <button type="button" class="btn btn-outline-primary btn-lg w-100 mb-3" onclick="triggerFileInput()">
+                                                    <i class="fas fa-folder-open me-2"></i>Choose Files
                                                 </button>
-                                                <input type="file" 
-                                                       id="mobileCamera" 
-                                                       class="d-none" 
-                                                       accept="image/*" 
-                                                       capture="environment"
-                                                       onchange="handleMobilePhoto(this)">
+                                            </div>
+                                            
+                                            <!-- Mobile-specific upload options -->
+                                            <div class="d-block d-md-none">
+                                                <div class="mobile-upload-section">
+                                                    <!-- Direct file input styled as button -->
+                                                    <div class="mb-3">
+                                                        <input type="file" 
+                                                               id="mobileFiles" 
+                                                               class="form-control form-control-lg" 
+                                                               multiple 
+                                                               accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png"
+                                                               onchange="handleMobileFiles(this)"
+                                                               style="padding: 15px; font-size: 16px;">
+                                                        <div class="form-text mt-1">
+                                                            <small>Tap to select multiple files</small>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Camera input -->
+                                                    <div class="mb-2">
+                                                        <input type="file" 
+                                                               id="mobileCamera" 
+                                                               class="form-control form-control-lg" 
+                                                               accept="image/*" 
+                                                               capture="environment"
+                                                               onchange="handleMobilePhoto(this)"
+                                                               style="padding: 15px; font-size: 16px;">
+                                                        <div class="form-text mt-1">
+                                                            <small>Tap to take a photo</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

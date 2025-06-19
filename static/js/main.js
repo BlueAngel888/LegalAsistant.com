@@ -125,11 +125,34 @@ function initializeFileUpload() {
     }
 }
 
-// Mobile Camera Functions
-function openMobileCamera() {
-    const mobileCamera = document.getElementById('mobileCamera');
-    if (mobileCamera) {
-        mobileCamera.click();
+// Desktop file input trigger
+function triggerFileInput() {
+    document.getElementById('file').click();
+}
+
+// Mobile file handling functions
+function handleMobileFiles(input) {
+    if (input.files && input.files.length > 0) {
+        const mainFileInput = document.getElementById('file');
+        const dt = new DataTransfer();
+        
+        // Keep existing files
+        for (let i = 0; i < mainFileInput.files.length; i++) {
+            dt.items.add(mainFileInput.files[i]);
+        }
+        
+        // Add new files
+        for (let i = 0; i < input.files.length; i++) {
+            dt.items.add(input.files[i]);
+        }
+        
+        mainFileInput.files = dt.files;
+        mainFileInput.dispatchEvent(new Event('change'));
+        
+        showSuccessMessage(`${input.files.length} file(s) added successfully!`);
+        
+        // Clear the mobile input for next use
+        input.value = '';
     }
 }
 
@@ -154,58 +177,44 @@ function handleMobilePhoto(input) {
         mainFileInput.dispatchEvent(new Event('change'));
         
         showSuccessMessage('Photo captured successfully!');
+        
+        // Clear the mobile input for next use
+        input.value = '';
     }
 }
 
-// Enhanced mobile file handling
-function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
-
-// Improve file input for mobile
-if (isMobileDevice()) {
-    document.addEventListener('DOMContentLoaded', function() {
-        const fileInput = document.getElementById('file');
-        if (fileInput) {
-            // Make file input more responsive on mobile
-            fileInput.addEventListener('click', function() {
-                // Small delay to ensure mobile browsers properly handle the file picker
-                setTimeout(() => {
-                    this.style.display = 'block';
-                    this.style.opacity = '0';
-                    this.style.position = 'absolute';
-                    this.style.left = '-9999px';
-                }, 10);
-            });
-        }
-        
-        // Add support for adding multiple files incrementally
+// Add more files functionality for all devices
+document.addEventListener('DOMContentLoaded', function() {
+    const fileList = document.getElementById('fileList');
+    if (fileList) {
         const addMoreBtn = document.createElement('button');
         addMoreBtn.type = 'button';
         addMoreBtn.className = 'btn btn-outline-secondary btn-sm mt-2';
         addMoreBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Add More Files';
         addMoreBtn.style.display = 'none';
         addMoreBtn.onclick = function() {
-            document.getElementById('file').click();
+            // Determine which input to trigger based on screen size
+            if (window.innerWidth < 768) {
+                document.getElementById('mobileFiles').click();
+            } else {
+                document.getElementById('file').click();
+            }
         };
         
-        const fileList = document.getElementById('fileList');
-        if (fileList) {
-            fileList.appendChild(addMoreBtn);
-            
-            // Show the button when files are selected
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'childList' || mutation.type === 'attributes') {
-                        const isVisible = fileList.style.display !== 'none';
-                        addMoreBtn.style.display = isVisible ? 'block' : 'none';
-                    }
-                });
+        fileList.appendChild(addMoreBtn);
+        
+        // Show the button when files are selected
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                    const isVisible = fileList.style.display !== 'none';
+                    addMoreBtn.style.display = isVisible ? 'block' : 'none';
+                }
             });
-            observer.observe(fileList, { attributes: true, childList: true, subtree: true });
-        }
-    });
-}
+        });
+        observer.observe(fileList, { attributes: true, childList: true, subtree: true });
+    }
+});
 
 // Form Validation
 function initializeFormValidation() {
