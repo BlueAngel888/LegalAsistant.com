@@ -152,6 +152,11 @@ def checkout():
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
+        # Debug session data
+        logging.info(f"Payment route - Session keys: {list(session.keys())}")
+        logging.info(f"Payment route - doc_text exists: {'doc_text' in session}")
+        logging.info(f"Payment route - doc_text length: {len(session.get('doc_text', ''))}")
+        
         if 'doc_text' not in session:
             logging.error("No document found in session for checkout")
             flash('No document found. Please upload a document first.', 'error')
@@ -194,21 +199,13 @@ def create_checkout_session():
             flash('Payment session creation failed. Please try again.', 'error')
             return redirect(url_for('checkout'))
             
-    except stripe.error.InvalidRequestError as e:
-        logging.error(f"Stripe invalid request error: {str(e)}")
-        flash('Invalid payment request. Please try again.', 'error')
-        return redirect(url_for('checkout'))
-    except stripe.error.AuthenticationError as e:
-        logging.error(f"Stripe authentication error: {str(e)}")
-        flash('Payment system authentication error. Please contact support.', 'error')
-        return redirect(url_for('checkout'))
-    except stripe.error.APIConnectionError as e:
-        logging.error(f"Stripe API connection error: {str(e)}")
-        flash('Payment system connection error. Please try again.', 'error')
-        return redirect(url_for('checkout'))
     except Exception as e:
-        logging.error(f"Stripe session creation error: {str(e)}")
-        flash(f'Payment error: {str(e)}', 'error')
+        if 'Invalid API Key' in str(e):
+            logging.error(f"Stripe authentication error: {str(e)}")
+            flash('Payment system authentication error. Please contact support.', 'error')
+        else:
+            logging.error(f"Stripe session creation error: {str(e)}")
+            flash(f'Payment error: {str(e)}', 'error')
         return redirect(url_for('checkout'))
 
 @app.route('/success')
