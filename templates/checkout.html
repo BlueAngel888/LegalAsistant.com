@@ -116,12 +116,15 @@
                         </div>
 
                         <!-- Payment Button -->
-                        <form action="{{ url_for('create_checkout_session') }}" method="POST">
+                        <form action="{{ url_for('create_checkout_session') }}" method="POST" id="payment-form">
                             <button type="submit" class="btn btn-success btn-lg w-100 py-3" id="checkout-button">
                                 <i class="fas fa-lock me-2"></i>
                                 Secure Payment with Stripe - €100.00
                             </button>
                         </form>
+                        
+                        <!-- Error Display -->
+                        <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
 
                         <div class="security-info text-center mt-4">
                             <p class="text-muted mb-2">
@@ -154,11 +157,26 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const paymentForm = document.getElementById('payment-form');
     const checkoutButton = document.getElementById('checkout-button');
+    const errorMessage = document.getElementById('error-message');
     
-    checkoutButton.addEventListener('click', function() {
-        this.disabled = true;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecting to Stripe...';
+    paymentForm.addEventListener('submit', function(e) {
+        console.log('Form submitted');
+        checkoutButton.disabled = true;
+        checkoutButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecting to Stripe...';
+        errorMessage.style.display = 'none';
+        
+        // Set a timeout to re-enable the button if something goes wrong
+        setTimeout(function() {
+            if (checkoutButton.disabled) {
+                checkoutButton.disabled = false;
+                checkoutButton.innerHTML = '<i class="fas fa-lock me-2"></i>Secure Payment with Stripe - €100.00';
+                errorMessage.textContent = 'Payment session timeout. Please try again.';
+                errorMessage.style.display = 'block';
+                console.error('Payment session timeout');
+            }
+        }, 10000); // 10 second timeout
     });
 });
 </script>

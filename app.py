@@ -122,6 +122,10 @@ def upload_file():
             
         session['processed_files'] = processed_files
         
+        # Debug session data
+        logging.info(f"Session data stored - doc_text length: {len(session.get('doc_text', ''))}")
+        logging.info(f"Session data stored - processed_files: {session.get('processed_files', [])}")
+        
         return redirect(url_for('checkout'))
         
     except Exception as e:
@@ -131,6 +135,11 @@ def upload_file():
 
 @app.route('/checkout')
 def checkout():
+    # Debug session data
+    logging.info(f"Checkout route - Session keys: {list(session.keys())}")
+    logging.info(f"Checkout route - doc_text exists: {'doc_text' in session}")
+    logging.info(f"Checkout route - doc_text length: {len(session.get('doc_text', ''))}")
+    
     if 'doc_text' not in session:
         flash('No document found. Please upload a document first.', 'error')
         return redirect(url_for('index'))
@@ -149,6 +158,13 @@ def create_checkout_session():
             return redirect(url_for('index'))
         
         logging.info(f"Creating Stripe session with domain: {YOUR_DOMAIN}")
+        logging.info(f"Stripe API Key configured: {bool(stripe.api_key and not stripe.api_key.startswith('sk_test_default'))}")
+        
+        # Validate Stripe API key
+        if not stripe.api_key or stripe.api_key.startswith('sk_test_default'):
+            logging.error("Invalid Stripe API key")
+            flash('Payment system configuration error. Please contact support.', 'error')
+            return redirect(url_for('checkout'))
         
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
@@ -178,6 +194,18 @@ def create_checkout_session():
             flash('Payment session creation failed. Please try again.', 'error')
             return redirect(url_for('checkout'))
             
+    except stripe.error.InvalidRequestError as e:
+        logging.error(f"Stripe invalid request error: {str(e)}")
+        flash('Invalid payment request. Please try again.', 'error')
+        return redirect(url_for('checkout'))
+    except stripe.error.AuthenticationError as e:
+        logging.error(f"Stripe authentication error: {str(e)}")
+        flash('Payment system authentication error. Please contact support.', 'error')
+        return redirect(url_for('checkout'))
+    except stripe.error.APIConnectionError as e:
+        logging.error(f"Stripe API connection error: {str(e)}")
+        flash('Payment system connection error. Please try again.', 'error')
+        return redirect(url_for('checkout'))
     except Exception as e:
         logging.error(f"Stripe session creation error: {str(e)}")
         flash(f'Payment error: {str(e)}', 'error')
