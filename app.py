@@ -17,10 +17,20 @@ app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_devel
 stripe.api_key = STRIPE_SECRET_KEY
 
 # Configure domain for Stripe redirects
-if os.environ.get('REPLIT_DEPLOYMENT'):
-    YOUR_DOMAIN = f"https://{os.environ.get('REPLIT_DEV_DOMAIN')}"
-else:
-    YOUR_DOMAIN = f"https://{os.environ.get('REPLIT_DOMAINS', 'localhost:5000').split(',')[0]}"
+def get_domain():
+    if os.environ.get('REPLIT_DEPLOYMENT'):
+        dev_domain = os.environ.get('REPLIT_DEV_DOMAIN')
+        if dev_domain:
+            return f"https://{dev_domain}"
+    
+    replit_domains = os.environ.get('REPLIT_DOMAINS')
+    if replit_domains:
+        domain = replit_domains.split(',')[0]
+        return f"https://{domain}"
+    
+    return "http://localhost:5000"
+
+YOUR_DOMAIN = get_domain()
 
 @app.route('/')
 def index():
@@ -100,8 +110,16 @@ def upload_file():
             flash('No text could be extracted from the uploaded files or scanned document. Please check your documents and try again.', 'error')
             return redirect(url_for('index'))
         
-        # Store document text and file info in session
-        session['doc_text'] = "\n\n--- Document Separator ---\n\n".join(texts)
+        # Store document text and file info in session (compress for large texts)
+        doc_text = "\n\n--- Document Separator ---\n\n".join(texts)
+        
+        # If text is too large, truncate and store summary instead
+        if len(doc_text) > 10000:  # 10KB limit for session
+            session['doc_text'] = doc_text[:10000] + "\n\n[Document truncated for session storage - full text will be analyzed]"
+            session['full_doc_text'] = doc_text  # Store full text temporarily
+        else:
+            session['doc_text'] = doc_text
+            
         session['processed_files'] = processed_files
         
         return redirect(url_for('checkout'))
@@ -126,7 +144,11 @@ def checkout():
 def create_checkout_session():
     try:
         if 'doc_text' not in session:
-            return jsonify(error='No document found in session'), 400
+            logging.error("No document found in session for checkout")
+            flash('No document found. Please upload a document first.', 'error')
+            return redirect(url_for('index'))
+        
+        logging.info(f"Creating Stripe session with domain: {YOUR_DOMAIN}")
         
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
@@ -145,18 +167,27 @@ def create_checkout_session():
             success_url=YOUR_DOMAIN + '/success',
             cancel_url=YOUR_DOMAIN + '/checkout',
         )
+        
+        logging.info(f"Stripe session created successfully with ID: {checkout_session.id}")
+        logging.info(f"Redirect URL: {checkout_session.url}")
+        
         if checkout_session.url:
             return redirect(checkout_session.url, code=303)
         else:
+            logging.error("No redirect URL in Stripe session")
+            flash('Payment session creation failed. Please try again.', 'error')
             return redirect(url_for('checkout'))
+            
     except Exception as e:
         logging.error(f"Stripe session creation error: {str(e)}")
-        return jsonify(error=str(e)), 403
+        flash(f'Payment error: {str(e)}', 'error')
+        return redirect(url_for('checkout'))
 
 @app.route('/success')
 def success():
     try:
-        doc_text = session.get('doc_text', '')
+        # Use full document text if available, otherwise use truncated version
+        doc_text = session.get('full_doc_text') or session.get('doc_text', '')
         processed_files = session.get('processed_files', [])
         
         if not doc_text:
@@ -167,6 +198,10 @@ def success():
         lang = session.get('language', 'en')
         t = get_translation(lang)
         analysis = analyze_with_gpt4(doc_text, lang)
+        
+        # Clear the full document text from session after analysis
+        if 'full_doc_text' in session:
+            del session['full_doc_text']
         
         return render_template('result.html', analysis=analysis, files=processed_files, t=t, lang=lang)
         
