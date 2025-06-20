@@ -41,6 +41,85 @@
 <!-- Upload Section -->
 <section class="py-5">
     <div class="container">
+        <!-- Gamification Progress Bar -->
+        {% if user_stats %}
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8">
+                <div class="gamification-header">
+                    <div class="user-progress-card">
+                        <div class="progress-info">
+                            <div class="level-badge">
+                                <span class="level-text">Level {{ user_stats.level }}</span>
+                            </div>
+                            <div class="xp-info">
+                                <span class="xp-text">{{ user_stats.total_xp }} XP</span>
+                                <span class="xp-next">{{ user_stats.next_level_xp - user_stats.total_xp }} to next level</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ user_stats.progress_percentage }}%"></div>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <span class="stat-number">{{ user_stats.documents_uploaded }}</span>
+                                <span class="stat-label">Documents</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{ user_stats.documents_analyzed }}</span>
+                                <span class="stat-label">Analyzed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{ user_stats.achievements_count }}</span>
+                                <span class="stat-label">Achievements</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Achievement Notifications -->
+        {% if gamification_result %}
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8">
+                <div class="achievement-notifications" id="achievementNotifications">
+                    {% if gamification_result.level_up %}
+                    <div class="achievement-item level-up">
+                        <div class="achievement-icon">🎉</div>
+                        <div class="achievement-content">
+                            <h4>Level Up!</h4>
+                            <p>You reached Level {{ gamification_result.new_level }}!</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if gamification_result.xp_gained > 0 %}
+                    <div class="achievement-item xp-gained">
+                        <div class="achievement-icon">⭐</div>
+                        <div class="achievement-content">
+                            <h4>+{{ gamification_result.xp_gained }} XP</h4>
+                            <p>Great job uploading documents!</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% for achievement in gamification_result.earned_achievements %}
+                    <div class="achievement-item {{ achievement.rarity }}">
+                        <div class="achievement-icon">{{ achievement.icon }}</div>
+                        <div class="achievement-content">
+                            <h4>{{ achievement.name }}</h4>
+                            <p>{{ achievement.description }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow-lg border-0">
