@@ -32,6 +32,8 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 
 # Import and initialize database
 from models import db, DocumentAnalysis, User, PaymentRecord
+from models_gamification import UserProgress, Achievement
+from utils.gamification import GamificationService
 from flask_migrate import Migrate
 
 db.init_app(app)
@@ -43,6 +45,8 @@ stripe.api_key = STRIPE_SECRET_KEY
 # Create database tables
 with app.app_context():
     db.create_all()
+    # Initialize gamification system
+    GamificationService.initialize_gamification()
 
 # Configure domain for Stripe redirects
 def get_domain():
@@ -89,8 +93,18 @@ def index():
     
     lang = session.get('language', 'en')
     t = get_translation(lang)
+    
+    # Get user stats for gamification display
+    user_stats = GamificationService.get_user_stats(
+        session.get('session_id', session.get('_id', 'anonymous'))
+    )
+    
     logging.info(f"Index route accessed - Session language: {lang}")
-    return render_template('index.html', stripe_public_key=STRIPE_PUBLIC_KEY, t=t, lang=lang)
+    return render_template('index.html', 
+                         stripe_public_key=STRIPE_PUBLIC_KEY, 
+                         user_stats=user_stats,
+                         gamification_result=session.pop('gamification_result', None),
+                         t=t, lang=lang)
 
 @app.route('/set-language', methods=['POST'])
 def set_language():
@@ -218,12 +232,32 @@ def upload_file():
             
         session['processed_files'] = processed_files
         
+        # Track gamification progress
+        is_photo = any(f.lower().endswith(('.jpg', '.jpeg', '.png')) for f in processed_files)
+        is_multiple = len(files) > 1
+        gamification_result = GamificationService.track_document_upload(
+            session.get('session_id', session.get('_id', 'anonymous')),
+            file_count=len(files),
+            is_photo=is_photo,
+            is_multiple=is_multiple
+        )
+        
+        # Store gamification results in session for display
+        session['gamification_result'] = {
+            'xp_gained': gamification_result['xp_gained'],
+            'level_up': gamification_result['level_up'],
+            'new_level': gamification_result['new_level'],
+            'earned_achievements': [{'name': a.name, 'description': a.description, 'icon': a.icon, 'rarity': a.rarity} 
+                                  for a in gamification_result['earned_achievements']]
+        }
+        
         # Force session to be saved
         session.modified = True
         
         # Debug session data
         logging.info(f"Session data stored - doc_text length: {len(session.get('doc_text', ''))}")
         logging.info(f"Session data stored - processed_files: {session.get('processed_files', [])}")
+        logging.info(f"Gamification result: {gamification_result['xp_gained']} XP gained, Level: {gamification_result['new_level']}")
         logging.info(f"Session modified flag set: {session.modified}")
         
         return redirect(url_for('checkout'))
@@ -402,11 +436,35 @@ def success():
         except Exception as db_error:
             logging.error(f"Database error storing analysis: {str(db_error)}")
         
+        # Track gamification progress for completed analysis
+        analysis_gamification = GamificationService.track_document_analysis(
+            session.get('session_id', session.get('_id', 'anonymous'))
+        )
+        
+        # Store analysis gamification results in session
+        session['analysis_gamification'] = {
+            'xp_gained': analysis_gamification['xp_gained'],
+            'level_up': analysis_gamification['level_up'],
+            'new_level': analysis_gamification['new_level'],
+            'earned_achievements': [{'name': a.name, 'description': a.description, 'icon': a.icon, 'rarity': a.rarity} 
+                                  for a in analysis_gamification['earned_achievements']]
+        }
+        
+        # Get complete user stats for display
+        user_stats = GamificationService.get_user_stats(
+            session.get('session_id', session.get('_id', 'anonymous'))
+        )
+        
         # Clear the full document text from session after analysis
         if 'full_doc_text' in session:
             del session['full_doc_text']
         
-        return render_template('result.html', analysis=analysis, files=processed_files, t=t, lang=lang)
+        return render_template('result.html', 
+                             analysis=analysis, 
+                             files=processed_files, 
+                             user_stats=user_stats,
+                             analysis_gamification=session.get('analysis_gamification'),
+                             t=t, lang=lang)
         
     except Exception as e:
         logging.error(f"Analysis error: {str(e)}")
