@@ -40,7 +40,9 @@ migrate = Migrate(app, db)
 # Configure Stripe
 stripe.api_key = STRIPE_SECRET_KEY
 
-# Database tables will be created via migrations
+# Create database tables
+with app.app_context():
+    db.create_all()
 
 # Configure domain for Stripe redirects
 def get_domain():
