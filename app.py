@@ -18,19 +18,28 @@ stripe.api_key = STRIPE_SECRET_KEY
 
 # Configure domain for Stripe redirects
 def get_domain():
+    # Check for Replit deployment first
     if os.environ.get('REPLIT_DEPLOYMENT'):
         dev_domain = os.environ.get('REPLIT_DEV_DOMAIN')
         if dev_domain:
             return f"https://{dev_domain}"
     
+    # Check for Replit domains
     replit_domains = os.environ.get('REPLIT_DOMAINS')
     if replit_domains:
-        domain = replit_domains.split(',')[0]
+        domain = replit_domains.split(',')[0].strip()
         return f"https://{domain}"
     
+    # Check for dev domain
+    dev_domain = os.environ.get('REPLIT_DEV_DOMAIN')
+    if dev_domain:
+        return f"https://{dev_domain}"
+    
+    # Fallback to localhost
     return "http://localhost:5000"
 
 YOUR_DOMAIN = get_domain()
+logging.info(f"Application domain configured as: {YOUR_DOMAIN}")
 
 @app.route('/')
 def index():
@@ -49,12 +58,26 @@ def set_language():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
+        # Ensure session is properly initialized
+        if 'language' not in session:
+            session['language'] = 'en'
+        
+        # Clear any previous session data
+        session.pop('doc_text', None)
+        session.pop('full_doc_text', None)
+        session.pop('processed_files', None)
+        session.pop('stripe_session_id', None)
+        
+        logging.info(f"Starting file upload process - Session ID: {session.get('_id', 'new')}")
+        
         # Handle scanned image from camera
         scanned_base64 = request.form.get('scannedImage')
         files = request.files.getlist('file')
         camera_files = request.files.getlist('camera')
         texts = []
         processed_files = []
+        
+        logging.info(f"Upload request - Files: {len(files)}, Camera files: {len(camera_files)}, Scanned: {bool(scanned_base64)}")
 
         # Process scanned image if provided
         if scanned_base64:
@@ -164,7 +187,9 @@ def create_checkout_session():
             flash('No document found. Please upload a document first.', 'error')
             return redirect(url_for('index'))
         
-        logging.info(f"Creating Stripe session with domain: {YOUR_DOMAIN}")
+        # Get current domain dynamically
+        current_domain = get_domain()
+        logging.info(f"Creating Stripe session with domain: {current_domain}")
         logging.info(f"Stripe API Key configured: {bool(stripe.api_key and not stripe.api_key.startswith('sk_test_default'))}")
         
         # Validate Stripe API key
@@ -187,14 +212,18 @@ def create_checkout_session():
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=YOUR_DOMAIN + '/success',
-            cancel_url=YOUR_DOMAIN + '/checkout',
+            success_url=current_domain + '/success',
+            cancel_url=current_domain + '/checkout',
+            allow_promotion_codes=False,
+            billing_address_collection='auto'
         )
         
         logging.info(f"Stripe session created successfully with ID: {checkout_session.id}")
         logging.info(f"Redirect URL: {checkout_session.url}")
         
         if checkout_session.url:
+            # Store session ID for verification
+            session['stripe_session_id'] = checkout_session.id
             return redirect(checkout_session.url, code=303)
         else:
             logging.error("No redirect URL in Stripe session")
@@ -202,12 +231,20 @@ def create_checkout_session():
             return redirect(url_for('checkout'))
             
     except Exception as e:
-        if 'Invalid API Key' in str(e):
-            logging.error(f"Stripe authentication error: {str(e)}")
+        error_msg = str(e)
+        if 'Invalid API Key' in error_msg or 'authentication' in error_msg.lower():
+            logging.error(f"Stripe authentication error: {error_msg}")
             flash('Payment system authentication error. Please contact support.', 'error')
+        elif 'invalid request' in error_msg.lower():
+            logging.error(f"Stripe invalid request error: {error_msg}")
+            flash('Payment configuration error. Please try again or contact support.', 'error')
         else:
-            logging.error(f"Stripe session creation error: {str(e)}")
-            flash(f'Payment error: {str(e)}', 'error')
+            logging.error(f"Stripe session creation error: {error_msg}")
+            flash(f'Payment error: {error_msg}', 'error')
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Stripe session creation error: {str(e)}")
+        flash(f'Payment error: {str(e)}', 'error')
         return redirect(url_for('checkout'))
 
 @app.route('/success')
