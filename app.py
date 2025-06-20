@@ -19,11 +19,16 @@ app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_devel
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
 
 # Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///legal_assistant.db")
+database_url = os.environ.get("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    # Fix for newer SQLAlchemy versions
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///legal_assistant.db"
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
-}
+} if database_url else {}
 
 # Import and initialize database
 from models import db, DocumentAnalysis, User, PaymentRecord
@@ -35,9 +40,7 @@ migrate = Migrate(app, db)
 # Configure Stripe
 stripe.api_key = STRIPE_SECRET_KEY
 
-# Create database tables
-with app.app_context():
-    db.create_all()
+# Database tables will be created via migrations
 
 # Configure domain for Stripe redirects
 def get_domain():
