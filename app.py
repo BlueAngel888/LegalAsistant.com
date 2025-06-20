@@ -46,12 +46,23 @@ with app.app_context():
 
 # Configure domain for Stripe redirects
 def get_domain():
-    # Check for Replit deployment first
-    if os.environ.get('REPLIT_DEPLOYMENT'):
-        dev_domain = os.environ.get('REPLIT_DEV_DOMAIN')
-        if dev_domain:
-            return f"https://{dev_domain}"
+    # Use request context if available
+    try:
+        # Get the host from the current request
+        host = request.headers.get('Host')
+        if host:
+            # Ensure we use HTTPS for external domains
+            if 'replit.dev' in host or 'replit.app' in host:
+                return f"https://{host}"
+            elif 'localhost' in host:
+                return f"http://{host}"
+            else:
+                return f"https://{host}"
+    except RuntimeError:
+        # No request context available
+        pass
     
+    # Fallback to environment variables
     # Check for Replit domains
     replit_domains = os.environ.get('REPLIT_DOMAINS')
     if replit_domains:
@@ -253,7 +264,13 @@ def create_checkout_session():
         
         # Get current domain dynamically
         current_domain = get_domain()
+        success_url = current_domain + '/success'
+        cancel_url = current_domain + '/checkout'
+        
         logging.info(f"Creating Stripe session with domain: {current_domain}")
+        logging.info(f"Success URL: {success_url}")
+        logging.info(f"Cancel URL: {cancel_url}")
+        logging.info(f"Request Host: {request.headers.get('Host', 'Not available')}")
         logging.info(f"Stripe API Key configured: {bool(stripe.api_key and not stripe.api_key.startswith('sk_test_default'))}")
         
         # Validate Stripe API key
@@ -276,8 +293,8 @@ def create_checkout_session():
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=current_domain + '/success',
-            cancel_url=current_domain + '/checkout',
+            success_url=success_url,
+            cancel_url=cancel_url,
             allow_promotion_codes=False,
             billing_address_collection='auto'
         )
