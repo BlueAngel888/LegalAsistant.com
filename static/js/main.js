@@ -172,11 +172,15 @@ function initializeFileUpload() {
         selectedFiles.splice(index, 1);
         updateFileInputValue();
         updateFileDisplay();
+        updateSubmitButton();
         
         if (selectedFiles.length === 0) {
             filePreview.style.display = 'none';
         }
     };
+
+    // Initialize submit button state
+    updateSubmitButton();
 }
 
     function updateFileDisplay(files) {
