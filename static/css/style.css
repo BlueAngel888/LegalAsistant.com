@@ -300,6 +300,286 @@ footer {
     .hero-section h1 {
         font-size: 1.75rem !important;
     }
+}
+
+/* Modern File Upload Styles */
+.modern-upload-area {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-zone:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+}
+
+.upload-zone.dragover {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+    transform: scale(1.02);
+    box-shadow: 0 25px 50px rgba(16, 185, 129, 0.15);
+}
+
+.upload-icon-container {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.upload-icon {
+    color: #64748b;
+    transition: all 0.3s ease;
+}
+
+.upload-zone:hover .upload-icon {
+    color: #3b82f6;
+    transform: translateY(-4px);
+}
+
+.upload-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.upload-subtitle {
+    color: #64748b;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+}
+
+.supported-formats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.format-badge {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.file-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* File Preview Area */
+.file-preview-area {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.preview-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.file-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.file-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.file-details h5 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.file-details small {
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+.btn-clear-files {
+    background: none;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 1rem;
+}
+
+.btn-clear-files:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* Mobile Camera Input */
+.mobile-camera-input {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.camera-input {
+    display: none;
+}
+
+.camera-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.camera-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+    color: white;
+}
+
+/* Loading and Animation States */
+.upload-zone.uploading {
+    pointer-events: none;
+}
+
+.upload-zone.uploading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.uploading .upload-icon {
+    animation: pulse 2s infinite;
+}
+
+/* Modern Upload Responsive Design */
+@media (max-width: 768px) {
+    .modern-upload-area {
+        padding: 1.5rem;
+    }
+    
+    .upload-zone {
+        padding: 2rem 1rem;
+        min-height: 240px;
+    }
+    
+    .upload-title {
+        font-size: 1.25rem;
+    }
+    
+    .supported-formats {
+        gap: 0.25rem;
+    }
+    
+    .format-badge {
+        font-size: 0.6875rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    .hero-section h1 {
+        font-size: 1.75rem !important;
+    }
     
     .display-4 {
         font-size: 2rem !important;

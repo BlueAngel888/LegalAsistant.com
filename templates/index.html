@@ -72,30 +72,61 @@
                                 <div class="tab-content" id="uploadTabContent">
                                     <!-- File Upload Tab -->
                                     <div class="tab-pane fade show active" id="file-upload" role="tabpanel">
-                                        <div class="upload-area border border-2 border-dashed rounded p-4 text-center" id="uploadArea">
-                                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                            <p class="mb-3">{{ t.drag_drop }}</p>
+                                        <div class="modern-upload-area" id="uploadArea">
+                                            <div class="upload-zone" id="dropZone">
+                                                <div class="upload-icon-container">
+                                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="upload-icon">
+                                                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M7 10L12 5L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M12 5V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                </div>
+                                                <h3 class="upload-title">Drop your documents here</h3>
+                                                <p class="upload-subtitle">or click to browse files</p>
+                                                <div class="supported-formats">
+                                                    <span class="format-badge">PDF</span>
+                                                    <span class="format-badge">DOCX</span>
+                                                    <span class="format-badge">DOC</span>
+                                                    <span class="format-badge">TXT</span>
+                                                    <span class="format-badge">JPG</span>
+                                                    <span class="format-badge">PNG</span>
+                                                </div>
+                                                <input type="file" 
+                                                       name="file" 
+                                                       id="file" 
+                                                       class="file-input" 
+                                                       multiple 
+                                                       accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png">
+                                            </div>
                                             
-                                            <!-- Unified file input that works on all devices -->
-                                            <input type="file" 
-                                                   name="file" 
-                                                   id="file" 
-                                                   class="form-control form-control-lg mb-3" 
-                                                   multiple 
-                                                   accept=".pdf,.docx,.doc,.txt,.jpg,.jpeg,.png"
-                                                   style="padding: 15px; font-size: 16px; border: 2px solid #3b82f6;">
+                                            <!-- File Preview Area -->
+                                            <div class="file-preview-area" id="filePreview" style="display: none;">
+                                                <h4 class="preview-title">Selected Files</h4>
+                                                <div class="file-list" id="fileList"></div>
+                                                <button type="button" class="btn-clear-files" id="clearFiles">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    Clear all files
+                                                </button>
+                                            </div>
                                             
-                                            <!-- Add camera input for mobile -->
-                                            <div class="d-block d-md-none mt-3">
+                                            <!-- Mobile Camera Input -->
+                                            <div class="mobile-camera-input d-block d-md-none">
                                                 <input type="file" 
                                                        name="camera" 
-                                                       class="form-control form-control-lg" 
+                                                       id="cameraInput"
+                                                       class="camera-input" 
                                                        accept="image/*" 
-                                                       capture="environment"
-                                                       style="padding: 15px; font-size: 16px; border: 2px solid #059669;">
-                                                <div class="form-text mt-1">
-                                                    <small class="text-muted">Use this to take photos with your camera</small>
-                                                </div>
+                                                       capture="environment">
+                                                <label for="cameraInput" class="camera-btn">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    Take Photo
+                                                </label>
                                             </div>
                                         </div>
                                     </div>

@@ -8,46 +8,176 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeScrollEffects();
 });
 
-// File Upload Functionality
+// Modern File Upload Functionality
 function initializeFileUpload() {
     const fileInput = document.getElementById('file');
+    const cameraInput = document.getElementById('cameraInput');
+    const dropZone = document.getElementById('dropZone');
+    const filePreview = document.getElementById('filePreview');
     const fileList = document.getElementById('fileList');
-    const selectedFiles = document.getElementById('selectedFiles');
-    const submitBtn = document.getElementById('submitBtn');
+    const clearFilesBtn = document.getElementById('clearFiles');
+    
+    let selectedFiles = [];
 
-    if (!fileInput) return;
+    if (!fileInput || !dropZone) return;
 
-    // Handle file selection display
-    fileInput.addEventListener('change', function() {
-        const files = Array.from(this.files);
-        updateFileDisplay(files);
+    // Handle file input change
+    fileInput.addEventListener('change', function(e) {
+        handleFileSelection(Array.from(e.target.files));
     });
 
-    // Simple drag and drop for desktop only
-    const uploadArea = document.getElementById('uploadArea');
-    if (uploadArea && window.innerWidth >= 768) {
-        uploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.classList.add('border-primary');
-        });
-
-        uploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.classList.remove('border-primary');
-        });
-
-        uploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.classList.remove('border-primary');
-            
-            const files = e.dataTransfer.files;
-            fileInput.files = files;
-            fileInput.dispatchEvent(new Event('change'));
+    // Handle camera input change
+    if (cameraInput) {
+        cameraInput.addEventListener('change', function(e) {
+            handleFileSelection(Array.from(e.target.files));
         });
     }
+
+    // Modern drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    // Click to upload
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // Clear files functionality
+    if (clearFilesBtn) {
+        clearFilesBtn.addEventListener('click', clearAllFiles);
+    }
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight() {
+        dropZone.classList.add('dragover');
+    }
+
+    function unhighlight() {
+        dropZone.classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFileSelection(Array.from(files));
+    }
+
+    function handleFileSelection(files) {
+        // Filter valid file types
+        const validTypes = ['.pdf', '.docx', '.doc', '.txt', '.jpg', '.jpeg', '.png'];
+        const validFiles = files.filter(file => {
+            const extension = '.' + file.name.split('.').pop().toLowerCase();
+            return validTypes.includes(extension);
+        });
+
+        if (validFiles.length !== files.length) {
+            showErrorMessage('Some files were skipped due to unsupported file types.');
+        }
+
+        // Add new files to selection
+        selectedFiles = [...selectedFiles, ...validFiles];
+        
+        // Update file input
+        updateFileInputValue();
+        
+        // Update display
+        updateFileDisplay();
+        
+        // Show preview area
+        if (selectedFiles.length > 0) {
+            filePreview.style.display = 'block';
+        }
+    }
+
+    function updateFileInputValue() {
+        // Create a new DataTransfer object to update the file input
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        fileInput.files = dt.files;
+    }
+
+    function updateFileDisplay() {
+        if (!fileList) return;
+        
+        fileList.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+            const fileItem = createFileItem(file, index);
+            fileList.appendChild(fileItem);
+        });
+        
+        // Update submit button state
+        updateSubmitButton();
+    }
+
+    function updateSubmitButton() {
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = selectedFiles.length === 0;
+        }
+    }
+
+    function createFileItem(file, index) {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        
+        const fileExtension = file.name.split('.').pop().toUpperCase();
+        const fileSize = formatFileSize(file.size);
+        
+        fileItem.innerHTML = `
+            <div class="file-info">
+                <div class="file-icon">${fileExtension}</div>
+                <div class="file-details">
+                    <h5>${file.name}</h5>
+                    <small>${fileSize}</small>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        `;
+        
+        return fileItem;
+    }
+
+    function clearAllFiles() {
+        selectedFiles = [];
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        updateFileDisplay();
+        updateSubmitButton();
+    }
+
+    // Make removeFile function global
+    window.removeFile = function(index) {
+        selectedFiles.splice(index, 1);
+        updateFileInputValue();
+        updateFileDisplay();
+        
+        if (selectedFiles.length === 0) {
+            filePreview.style.display = 'none';
+        }
+    };
+}
 
     function updateFileDisplay(files) {
         if (!fileList || !selectedFiles || !submitBtn) return;
