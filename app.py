@@ -43,8 +43,14 @@ logging.info(f"Application domain configured as: {YOUR_DOMAIN}")
 
 @app.route('/')
 def index():
+    # Initialize session if needed
+    if 'language' not in session:
+        session['language'] = 'en'
+        session.permanent = True
+    
     lang = session.get('language', 'en')
     t = get_translation(lang)
+    logging.info(f"Index route accessed - Session language: {lang}")
     return render_template('index.html', stripe_public_key=STRIPE_PUBLIC_KEY, t=t, lang=lang)
 
 @app.route('/set-language', methods=['POST'])
@@ -147,9 +153,13 @@ def upload_file():
             
         session['processed_files'] = processed_files
         
+        # Force session to be saved
+        session.modified = True
+        
         # Debug session data
         logging.info(f"Session data stored - doc_text length: {len(session.get('doc_text', ''))}")
         logging.info(f"Session data stored - processed_files: {session.get('processed_files', [])}")
+        logging.info(f"Session modified flag set: {session.modified}")
         
         return redirect(url_for('checkout'))
         
@@ -242,10 +252,6 @@ def create_checkout_session():
             logging.error(f"Stripe session creation error: {error_msg}")
             flash(f'Payment error: {error_msg}', 'error')
         return redirect(url_for('checkout'))
-    except Exception as e:
-        logging.error(f"Stripe session creation error: {str(e)}")
-        flash(f'Payment error: {str(e)}', 'error')
-        return redirect(url_for('checkout'))
 
 @app.route('/success')
 def success():
@@ -282,6 +288,20 @@ def success():
 def clear_session():
     session.clear()
     return redirect(url_for('index'))
+
+@app.route('/debug-info')
+def debug_info():
+    """Debug endpoint to check domain and session configuration"""
+    return {
+        'domain': get_domain(),
+        'session_keys': list(session.keys()),
+        'session_id': session.get('_id', 'none'),
+        'language': session.get('language', 'not_set'),
+        'has_doc_text': 'doc_text' in session,
+        'doc_text_length': len(session.get('doc_text', '')),
+        'stripe_configured': bool(stripe.api_key and not stripe.api_key.startswith('sk_test_default')),
+        'openai_configured': bool(os.environ.get('OPENAI_API_KEY') and not os.environ.get('OPENAI_API_KEY').startswith('sk-default'))
+    }
 
 @app.errorhandler(404)
 def not_found_error(error):
