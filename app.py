@@ -1,6 +1,9 @@
 import os
 import logging
+import json
+import uuid
 from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 import stripe
 from utils.pdf_tools import extract_text_from_file
 from utils.ai_analyzer import analyze_with_gpt4
@@ -12,9 +15,25 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_development")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
+
+# Configure the database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///legal_assistant.db")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+
+# Import and initialize database
+from models import db, DocumentAnalysis, User, PaymentRecord
+db.init_app(app)
 
 # Configure Stripe
 stripe.api_key = STRIPE_SECRET_KEY
+
+# Create database tables
+with app.app_context():
+    db.create_all()
 
 # Configure domain for Stripe redirects
 def get_domain():
@@ -144,6 +163,32 @@ def upload_file():
         # Store document text and file info in session (compress for large texts)
         doc_text = "\n\n--- Document Separator ---\n\n".join(texts)
         
+        # Create database record for the document analysis
+        try:
+            # Get or create session ID
+            if '_id' not in session:
+                session['_id'] = str(uuid.uuid4())
+                session.permanent = True
+            
+            analysis_record = DocumentAnalysis(
+                session_id=session['_id'],
+                file_names=json.dumps(processed_files),
+                document_text=doc_text,
+                language=session.get('language', 'en'),
+                payment_status='pending'
+            )
+            
+            db.session.add(analysis_record)
+            db.session.commit()
+            
+            # Store analysis ID in session
+            session['analysis_id'] = analysis_record.id
+            logging.info(f"Document analysis record created with ID: {analysis_record.id}")
+            
+        except Exception as db_error:
+            logging.error(f"Database error: {str(db_error)}")
+            # Continue without database storage if DB fails
+            
         # If text is too large, truncate and store summary instead
         if len(doc_text) > 10000:  # 10KB limit for session
             session['doc_text'] = doc_text[:10000] + "\n\n[Document truncated for session storage - full text will be analyzed]"
@@ -300,7 +345,7 @@ def debug_info():
         'has_doc_text': 'doc_text' in session,
         'doc_text_length': len(session.get('doc_text', '')),
         'stripe_configured': bool(stripe.api_key and not stripe.api_key.startswith('sk_test_default')),
-        'openai_configured': bool(os.environ.get('OPENAI_API_KEY') and not os.environ.get('OPENAI_API_KEY').startswith('sk-default'))
+        'openai_configured': bool(os.environ.get('OPENAI_API_KEY'))
     }
 
 @app.errorhandler(404)
