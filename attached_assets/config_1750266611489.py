@@ -1,3 +1,0 @@
-STRIPE_PUBLIC_KEY = "pk_live_XXXX"
-STRIPE_SECRET_KEY = "sk_live_XXXX"
-OPENAI_API_KEY = "sk-XXXX"
