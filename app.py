@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import uuid
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 import stripe
@@ -276,6 +277,31 @@ def create_checkout_session():
         logging.info(f"Stripe session created successfully with ID: {checkout_session.id}")
         logging.info(f"Redirect URL: {checkout_session.url}")
         
+        # Create payment record in database
+        try:
+            analysis_id = session.get('analysis_id')
+            if analysis_id:
+                payment_record = PaymentRecord(
+                    stripe_session_id=checkout_session.id,
+                    document_analysis_id=analysis_id,
+                    amount=10000,  # €100.00 in cents
+                    currency='EUR',
+                    status='pending'
+                )
+                db.session.add(payment_record)
+                
+                # Update analysis record with Stripe session ID
+                analysis = DocumentAnalysis.query.get(analysis_id)
+                if analysis:
+                    analysis.stripe_session_id = checkout_session.id
+                
+                db.session.commit()
+                logging.info(f"Payment record created for analysis ID: {analysis_id}")
+                
+        except Exception as db_error:
+            logging.error(f"Database error creating payment record: {str(db_error)}")
+            # Continue with payment flow even if database fails
+        
         if checkout_session.url:
             # Store session ID for verification
             session['stripe_session_id'] = checkout_session.id
@@ -301,6 +327,29 @@ def create_checkout_session():
 @app.route('/success')
 def success():
     try:
+        # Update payment status in database
+        try:
+            stripe_session_id = session.get('stripe_session_id')
+            analysis_id = session.get('analysis_id')
+            
+            if stripe_session_id and analysis_id:
+                # Update payment record
+                payment_record = PaymentRecord.query.filter_by(stripe_session_id=stripe_session_id).first()
+                if payment_record:
+                    payment_record.status = 'completed'
+                    payment_record.completed_at = datetime.utcnow()
+                
+                # Update analysis record
+                analysis_record = DocumentAnalysis.query.get(analysis_id)
+                if analysis_record:
+                    analysis_record.payment_status = 'completed'
+                
+                db.session.commit()
+                logging.info(f"Payment status updated for analysis ID: {analysis_id}")
+                
+        except Exception as db_error:
+            logging.error(f"Database error updating payment status: {str(db_error)}")
+        
         # Use full document text if available, otherwise use truncated version
         doc_text = session.get('full_doc_text') or session.get('doc_text', '')
         processed_files = session.get('processed_files', [])
@@ -313,6 +362,20 @@ def success():
         lang = session.get('language', 'en')
         t = get_translation(lang)
         analysis = analyze_with_gpt4(doc_text, lang)
+        
+        # Store analysis result in database
+        try:
+            analysis_id = session.get('analysis_id')
+            if analysis_id:
+                analysis_record = DocumentAnalysis.query.get(analysis_id)
+                if analysis_record:
+                    analysis_record.analysis_result = analysis
+                    analysis_record.updated_at = datetime.utcnow()
+                    db.session.commit()
+                    logging.info(f"Analysis result stored for ID: {analysis_id}")
+                    
+        except Exception as db_error:
+            logging.error(f"Database error storing analysis: {str(db_error)}")
         
         # Clear the full document text from session after analysis
         if 'full_doc_text' in session:
@@ -345,8 +408,54 @@ def debug_info():
         'has_doc_text': 'doc_text' in session,
         'doc_text_length': len(session.get('doc_text', '')),
         'stripe_configured': bool(stripe.api_key and not stripe.api_key.startswith('sk_test_default')),
-        'openai_configured': bool(os.environ.get('OPENAI_API_KEY'))
+        'openai_configured': bool(os.environ.get('OPENAI_API_KEY')),
+        'database_url': bool(os.environ.get('DATABASE_URL'))
     }
+
+@app.route('/admin/database')
+def database_admin():
+    """Database administration endpoint"""
+    try:
+        # Get recent document analyses
+        analyses = DocumentAnalysis.query.order_by(DocumentAnalysis.created_at.desc()).limit(10).all()
+        
+        # Get recent payments
+        payments = PaymentRecord.query.order_by(PaymentRecord.created_at.desc()).limit(10).all()
+        
+        # Get database statistics
+        total_analyses = DocumentAnalysis.query.count()
+        completed_payments = PaymentRecord.query.filter_by(status='completed').count()
+        pending_payments = PaymentRecord.query.filter_by(status='pending').count()
+        
+        return {
+            'total_analyses': total_analyses,
+            'completed_payments': completed_payments,
+            'pending_payments': pending_payments,
+            'recent_analyses': [
+                {
+                    'id': a.id,
+                    'session_id': a.session_id[:8] + '...',
+                    'language': a.language,
+                    'payment_status': a.payment_status,
+                    'created_at': a.created_at.isoformat() if a.created_at else None,
+                    'has_analysis': bool(a.analysis_result)
+                } for a in analyses
+            ],
+            'recent_payments': [
+                {
+                    'id': p.id,
+                    'stripe_session_id': p.stripe_session_id[:8] + '...',
+                    'amount': p.amount,
+                    'currency': p.currency,
+                    'status': p.status,
+                    'created_at': p.created_at.isoformat() if p.created_at else None
+                } for p in payments
+            ]
+        }
+        
+    except Exception as e:
+        logging.error(f"Database admin error: {str(e)}")
+        return {'error': str(e)}, 500
 
 @app.errorhandler(404)
 def not_found_error(error):

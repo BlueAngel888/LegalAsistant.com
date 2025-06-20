@@ -26,6 +26,15 @@ class DocumentAnalysis(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
+    def __init__(self, session_id, file_names, document_text, language='en', payment_status='pending', stripe_session_id=None, analysis_result=None):
+        self.session_id = session_id
+        self.file_names = file_names
+        self.document_text = document_text
+        self.language = language
+        self.payment_status = payment_status
+        self.stripe_session_id = stripe_session_id
+        self.analysis_result = analysis_result
+    
     def __repr__(self):
         return f'<DocumentAnalysis {self.id}>'
 
@@ -60,6 +69,13 @@ class PaymentRecord(db.Model):
     
     # Relationship
     document_analysis = db.relationship('DocumentAnalysis', backref='payment_records')
+    
+    def __init__(self, stripe_session_id, document_analysis_id, amount, currency='EUR', status='pending'):
+        self.stripe_session_id = stripe_session_id
+        self.document_analysis_id = document_analysis_id
+        self.amount = amount
+        self.currency = currency
+        self.status = status
     
     def __repr__(self):
         return f'<PaymentRecord {self.stripe_session_id}>'
