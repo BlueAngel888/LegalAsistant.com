@@ -27,7 +27,10 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 
 # Import and initialize database
 from models import db, DocumentAnalysis, User, PaymentRecord
+from flask_migrate import Migrate
+
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # Configure Stripe
 stripe.api_key = STRIPE_SECRET_KEY
