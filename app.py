@@ -126,9 +126,9 @@ def upload_file():
         if 'language' not in session:
             session['language'] = 'en'
         
-        # Get legal analysis parameters from form
-        document_country = request.form.get('document_country', '').strip()
-        analysis_language = request.form.get('analysis_language', '').strip()
+        # Get legal analysis parameters from form (check both upload and camera tabs)
+        document_country = request.form.get('document_country', '').strip() or request.form.get('document_country_camera', '').strip()
+        analysis_language = request.form.get('analysis_language', '').strip() or request.form.get('analysis_language_camera', '').strip()
         
         if not document_country or not analysis_language:
             flash('Please select both document country and analysis language.', 'error')

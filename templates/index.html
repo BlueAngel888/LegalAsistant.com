@@ -292,6 +292,102 @@
                                                     </button>
                                                 </div>
                                             </div>
+
+                                            <!-- Legal Analysis Configuration for Camera -->
+                                            <div class="legal-analysis-options">
+                                                <h5 class="options-title">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                                                    </svg>
+                                                    Legal Analysis Configuration
+                                                </h5>
+                                                
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Document Country</label>
+                                                        <div class="country-selector" id="countrySelectorCamera">
+                                                            <div class="selector-display" onclick="toggleCountryDropdown('camera')">
+                                                                <div class="selected-option">
+                                                                    <div class="country-flag">🇷🇴</div>
+                                                                    <span class="country-name">Romania</span>
+                                                                </div>
+                                                                <div class="dropdown-arrow">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                            <div class="dropdown-options" id="countryDropdownCamera">
+                                                                <div class="option" data-value="RO" onclick="selectCountry('RO', 'camera')">
+                                                                    <div class="country-flag">🇷🇴</div>
+                                                                    <span class="country-name">Romania</span>
+                                                                </div>
+                                                                <div class="option" data-value="DE" onclick="selectCountry('DE', 'camera')">
+                                                                    <div class="country-flag">🇩🇪</div>
+                                                                    <span class="country-name">Germany</span>
+                                                                </div>
+                                                                <div class="option" data-value="AE" onclick="selectCountry('AE', 'camera')">
+                                                                    <div class="country-flag">🇦🇪</div>
+                                                                    <span class="country-name">UAE</span>
+                                                                </div>
+                                                                <div class="option" data-value="US" onclick="selectCountry('US', 'camera')">
+                                                                    <div class="country-flag">🇺🇸</div>
+                                                                    <span class="country-name">United States</span>
+                                                                </div>
+                                                                <div class="option" data-value="GB" onclick="selectCountry('GB', 'camera')">
+                                                                    <div class="country-flag">🇬🇧</div>
+                                                                    <span class="country-name">United Kingdom</span>
+                                                                </div>
+                                                                <div class="option" data-value="FR" onclick="selectCountry('FR', 'camera')">
+                                                                    <div class="country-flag">🇫🇷</div>
+                                                                    <span class="country-name">France</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <input type="hidden" name="document_country_camera" id="documentCountryCamera" value="RO">
+                                                    </div>
+                                                    
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Analysis Language</label>
+                                                        <div class="language-selector" id="languageSelectorCamera">
+                                                            <div class="selector-display" onclick="toggleLanguageDropdown('camera')">
+                                                                <div class="selected-option">
+                                                                    <div class="language-icon">🇷🇴</div>
+                                                                    <span class="language-name">Română</span>
+                                                                </div>
+                                                                <div class="dropdown-arrow">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                            <div class="dropdown-options" id="languageDropdownCamera">
+                                                                <div class="option" data-value="ro" onclick="selectAnalysisLanguage('ro', 'camera')">
+                                                                    <div class="language-icon">🇷🇴</div>
+                                                                    <span class="language-name">Română</span>
+                                                                </div>
+                                                                <div class="option" data-value="en" onclick="selectAnalysisLanguage('en', 'camera')">
+                                                                    <div class="language-icon">🇺🇸</div>
+                                                                    <span class="language-name">English</span>
+                                                                </div>
+                                                                <div class="option" data-value="de" onclick="selectAnalysisLanguage('de', 'camera')">
+                                                                    <div class="language-icon">🇩🇪</div>
+                                                                    <span class="language-name">Deutsch</span>
+                                                                </div>
+                                                                <div class="option" data-value="ar" onclick="selectAnalysisLanguage('ar', 'camera')">
+                                                                    <div class="language-icon">🇦🇪</div>
+                                                                    <span class="language-name">العربية</span>
+                                                                </div>
+                                                                <div class="option" data-value="fr" onclick="selectAnalysisLanguage('fr', 'camera')">
+                                                                    <div class="language-icon">🇫🇷</div>
+                                                                    <span class="language-name">Français</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <input type="hidden" name="analysis_language_camera" id="analysisLanguageCamera" value="ro">
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

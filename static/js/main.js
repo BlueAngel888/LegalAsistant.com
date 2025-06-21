@@ -209,6 +209,145 @@ function initializeFileUpload() {
 }
 
 // Enhanced Legal Selector Functions
+
+// Global variables to track dropdown states
+let activeDropdowns = {
+    country: null,
+    language: null
+};
+
+// Country and language data
+const countryData = {
+    'RO': { flag: '🇷🇴', name: 'Romania' },
+    'DE': { flag: '🇩🇪', name: 'Germany' },
+    'AE': { flag: '🇦🇪', name: 'UAE' },
+    'US': { flag: '🇺🇸', name: 'United States' },
+    'GB': { flag: '🇬🇧', name: 'United Kingdom' },
+    'FR': { flag: '🇫🇷', name: 'France' }
+};
+
+const languageData = {
+    'ro': { icon: '🇷🇴', name: 'Română' },
+    'en': { icon: '🇺🇸', name: 'English' },
+    'de': { icon: '🇩🇪', name: 'Deutsch' },
+    'ar': { icon: '🇦🇪', name: 'العربية' },
+    'fr': { icon: '🇫🇷', name: 'Français' }
+};
+
+// Toggle country dropdown
+function toggleCountryDropdown(tabType = 'upload') {
+    const dropdownId = tabType === 'camera' ? 'countryDropdownCamera' : 'countryDropdown';
+    const dropdown = document.getElementById(dropdownId);
+    
+    if (!dropdown) return;
+    
+    // Close other dropdowns
+    closeAllDropdowns();
+    
+    // Toggle current dropdown
+    dropdown.classList.toggle('show');
+    activeDropdowns.country = dropdown.classList.contains('show') ? tabType : null;
+}
+
+// Toggle language dropdown
+function toggleLanguageDropdown(tabType = 'upload') {
+    const dropdownId = tabType === 'camera' ? 'languageDropdownCamera' : 'languageDropdown';
+    const dropdown = document.getElementById(dropdownId);
+    
+    if (!dropdown) return;
+    
+    // Close other dropdowns
+    closeAllDropdowns();
+    
+    // Toggle current dropdown
+    dropdown.classList.toggle('show');
+    activeDropdowns.language = dropdown.classList.contains('show') ? tabType : null;
+}
+
+// Select country
+function selectCountry(countryCode, tabType = 'upload') {
+    const country = countryData[countryCode];
+    if (!country) return;
+    
+    const selectorId = tabType === 'camera' ? 'countrySelectorCamera' : 'countrySelector';
+    const hiddenInputId = tabType === 'camera' ? 'documentCountryCamera' : 'documentCountry';
+    const dropdownId = tabType === 'camera' ? 'countryDropdownCamera' : 'countryDropdown';
+    
+    const selector = document.getElementById(selectorId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const dropdown = document.getElementById(dropdownId);
+    
+    if (selector && hiddenInput) {
+        // Update display
+        const flagElement = selector.querySelector('.country-flag');
+        const nameElement = selector.querySelector('.country-name');
+        
+        if (flagElement) flagElement.textContent = country.flag;
+        if (nameElement) nameElement.textContent = country.name;
+        
+        // Update hidden input
+        hiddenInput.value = countryCode;
+        
+        // Close dropdown
+        if (dropdown) dropdown.classList.remove('show');
+        activeDropdowns.country = null;
+        
+        // Update submit button state
+        updateSubmitButton();
+    }
+}
+
+// Select analysis language
+function selectAnalysisLanguage(languageCode, tabType = 'upload') {
+    const language = languageData[languageCode];
+    if (!language) return;
+    
+    const selectorId = tabType === 'camera' ? 'languageSelectorCamera' : 'languageSelector';
+    const hiddenInputId = tabType === 'camera' ? 'analysisLanguageCamera' : 'analysisLanguage';
+    const dropdownId = tabType === 'camera' ? 'languageDropdownCamera' : 'languageDropdown';
+    
+    const selector = document.getElementById(selectorId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const dropdown = document.getElementById(dropdownId);
+    
+    if (selector && hiddenInput) {
+        // Update display
+        const iconElement = selector.querySelector('.language-icon');
+        const nameElement = selector.querySelector('.language-name');
+        
+        if (iconElement) iconElement.textContent = language.icon;
+        if (nameElement) nameElement.textContent = language.name;
+        
+        // Update hidden input
+        hiddenInput.value = languageCode;
+        
+        // Close dropdown
+        if (dropdown) dropdown.classList.remove('show');
+        activeDropdowns.language = null;
+        
+        // Update submit button state
+        updateSubmitButton();
+    }
+}
+
+// Close all dropdowns
+function closeAllDropdowns() {
+    const dropdowns = document.querySelectorAll('.dropdown-options');
+    dropdowns.forEach(dropdown => {
+        dropdown.classList.remove('show');
+    });
+    activeDropdowns.country = null;
+    activeDropdowns.language = null;
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const isDropdownClick = event.target.closest('.country-selector, .language-selector');
+    if (!isDropdownClick) {
+        closeAllDropdowns();
+    }
+});
+
 function initializeLegalSelectors() {
     const countrySelect = document.getElementById('document_country');
     const languageSelect = document.getElementById('analysis_language');
