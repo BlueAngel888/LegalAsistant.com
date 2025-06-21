@@ -43,6 +43,66 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+                
+                <!-- User Progress Card -->
+                {% if user_stats %}
+                <div class="card mb-4 progress-card">
+                    <div class="card-body">
+                        <div class="user-progress-header">
+                            <div class="level-badge">
+                                <span class="level-icon">⭐</span>
+                                <span class="level-text">Level {{ user_stats.level }}</span>
+                            </div>
+                            <div class="xp-info">
+                                <span class="xp-text">{{ user_stats.total_xp }} XP</span>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-bar-container">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ user_stats.progress_percentage }}%"
+                                     aria-valuenow="{{ user_stats.progress_percentage }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small class="progress-text">{{ user_stats.progress_to_next }}/100 XP to Level {{ user_stats.level + 1 }}</small>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">📄</div>
+                                <div class="stat-value">{{ user_stats.documents_uploaded }}</div>
+                                <div class="stat-label">Documents</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">🔍</div>
+                                <div class="stat-value">{{ user_stats.documents_analyzed }}</div>
+                                <div class="stat-label">Analyzed</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">🏆</div>
+                                <div class="stat-value">{{ user_stats.achievements_count }}</div>
+                                <div class="stat-label">Achievements</div>
+                            </div>
+                        </div>
+                        
+                        {% if user_stats.achievements %}
+                        <div class="achievements-preview">
+                            <h6 class="achievements-title">Recent Achievements</h6>
+                            <div class="achievements-list">
+                                {% for achievement in user_stats.achievements[-3:] %}
+                                <div class="achievement-badge achievement-{{ achievement.rarity }}">
+                                    <span class="achievement-icon">{{ achievement.icon }}</span>
+                                    <span class="achievement-name">{{ achievement.name }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
                 <div class="card shadow-lg border-0">
                     <div class="card-header bg-white py-4">
                         <h2 class="text-center mb-0">
