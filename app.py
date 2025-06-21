@@ -34,7 +34,9 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 # Import and initialize database
 from models import db, DocumentAnalysis, User, PaymentRecord
 from models_gamification import UserProgress, Achievement
+from models_learning import LegalAnalysisLearning, LegalKnowledgeBase, AnalysisImprovement
 from utils.gamification import GamificationService
+from utils.learning_service import LegalLearningService, analyze_with_learning_integration
 from flask_migrate import Migrate
 
 db.init_app(app)
@@ -48,6 +50,8 @@ with app.app_context():
     db.create_all()
     # Initialize gamification system
     GamificationService.initialize_gamification()
+    # Initialize learning system
+    LegalLearningService.initialize_knowledge_base()
 
 # Configure domain for Stripe redirects
 def get_domain():
@@ -434,10 +438,11 @@ def success():
         document_country = session.get('document_country', 'RO')
         analysis_language = session.get('analysis_language', 'ro')
         
-        # Analyze the document with enhanced legal analyzer
+        # Analyze the document with enhanced legal analyzer and learning integration
         lang = session.get('language', 'en')
         t = get_translation(lang)
-        analysis = analyze_with_enhanced_gpt4(doc_text, document_country, analysis_language)
+        session_id = session.get('session_id', session.get('_id', 'anonymous'))
+        analysis = analyze_with_learning_integration(doc_text, document_country, analysis_language, session_id)
         
         # Store analysis result in database
         try:

@@ -13,15 +13,14 @@ class LegalLearningService:
                                document_length, analysis_length, processing_time):
         """Record analysis session for learning purposes"""
         try:
-            learning_record = LegalAnalysisLearning(
-                session_id=session_id,
-                document_type=document_type,
-                document_country=country_code,
-                analysis_language=analysis_language,
-                document_length=document_length,
-                analysis_length=analysis_length,
-                processing_time=processing_time
-            )
+            learning_record = LegalAnalysisLearning()
+            learning_record.session_id = session_id
+            learning_record.document_type = document_type
+            learning_record.document_country = country_code
+            learning_record.analysis_language = analysis_language
+            learning_record.document_length = document_length
+            learning_record.analysis_length = analysis_length
+            learning_record.processing_time = processing_time
             
             db.session.add(learning_record)
             db.session.commit()
@@ -53,14 +52,13 @@ class LegalLearningService:
                            practical_application=None, common_issues=None):
         """Add new knowledge base entry"""
         try:
-            knowledge = LegalKnowledgeBase(
-                country_code=country_code,
-                legal_category=legal_category,
-                law_reference=law_reference,
-                law_text=law_text,
-                practical_application=practical_application,
-                common_issues=common_issues
-            )
+            knowledge = LegalKnowledgeBase()
+            knowledge.country_code = country_code
+            knowledge.legal_category = legal_category
+            knowledge.law_reference = law_reference
+            knowledge.law_text = law_text
+            knowledge.practical_application = practical_application
+            knowledge.common_issues = common_issues
             
             db.session.add(knowledge)
             db.session.commit()
