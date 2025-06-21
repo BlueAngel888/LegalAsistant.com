@@ -62,10 +62,8 @@ function initializeFileUpload() {
 
     dropZone.addEventListener('drop', handleDrop, false);
 
-    // Click to upload - simplified
+    // Click to upload - simplified direct approach
     dropZone.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
         console.log('Drop zone clicked, opening file dialog');
         fileInput.click();
     });
