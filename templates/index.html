@@ -302,141 +302,71 @@
                                                     Legal Analysis Configuration
                                                 </h5>
                                                 
-                                                <div class="row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Document Country</label>
-                                                        <div class="country-selector" id="countrySelectorCamera">
-                                                            <div class="selector-display" onclick="toggleCountryDropdown('camera')">
-                                                                <div class="selected-option">
-                                                                    <div class="country-flag">🇷🇴</div>
-                                                                    <span class="country-name">Romania</span>
-                                                                </div>
-                                                                <div class="dropdown-arrow">
-                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div class="dropdown-options" id="countryDropdownCamera">
-                                                                <div class="option" data-value="RO" onclick="selectCountry('RO', 'camera')">
-                                                                    <div class="country-flag">🇷🇴</div>
-                                                                    <span class="country-name">Romania</span>
-                                                                </div>
-                                                                <div class="option" data-value="DE" onclick="selectCountry('DE', 'camera')">
-                                                                    <div class="country-flag">🇩🇪</div>
-                                                                    <span class="country-name">Germany</span>
-                                                                </div>
-                                                                <div class="option" data-value="FR" onclick="selectCountry('FR', 'camera')">
-                                                                    <div class="country-flag">🇫🇷</div>
-                                                                    <span class="country-name">France</span>
-                                                                </div>
-                                                                <div class="option" data-value="IT" onclick="selectCountry('IT', 'camera')">
-                                                                    <div class="country-flag">🇮🇹</div>
-                                                                    <span class="country-name">Italy</span>
-                                                                </div>
-                                                                <div class="option" data-value="ES" onclick="selectCountry('ES', 'camera')">
-                                                                    <div class="country-flag">🇪🇸</div>
-                                                                    <span class="country-name">Spain</span>
-                                                                </div>
-                                                                <div class="option" data-value="NL" onclick="selectCountry('NL', 'camera')">
-                                                                    <div class="country-flag">🇳🇱</div>
-                                                                    <span class="country-name">Netherlands</span>
-                                                                </div>
-                                                                <div class="option" data-value="BE" onclick="selectCountry('BE', 'camera')">
-                                                                    <div class="country-flag">🇧🇪</div>
-                                                                    <span class="country-name">Belgium</span>
-                                                                </div>
-                                                                <div class="option" data-value="AT" onclick="selectCountry('AT', 'camera')">
-                                                                    <div class="country-flag">🇦🇹</div>
-                                                                    <span class="country-name">Austria</span>
-                                                                </div>
-                                                                <div class="option" data-value="CH" onclick="selectCountry('CH', 'camera')">
-                                                                    <div class="country-flag">🇨🇭</div>
-                                                                    <span class="country-name">Switzerland</span>
-                                                                </div>
-                                                                <div class="option" data-value="PL" onclick="selectCountry('PL', 'camera')">
-                                                                    <div class="country-flag">🇵🇱</div>
-                                                                    <span class="country-name">Poland</span>
-                                                                </div>
-                                                                <div class="option" data-value="HU" onclick="selectCountry('HU', 'camera')">
-                                                                    <div class="country-flag">🇭🇺</div>
-                                                                    <span class="country-name">Hungary</span>
-                                                                </div>
-                                                                <div class="option" data-value="CZ" onclick="selectCountry('CZ', 'camera')">
-                                                                    <div class="country-flag">🇨🇿</div>
-                                                                    <span class="country-name">Czech Republic</span>
-                                                                </div>
-                                                                <div class="option" data-value="BG" onclick="selectCountry('BG', 'camera')">
-                                                                    <div class="country-flag">🇧🇬</div>
-                                                                    <span class="country-name">Bulgaria</span>
-                                                                </div>
-                                                                <div class="option" data-value="GR" onclick="selectCountry('GR', 'camera')">
-                                                                    <div class="country-flag">🇬🇷</div>
-                                                                    <span class="country-name">Greece</span>
-                                                                </div>
-                                                                <div class="option" data-value="PT" onclick="selectCountry('PT', 'camera')">
-                                                                    <div class="country-flag">🇵🇹</div>
-                                                                    <span class="country-name">Portugal</span>
-                                                                </div>
-                                                                <div class="option" data-value="AE" onclick="selectCountry('AE', 'camera')">
-                                                                    <div class="country-flag">🇦🇪</div>
-                                                                    <span class="country-name">United Arab Emirates</span>
-                                                                </div>
-                                                                <div class="option" data-value="OTHER" onclick="selectCountry('OTHER', 'camera')">
-                                                                    <div class="country-flag">🌍</div>
-                                                                    <span class="country-name">Other Country</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <input type="hidden" name="document_country_camera" id="documentCountryCamera" value="RO">
+                                                <div class="options-grid">
+                                                    <div class="option-group">
+                                                        <label for="document_country_camera" class="option-label">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                                                <path d="M2 12h20" stroke="currentColor" stroke-width="2"/>
+                                                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" stroke-width="2"/>
+                                                            </svg>
+                                                            Document Origin Country
+                                                        </label>
+                                                        <select id="document_country_camera" name="document_country_camera" class="legal-select" required>
+                                                            <option value="">Select country where document was issued</option>
+                                                            <option value="RO">🇷🇴 Romania</option>
+                                                            <option value="DE">🇩🇪 Germany</option>
+                                                            <option value="FR">🇫🇷 France</option>
+                                                            <option value="IT">🇮🇹 Italy</option>
+                                                            <option value="ES">🇪🇸 Spain</option>
+                                                            <option value="UK">🇬🇧 United Kingdom</option>
+                                                            <option value="US">🇺🇸 United States</option>
+                                                            <option value="NL">🇳🇱 Netherlands</option>
+                                                            <option value="BE">🇧🇪 Belgium</option>
+                                                            <option value="AT">🇦🇹 Austria</option>
+                                                            <option value="CH">🇨🇭 Switzerland</option>
+                                                            <option value="PL">🇵🇱 Poland</option>
+                                                            <option value="HU">🇭🇺 Hungary</option>
+                                                            <option value="CZ">🇨🇿 Czech Republic</option>
+                                                            <option value="BG">🇧🇬 Bulgaria</option>
+                                                            <option value="GR">🇬🇷 Greece</option>
+                                                            <option value="PT">🇵🇹 Portugal</option>
+                                                            <option value="AE">🇦🇪 United Arab Emirates</option>
+                                                            <option value="OTHER">🌍 Other Country</option>
+                                                        </select>
+                                                        <small class="option-hint">Select the country where this legal document was issued to apply correct laws</small>
                                                     </div>
                                                     
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Analysis Language</label>
-                                                        <div class="language-selector" id="languageSelectorCamera">
-                                                            <div class="selector-display" onclick="toggleLanguageDropdown('camera')">
-                                                                <div class="selected-option">
-                                                                    <div class="language-icon">🇷🇴</div>
-                                                                    <span class="language-name">Română</span>
-                                                                </div>
-                                                                <div class="dropdown-arrow">
-                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                                    </svg>
-                                                                </div>
-                                                            </div>
-                                                            <div class="dropdown-options" id="languageDropdownCamera">
-                                                                <div class="option" data-value="ro" onclick="selectAnalysisLanguage('ro', 'camera')">
-                                                                    <div class="language-icon">🇷🇴</div>
-                                                                    <span class="language-name">Română</span>
-                                                                </div>
-                                                                <div class="option" data-value="en" onclick="selectAnalysisLanguage('en', 'camera')">
-                                                                    <div class="language-icon">🇬🇧</div>
-                                                                    <span class="language-name">English</span>
-                                                                </div>
-                                                                <div class="option" data-value="de" onclick="selectAnalysisLanguage('de', 'camera')">
-                                                                    <div class="language-icon">🇩🇪</div>
-                                                                    <span class="language-name">Deutsch</span>
-                                                                </div>
-                                                                <div class="option" data-value="fr" onclick="selectAnalysisLanguage('fr', 'camera')">
-                                                                    <div class="language-icon">🇫🇷</div>
-                                                                    <span class="language-name">Français</span>
-                                                                </div>
-                                                                <div class="option" data-value="it" onclick="selectAnalysisLanguage('it', 'camera')">
-                                                                    <div class="language-icon">🇮🇹</div>
-                                                                    <span class="language-name">Italiano</span>
-                                                                </div>
-                                                                <div class="option" data-value="es" onclick="selectAnalysisLanguage('es', 'camera')">
-                                                                    <div class="language-icon">🇪🇸</div>
-                                                                    <span class="language-name">Español</span>
-                                                                </div>
-                                                                <div class="option" data-value="nl" onclick="selectAnalysisLanguage('nl', 'camera')">
-                                                                    <div class="language-icon">🇳🇱</div>
-                                                                    <span class="language-name">Nederlands</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <input type="hidden" name="analysis_language_camera" id="analysisLanguageCamera" value="ro">
+                                                    <div class="option-group">
+                                                        <label for="analysis_language_camera" class="option-label">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M5 8l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M4 14l6-6 2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M2 5h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M7 2h1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M22 22l-5-10-5 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                <path d="M14 18h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            </svg>
+                                                            Analysis Language
+                                                        </label>
+                                                        <select id="analysis_language_camera" name="analysis_language_camera" class="legal-select" required>
+                                                            <option value="">Select preferred analysis language</option>
+                                                            <option value="ro">🇷🇴 Română (Romanian)</option>
+                                                            <option value="en">🇬🇧 English</option>
+                                                            <option value="de">🇩🇪 Deutsch (German)</option>
+                                                            <option value="fr">🇫🇷 Français (French)</option>
+                                                            <option value="it">🇮🇹 Italiano (Italian)</option>
+                                                            <option value="es">🇪🇸 Español (Spanish)</option>
+                                                            <option value="nl">🇳🇱 Nederlands (Dutch)</option>
+                                                            <option value="pl">🇵🇱 Polski (Polish)</option>
+                                                            <option value="hu">🇭🇺 Magyar (Hungarian)</option>
+                                                            <option value="cs">🇨🇿 Čeština (Czech)</option>
+                                                            <option value="bg">🇧🇬 Български (Bulgarian)</option>
+                                                            <option value="el">🇬🇷 Ελληνικά (Greek)</option>
+                                                            <option value="pt">🇵🇹 Português (Portuguese)</option>
+                                                            <option value="ar">🇦🇪 العربية (Arabic)</option>
+                                                        </select>
+                                                        <small class="option-hint">Choose the language for your detailed legal analysis report</small>
                                                     </div>
                                                 </div>
                                             </div>
