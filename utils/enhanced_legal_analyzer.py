@@ -68,6 +68,17 @@ class EnhancedLegalAnalyzer:
                 'language': 'English',
                 'currency': 'USD',
                 'eu_member': False
+            },
+            'AE': {
+                'name': 'United Arab Emirates',
+                'civil_code': 'UAE Civil Code (Federal Law No. 5 of 1985)',
+                'commercial_code': 'UAE Commercial Code (Federal Law No. 18 of 1993)',
+                'criminal_code': 'UAE Penal Code (Federal Law No. 3 of 1987)',
+                'constitution': 'UAE Constitution (1971)',
+                'court_system': 'Federal Courts, Local Courts, Court of Cassation',
+                'language': 'Arabic',
+                'currency': 'AED',
+                'eu_member': False
             }
         }
     

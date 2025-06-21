@@ -193,6 +193,190 @@ function initializeFileUpload() {
     updateSubmitButton();
 }
 
+// Enhanced Legal Selector Functions
+function initializeLegalSelectors() {
+    const countrySelect = document.getElementById('document_country');
+    const languageSelect = document.getElementById('analysis_language');
+    
+    if (!countrySelect || !languageSelect) return;
+    
+    // Add change event listeners
+    countrySelect.addEventListener('change', function() {
+        validateAndStyleSelector(this);
+        updateSubmitButtonState();
+        showCountryInfo(this.value);
+    });
+    
+    languageSelect.addEventListener('change', function() {
+        validateAndStyleSelector(this);
+        updateSubmitButtonState();
+        showLanguageInfo(this.value);
+    });
+    
+    // Add focus/blur effects
+    [countrySelect, languageSelect].forEach(select => {
+        select.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        select.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+}
+
+function validateAndStyleSelector(select) {
+    const optionGroup = select.closest('.option-group');
+    
+    if (select.value && select.value !== '') {
+        select.classList.add('filled');
+        optionGroup.classList.remove('error');
+        optionGroup.classList.add('success');
+    } else {
+        select.classList.remove('filled');
+        optionGroup.classList.remove('success');
+        optionGroup.classList.add('error');
+    }
+}
+
+function updateSubmitButtonState() {
+    const countrySelect = document.getElementById('document_country');
+    const languageSelect = document.getElementById('analysis_language');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const fileInput = document.getElementById('file');
+    
+    if (submitBtn && countrySelect && languageSelect && fileInput) {
+        const hasFiles = fileInput.files && fileInput.files.length > 0;
+        const hasCountry = countrySelect.value && countrySelect.value !== '';
+        const hasLanguage = languageSelect.value && languageSelect.value !== '';
+        
+        submitBtn.disabled = !(hasFiles && hasCountry && hasLanguage);
+        
+        if (hasFiles && hasCountry && hasLanguage) {
+            submitBtn.classList.add('enhanced-ready');
+        } else {
+            submitBtn.classList.remove('enhanced-ready');
+        }
+    }
+}
+
+function showCountryInfo(countryCode) {
+    if (!countryCode) return;
+    
+    const countryInfo = {
+        'RO': {
+            name: 'Romania',
+            flag: '🇷🇴',
+            legalSystem: 'Civil Law System (Continental European)',
+            primaryLaws: 'Codul Civil Romanian, Codul de Procedura Civila'
+        },
+        'DE': {
+            name: 'Germany', 
+            flag: '🇩🇪',
+            legalSystem: 'Civil Law System (Germanic)',
+            primaryLaws: 'Bürgerliches Gesetzbuch (BGB), Handelsgesetzbuch (HGB)'
+        },
+        'AE': {
+            name: 'United Arab Emirates',
+            flag: '🇦🇪', 
+            legalSystem: 'Mixed Legal System (Islamic Law + Civil Law)',
+            primaryLaws: 'UAE Civil Code, UAE Commercial Code, Sharia Law'
+        },
+        'US': {
+            name: 'United States',
+            flag: '🇺🇸',
+            legalSystem: 'Common Law System',
+            primaryLaws: 'Federal Code, State Laws, Case Law Precedents'
+        },
+        'UK': {
+            name: 'United Kingdom',
+            flag: '🇬🇧',
+            legalSystem: 'Common Law System',
+            primaryLaws: 'Statutes, Case Law, Common Law Principles'
+        },
+        'FR': {
+            name: 'France',
+            flag: '🇫🇷',
+            legalSystem: 'Civil Law System (Napoleonic)',
+            primaryLaws: 'Code Civil Français, Code de Commerce'
+        }
+    };
+    
+    const info = countryInfo[countryCode];
+    if (info) {
+        showLegalFrameworkInfo(info);
+    }
+}
+
+function showLanguageInfo(languageCode) {
+    if (!languageCode) return;
+    
+    const languageInfo = {
+        'ro': { name: 'Română', nativeName: 'Română', flag: '🇷🇴' },
+        'en': { name: 'English', nativeName: 'English', flag: '🇬🇧' },
+        'de': { name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
+        'fr': { name: 'French', nativeName: 'Français', flag: '🇫🇷' },
+        'ar': { name: 'Arabic', nativeName: 'العربية', flag: '🇦🇪' },
+        'it': { name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹' },
+        'es': { name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' }
+    };
+    
+    const info = languageInfo[languageCode];
+    if (info) {
+        showAnalysisLanguageInfo(info);
+    }
+}
+
+function showLegalFrameworkInfo(countryInfo) {
+    // Remove existing indicators
+    const existingIndicator = document.querySelector('.legal-framework-indicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+    
+    // Create new indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'legal-framework-indicator';
+    indicator.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+        </svg>
+        <span class="country-flag">${countryInfo.flag}</span>
+        <div>
+            <strong>${countryInfo.name}</strong> - ${countryInfo.legalSystem}<br>
+            <small>Primary Laws: ${countryInfo.primaryLaws}</small>
+        </div>
+    `;
+    
+    // Insert after legal analysis options
+    const legalOptions = document.querySelector('.legal-analysis-options');
+    if (legalOptions) {
+        legalOptions.insertAdjacentElement('afterend', indicator);
+        
+        // Animate in
+        setTimeout(() => {
+            indicator.style.opacity = '1';
+            indicator.style.transform = 'translateY(0)';
+        }, 100);
+    }
+}
+
+function showAnalysisLanguageInfo(languageInfo) {
+    // Update language hint with selected language info
+    const languageHint = document.querySelector('#analysis_language').nextElementSibling;
+    if (languageHint && languageHint.classList.contains('option-hint')) {
+        languageHint.innerHTML = `
+            Analysis will be provided in <strong>${languageInfo.nativeName}</strong> ${languageInfo.flag}<br>
+            Professional legal terminology and citations will be used
+        `;
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeLegalSelectors();
+});
+
 // Document Preview and Scanner Functions
 let currentFileIndex = null;
 let currentImageUrl = null;
