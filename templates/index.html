@@ -358,6 +358,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.getElementById('uploadArea');
     const fileList = document.getElementById('fileList');
     const selectedFiles = document.getElementById('selectedFiles');
+    
+    // Initialize gamification features
+    {% if gamification_result %}
+    setTimeout(() => {
+        handleGamificationResult({{ gamification_result | tojson }});
+    }, 1000);
+    {% endif %}
+    
+    // Animate progress bar on load
+    {% if user_stats %}
+    setTimeout(() => {
+        animateProgressBar({{ user_stats.progress_percentage }});
+    }, 500);
+    {% endif %}
     const submitBtn = document.getElementById('submitBtn');
 
     // Handle file selection display
