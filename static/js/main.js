@@ -18,18 +18,31 @@ function initializeFileUpload() {
     const clearFilesBtn = document.getElementById('clearFiles');
     
     let selectedFiles = [];
+    let isProcessingFiles = false; // Flag to prevent recursive calls
 
     if (!fileInput || !dropZone) return;
 
-    // Handle file input change
+    // Handle file input change - simplified approach
     fileInput.addEventListener('change', function(e) {
-        handleFileSelection(Array.from(e.target.files));
+        if (isProcessingFiles) return; // Prevent recursive calls
+        
+        console.log('File input changed:', e.target.files.length, 'files selected');
+        
+        if (e.target.files.length > 0) {
+            isProcessingFiles = true;
+            const files = Array.from(e.target.files);
+            processSelectedFiles(files);
+            isProcessingFiles = false;
+        }
     });
 
     // Handle camera input change
     if (cameraInput) {
         cameraInput.addEventListener('change', function(e) {
-            handleFileSelection(Array.from(e.target.files));
+            if (e.target.files.length > 0) {
+                const files = Array.from(e.target.files);
+                processSelectedFiles(files);
+            }
         });
     }
 
@@ -49,8 +62,11 @@ function initializeFileUpload() {
 
     dropZone.addEventListener('drop', handleDrop, false);
 
-    // Click to upload
-    dropZone.addEventListener('click', () => {
+    // Click to upload - simplified
+    dropZone.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Drop zone clicked, opening file dialog');
         fileInput.click();
     });
 
@@ -75,10 +91,12 @@ function initializeFileUpload() {
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
-        handleFileSelection(Array.from(files));
+        processSelectedFiles(Array.from(files));
     }
 
-    function handleFileSelection(files) {
+    function processSelectedFiles(files) {
+        console.log('Processing', files.length, 'files');
+        
         // Filter valid file types
         const validTypes = ['.pdf', '.docx', '.doc', '.txt', '.jpg', '.jpeg', '.png'];
         const validFiles = files.filter(file => {
@@ -90,26 +108,25 @@ function initializeFileUpload() {
             showErrorMessage('Some files were skipped due to unsupported file types.');
         }
 
-        // Add new files to selection
-        selectedFiles = [...selectedFiles, ...validFiles];
-        
-        // Update file input
-        updateFileInputValue();
+        if (validFiles.length === 0) {
+            console.log('No valid files selected');
+            return;
+        }
+
+        // Update selected files
+        selectedFiles = [...validFiles];
+        console.log('Files processed:', selectedFiles.length, 'valid files');
         
         // Update display
         updateFileDisplay();
         
+        // Update submit button state
+        updateSubmitButtonState();
+        
         // Show preview area
-        if (selectedFiles.length > 0) {
+        if (selectedFiles.length > 0 && filePreview) {
             filePreview.style.display = 'block';
         }
-    }
-
-    function updateFileInputValue() {
-        // Create a new DataTransfer object to update the file input
-        const dt = new DataTransfer();
-        selectedFiles.forEach(file => dt.items.add(file));
-        fileInput.files = dt.files;
     }
 
     function updateFileDisplay() {
