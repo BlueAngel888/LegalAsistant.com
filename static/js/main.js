@@ -119,7 +119,7 @@ function initializeFileUpload() {
         updateFileDisplay();
         
         // Update submit button state
-        updateSubmitButtonState();
+        updateSubmitButton();
         
         // Show preview area
         if (selectedFiles.length > 0 && filePreview) {
@@ -220,18 +220,31 @@ let activeDropdowns = {
 const countryData = {
     'RO': { flag: '🇷🇴', name: 'Romania' },
     'DE': { flag: '🇩🇪', name: 'Germany' },
-    'AE': { flag: '🇦🇪', name: 'UAE' },
-    'US': { flag: '🇺🇸', name: 'United States' },
-    'GB': { flag: '🇬🇧', name: 'United Kingdom' },
-    'FR': { flag: '🇫🇷', name: 'France' }
+    'FR': { flag: '🇫🇷', name: 'France' },
+    'IT': { flag: '🇮🇹', name: 'Italy' },
+    'ES': { flag: '🇪🇸', name: 'Spain' },
+    'NL': { flag: '🇳🇱', name: 'Netherlands' },
+    'BE': { flag: '🇧🇪', name: 'Belgium' },
+    'AT': { flag: '🇦🇹', name: 'Austria' },
+    'CH': { flag: '🇨🇭', name: 'Switzerland' },
+    'PL': { flag: '🇵🇱', name: 'Poland' },
+    'HU': { flag: '🇭🇺', name: 'Hungary' },
+    'CZ': { flag: '🇨🇿', name: 'Czech Republic' },
+    'BG': { flag: '🇧🇬', name: 'Bulgaria' },
+    'GR': { flag: '🇬🇷', name: 'Greece' },
+    'PT': { flag: '🇵🇹', name: 'Portugal' },
+    'AE': { flag: '🇦🇪', name: 'United Arab Emirates' },
+    'OTHER': { flag: '🌍', name: 'Other Country' }
 };
 
 const languageData = {
     'ro': { icon: '🇷🇴', name: 'Română' },
-    'en': { icon: '🇺🇸', name: 'English' },
+    'en': { icon: '🇬🇧', name: 'English' },
     'de': { icon: '🇩🇪', name: 'Deutsch' },
-    'ar': { icon: '🇦🇪', name: 'العربية' },
-    'fr': { icon: '🇫🇷', name: 'Français' }
+    'fr': { icon: '🇫🇷', name: 'Français' },
+    'it': { icon: '🇮🇹', name: 'Italiano' },
+    'es': { icon: '🇪🇸', name: 'Español' },
+    'nl': { icon: '🇳🇱', name: 'Nederlands' }
 };
 
 // Toggle country dropdown
