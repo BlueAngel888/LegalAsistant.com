@@ -8,6 +8,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import stripe
 from utils.pdf_tools import extract_text_from_file
 from utils.ai_analyzer import analyze_with_gpt4
+from utils.enhanced_legal_analyzer import analyze_with_enhanced_gpt4
 from config import STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY
 from translations import get_translation
 
@@ -120,6 +121,18 @@ def upload_file():
         # Ensure session is properly initialized
         if 'language' not in session:
             session['language'] = 'en'
+        
+        # Get legal analysis parameters from form
+        document_country = request.form.get('document_country', '').strip()
+        analysis_language = request.form.get('analysis_language', '').strip()
+        
+        if not document_country or not analysis_language:
+            flash('Please select both document country and analysis language.', 'error')
+            return redirect(url_for('index'))
+        
+        # Store legal analysis parameters in session
+        session['document_country'] = document_country
+        session['analysis_language'] = analysis_language
         
         # Clear any previous session data
         session.pop('doc_text', None)
@@ -417,10 +430,14 @@ def success():
             flash('No document found. Please start over.', 'error')
             return redirect(url_for('index'))
         
-        # Analyze the document with GPT-4 in user's preferred language
+        # Get legal analysis parameters
+        document_country = session.get('document_country', 'RO')
+        analysis_language = session.get('analysis_language', 'ro')
+        
+        # Analyze the document with enhanced legal analyzer
         lang = session.get('language', 'en')
         t = get_translation(lang)
-        analysis = analyze_with_gpt4(doc_text, lang)
+        analysis = analyze_with_enhanced_gpt4(doc_text, document_country, analysis_language)
         
         # Store analysis result in database
         try:

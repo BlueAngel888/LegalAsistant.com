@@ -837,6 +837,137 @@ footer {
     .modal-footer button {
         width: 100%;
     }
+}
+
+/* Legal Analysis Options Styles */
+.legal-analysis-options {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.options-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.options-title svg {
+    color: #3b82f6;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.option-label svg {
+    color: #6b7280;
+}
+
+.legal-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.875rem;
+    color: #374151;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.legal-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.legal-select:invalid {
+    border-color: #ef4444;
+}
+
+.option-hint {
+    color: #6b7280;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .legal-analysis-options {
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .options-title {
+        font-size: 1rem;
+    }
+}
+
+/* Enhanced Legal Analysis Styles */
+.analysis-enhancement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.country-flag {
+    font-size: 1.25rem;
+}
+
+.legal-framework-indicator {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    color: #92400e;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
     .hero-section h1 {
         font-size: 1.75rem !important;
