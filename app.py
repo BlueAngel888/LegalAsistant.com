@@ -240,14 +240,10 @@ def upload_file():
             logging.error(f"Database error: {str(db_error)}")
             # Continue without database storage if DB fails
             
-        # If text is too large, truncate and store summary instead
-        if len(doc_text) > 10000:  # 10KB limit for session
-            session['doc_text'] = doc_text[:10000] + "\n\n[Document truncated for session storage - full text will be analyzed]"
-            session['full_doc_text'] = doc_text  # Store full text temporarily
-        else:
-            session['doc_text'] = doc_text
-            
+        # Don't store large document text in session - only store metadata
         session['processed_files'] = processed_files
+        session['doc_text_length'] = len(doc_text)
+        session['has_document'] = True
         
         # Track gamification progress
         is_photo = any(f.lower().endswith(('.jpg', '.jpeg', '.png')) for f in processed_files)
@@ -272,10 +268,10 @@ def upload_file():
         session.modified = True
         
         # Debug session data
-        logging.info(f"Session data stored - doc_text length: {len(session.get('doc_text', ''))}")
+        logging.info(f"Session data stored - analysis_id: {session.get('analysis_id')}")
         logging.info(f"Session data stored - processed_files: {session.get('processed_files', [])}")
+        logging.info(f"Session data stored - has_document: {session.get('has_document')}")
         logging.info(f"Gamification result: {gamification_result['xp_gained']} XP gained, Level: {gamification_result['new_level']}")
-        logging.info(f"Session modified flag set: {session.modified}")
         
         return redirect(url_for('checkout'))
         
@@ -288,12 +284,26 @@ def upload_file():
 def checkout():
     # Debug session data
     logging.info(f"Checkout route - Session keys: {list(session.keys())}")
-    logging.info(f"Checkout route - doc_text exists: {'doc_text' in session}")
-    logging.info(f"Checkout route - doc_text length: {len(session.get('doc_text', ''))}")
+    logging.info(f"Checkout route - has_document: {session.get('has_document', False)}")
+    logging.info(f"Checkout route - analysis_id: {session.get('analysis_id', 'None')}")
     
-    if 'doc_text' not in session:
+    # Check if we have document data either in session metadata or database
+    has_document = session.get('has_document', False)
+    analysis_id = session.get('analysis_id')
+    
+    if not has_document and not analysis_id:
         flash('No document found. Please upload a document first.', 'error')
         return redirect(url_for('index'))
+    
+    # If we have analysis_id, verify the document exists in database
+    if analysis_id:
+        try:
+            analysis = DocumentAnalysis.query.filter_by(id=analysis_id).first()
+            if not analysis:
+                flash('Document not found. Please upload a document again.', 'error')
+                return redirect(url_for('index'))
+        except Exception as e:
+            logging.error(f"Database error checking analysis: {str(e)}")
     
     lang = session.get('language', 'en')
     t = get_translation(lang)
@@ -305,13 +315,30 @@ def create_checkout_session():
     try:
         # Debug session data
         logging.info(f"Payment route - Session keys: {list(session.keys())}")
-        logging.info(f"Payment route - doc_text exists: {'doc_text' in session}")
-        logging.info(f"Payment route - doc_text length: {len(session.get('doc_text', ''))}")
+        logging.info(f"Payment route - has_document: {session.get('has_document', False)}")
+        logging.info(f"Payment route - analysis_id: {session.get('analysis_id', 'None')}")
         
-        if 'doc_text' not in session:
-            logging.error("No document found in session for checkout")
+        # Check if we have document data
+        has_document = session.get('has_document', False)
+        analysis_id = session.get('analysis_id')
+        
+        if not has_document and not analysis_id:
+            logging.error("No document found for checkout")
             flash('No document found. Please upload a document first.', 'error')
             return redirect(url_for('index'))
+        
+        # Verify document exists in database
+        if analysis_id:
+            try:
+                analysis = DocumentAnalysis.query.filter_by(id=analysis_id).first()
+                if not analysis:
+                    logging.error(f"Document analysis not found for ID: {analysis_id}")
+                    flash('Document not found. Please upload a document again.', 'error')
+                    return redirect(url_for('index'))
+            except Exception as e:
+                logging.error(f"Database error checking analysis: {str(e)}")
+                flash('Error accessing document. Please try again.', 'error')
+                return redirect(url_for('index'))
         
         # Get current domain dynamically
         current_domain = get_domain()
@@ -426,12 +453,22 @@ def success():
         except Exception as db_error:
             logging.error(f"Database error updating payment status: {str(db_error)}")
         
-        # Use full document text if available, otherwise use truncated version
-        doc_text = session.get('full_doc_text') or session.get('doc_text', '')
-        processed_files = session.get('processed_files', [])
+        # Retrieve document data from database
+        analysis_id = session.get('analysis_id')
+        if not analysis_id:
+            flash('No document found. Please start over.', 'error')
+            return redirect(url_for('index'))
+        
+        analysis_record = DocumentAnalysis.query.get(analysis_id)
+        if not analysis_record:
+            flash('Document not found. Please start over.', 'error')
+            return redirect(url_for('index'))
+        
+        doc_text = analysis_record.document_text
+        processed_files = json.loads(analysis_record.file_names) if analysis_record.file_names else []
         
         if not doc_text:
-            flash('No document found. Please start over.', 'error')
+            flash('No document text found. Please start over.', 'error')
             return redirect(url_for('index'))
         
         # Get legal analysis parameters
