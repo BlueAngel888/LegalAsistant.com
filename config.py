@@ -1,7 +1,7 @@
 import os
 
 # Stripe Configuration
-STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "pk_test_default")
+STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "pk_test_default")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "sk_test_default")
 
 # OpenAI Configuration
