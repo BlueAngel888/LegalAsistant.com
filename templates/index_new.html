@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Service - Payment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .price {
+            font-size: 3rem;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-description {
+            color: #888;
+            margin-bottom: 2rem;
+        }
+        
+        .payment-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        .payment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .payment-btn:active {
+            transform: translateY(0);
+        }
+        
+        .features {
+            margin-top: 2rem;
+            text-align: left;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: #666;
+        }
+        
+        .feature-icon {
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📄</div>
+        <h1>OCR Document Service</h1>
+        <p class="description">
+            Professional OCR text extraction from your images and documents. 
+            Fast, accurate, and secure processing.
+        </p>
+        
+        <div class="price">€5.00</div>
+        <p class="price-description">One-time payment • Instant processing</p>
+        
+        <form action="/create-payment" method="POST" id="payment-form">
+            <button type="submit" class="payment-btn" id="payment-btn">
+                🔒 Secure Payment
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            Processing payment... Please wait.
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>High-accuracy OCR technology</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">⚡</span>
+                <span>Instant processing after payment</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔐</span>
+                <span>Secure and private</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📱</span>
+                <span>Works with any image format</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('payment-form').addEventListener('submit', function(e) {
+            const btn = document.getElementById('payment-btn');
+            const loading = document.getElementById('loading');
+            
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Processing...';
+            loading.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
