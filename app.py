@@ -515,7 +515,18 @@ def create_checkout_session():
         if checkout_session.url:
             # Store session ID for verification
             session['stripe_session_id'] = checkout_session.id
-            return redirect(checkout_session.url, code=303)
+            
+            # For AJAX requests, return JSON with redirect URL
+            if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'redirect_url': checkout_session.url})
+            
+            # For normal form submissions, use window.location redirect via JavaScript
+            return f'''
+            <script>
+                console.log('Redirecting to Stripe checkout...');
+                window.location.href = '{checkout_session.url}';
+            </script>
+            '''
         else:
             logging.error("No redirect URL in Stripe session")
             flash('Payment session creation failed. Please try again.', 'error')
