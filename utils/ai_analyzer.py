@@ -169,3 +169,86 @@ Document excerpt: {text[:1000]}...
     except Exception as e:
         logging.error(f"Error generating document summary: {str(e)}")
         return "Unable to generate document summary."
+
+def get_legal_chat_response(message: str, analysis_context: str = '', conversation_history: list = None, language: str = 'ro') -> str:
+    """
+    Generate a legal chat response based on user question and document analysis context.
+    """
+    try:
+        if not message.strip():
+            return "Vă rugăm să introduceți o întrebare validă."
+        
+        if conversation_history is None:
+            conversation_history = []
+        
+        # Create system prompt for legal assistant
+        system_prompt = f"""
+        Ești un asistent legal virtual specializat în analiza documentelor juridice românești.
+        
+        IMPORTANT: Răspunde DOAR la întrebări care sunt strict legate de aspectele legale ale documentului analizat.
+        
+        Contextul documentului analizat:
+        {analysis_context[:3000] if analysis_context else 'Nu este disponibil contextul documentului.'}
+        
+        Instrucțiuni:
+        1. Răspunde doar la întrebări despre aspectele legale ale documentului specific
+        2. Dacă întrebarea nu este legată de document, explică că nu poți răspunde
+        3. Oferă răspunsuri practice și clare
+        4. Menționează că sfaturile sunt generale și nu înlocuiesc consultarea unui avocat
+        5. Folosește limba română
+        6. Limitează răspunsul la 300 de cuvinte maximum
+        7. Evidențiază riscurile importante cu ⚠️
+        8. Folosește puncte pentru claritate
+        
+        Exemple de întrebări la care poți răspunde:
+        - Obligațiile părților din contract
+        - Termene și deadline-uri importante
+        - Clauze problematice sau riscante
+        - Drepturi și responsabilități
+        - Consecințe legale
+        - Proceduri de reziliere
+        
+        Nu răspunde la:
+        - Întrebări generale despre drept fără legătură cu documentul
+        - Solicitări de consiliere juridică specifică
+        - Întrebări despre alte documente
+        - Subiecte non-juridice
+        """
+        
+        # Build conversation for API
+        messages = [{"role": "system", "content": system_prompt}]
+        
+        # Add conversation history (limited)
+        for msg in conversation_history[-4:]:  # Last 4 messages for context
+            if 'role' in msg and 'content' in msg:
+                messages.append(msg)
+        
+        # Add current user message
+        messages.append({"role": "user", "content": message})
+        
+        openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+            messages=messages,
+            max_tokens=500,
+            temperature=0.3,
+            presence_penalty=0.1,
+            frequency_penalty=0.1
+        )
+        
+        chat_response = response.choices[0].message.content.strip()
+        
+        # Add disclaimer to response
+        if not "consultați un avocat" in chat_response.lower():
+            chat_response += "\n\n💡 **Disclaimer**: Aceste informații sunt generale. Pentru sfaturi juridice specifice, consultați un avocat calificat."
+        
+        return chat_response
+        
+    except Exception as e:
+        logging.error(f"Error in legal chat response: {str(e)}")
+        if "rate limit" in str(e).lower():
+            return "Momentan sistemul este suprasolicitat. Vă rugăm să încercați din nou în câteva momente."
+        elif "api" in str(e).lower():
+            return "Ne pare rău, serviciul este temporar indisponibil. Vă rugăm să încercați din nou mai târziu."
+        else:
+            return "A apărut o eroare neașteptată. Vă rugăm să reformulați întrebarea sau să încercați din nou."

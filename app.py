@@ -635,6 +635,60 @@ def success():
                              error_message='We encountered an error while analyzing your document. Please contact support if this issue persists.',
                              t=t, lang=lang)
 
+@app.route('/legal-chat', methods=['POST'])
+def legal_chat():
+    """Handle legal chat questions about analyzed documents"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        message = data.get('message', '').strip()
+        analysis_context = data.get('analysis_context', '')
+        conversation_history = data.get('conversation_history', [])
+        
+        if not message:
+            return jsonify({'success': False, 'error': 'No message provided'}), 400
+        
+        # Security: Limit message length and validate content
+        if len(message) > 500:
+            return jsonify({'success': False, 'error': 'Message too long'}), 400
+        
+        # Check if user has access to legal chat (has analyzed document)
+        if not session.get('has_document') and not session.get('analysis_id'):
+            return jsonify({'success': False, 'error': 'No document analysis found'}), 403
+        
+        # Import OpenAI here to avoid import issues
+        from utils.ai_analyzer import get_legal_chat_response
+        
+        # Get AI response
+        try:
+            response = get_legal_chat_response(
+                message=message,
+                analysis_context=analysis_context,
+                conversation_history=conversation_history,
+                language=session.get('language', 'ro')
+            )
+            
+            # Log chat interaction for learning
+            logging.info(f"Legal chat - User: {message[:100]}..., Response length: {len(response)}")
+            
+            return jsonify({
+                'success': True,
+                'response': response
+            })
+            
+        except Exception as ai_error:
+            logging.error(f"AI chat error: {str(ai_error)}")
+            return jsonify({
+                'success': False,
+                'error': 'Could not process your question at this time'
+            }), 500
+            
+    except Exception as e:
+        logging.error(f"Legal chat error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
 @app.route('/clear-session')
 def clear_session():
     session.clear()
