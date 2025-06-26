@@ -343,9 +343,8 @@ function initializeFileUpload() {
                 const form = submitBtn.closest('form');
                 if (form) {
                     console.log('Form found, manually triggering submission');
-                    // Manually trigger form submission since normal submission isn't working
-                    e.preventDefault();
-                    form.submit();
+                    // Let the normal form submission happen
+                    console.log('Form found, allowing normal submission');
                 } else {
                     console.error('No form found for submit button!');
                 }
@@ -1267,9 +1266,8 @@ function initializeFormValidation() {
             if (submitButton && !submitButton.disabled) {
                 console.log('Submit button is enabled, proceeding with form submission');
                 
-                // Add loading state
+                // Add loading state but don't prevent form submission
                 const originalText = submitButton.innerHTML;
-                submitButton.disabled = true;
                 submitButton.classList.add('loading');
                 
                 // Update button text based on form action
@@ -1279,6 +1277,11 @@ function initializeFormValidation() {
                     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecting to payment...';
                 }
                 
+                // Don't disable the button immediately - let form submit first
+                setTimeout(() => {
+                    submitButton.disabled = true;
+                }, 100);
+                
                 // Reset button after a timeout (fallback)
                 setTimeout(() => {
                     if (submitButton.disabled) {
@@ -1286,8 +1289,8 @@ function initializeFormValidation() {
                         submitButton.classList.remove('loading');
                         submitButton.innerHTML = originalText;
                     }
-                }, 10000);
-            } else {
+                }, 15000);
+            } else if (submitButton && submitButton.disabled) {
                 console.log('Submit button is disabled, form submission blocked');
                 e.preventDefault();
             }
