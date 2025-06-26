@@ -9,6 +9,7 @@ import stripe
 from utils.pdf_tools import extract_text_from_file
 from utils.ai_analyzer import analyze_with_gpt4
 from utils.enhanced_legal_analyzer import analyze_with_enhanced_gpt4
+from utils.document_consistency_analyzer import DocumentConsistencyAnalyzer
 from config import STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY
 from translations import get_translation
 
@@ -217,6 +218,41 @@ def upload_file():
         
         # Store document text and file info in session (compress for large texts)
         doc_text = "\n\n--- Document Separator ---\n\n".join(texts)
+        
+        # Analyze document consistency for multiple files
+        consistency_warnings = []
+        if len(texts) > 1:
+            try:
+                analyzer = DocumentConsistencyAnalyzer()
+                documents = [
+                    {
+                        'filename': processed_files[i],
+                        'text': texts[i],
+                        'size': len(texts[i])
+                    } for i in range(len(texts))
+                ]
+                
+                consistency_result = analyzer.analyze_document_consistency(documents)
+                logging.info(f"Document consistency analysis - Consistent: {consistency_result['is_consistent']}, Confidence: {consistency_result['confidence']:.2f}")
+                
+                if not consistency_result['is_consistent'] or consistency_result['confidence'] < 0.7:
+                    for warning in consistency_result['warnings']:
+                        if warning['severity'] in ['high', 'medium']:
+                            warning_msg = f"⚠️ {warning['message']}"
+                            consistency_warnings.append(warning_msg)
+                            logging.warning(f"Document consistency warning: {warning['message']}")
+                
+                # Store consistency info in session for display
+                session['consistency_result'] = {
+                    'is_consistent': consistency_result['is_consistent'],
+                    'confidence': consistency_result['confidence'],
+                    'warnings': consistency_warnings,
+                    'recommendations': consistency_result['recommendations']
+                }
+                
+            except Exception as e:
+                logging.error(f"Error in document consistency analysis: {str(e)}")
+                # Continue without consistency check if analysis fails
         
         # Create database record for the document analysis
         try:
