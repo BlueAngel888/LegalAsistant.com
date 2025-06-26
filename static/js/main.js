@@ -303,8 +303,10 @@ function initializeFileUpload() {
                 // Check if we need to manually trigger form submission
                 const form = submitBtn.closest('form');
                 if (form) {
-                    console.log('Form found, triggering submission');
-                    // Don't prevent default - let normal form submission happen
+                    console.log('Form found, manually triggering submission');
+                    // Manually trigger form submission since normal submission isn't working
+                    e.preventDefault();
+                    form.submit();
                 } else {
                     console.error('No form found for submit button!');
                 }
