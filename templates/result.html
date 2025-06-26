@@ -111,7 +111,22 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/legal-chat.js') }}"></script>
 <script>
+// Initialize legal chat with analysis context
+document.addEventListener('DOMContentLoaded', function() {
+    const analysisContent = document.querySelector('.formatted-analysis');
+    if (analysisContent && window.LegalChatSystem) {
+        const contextText = analysisContent.innerText || analysisContent.textContent || '';
+        window.legalChat = new window.LegalChatSystem();
+        
+        // Delay initialization to ensure page is fully loaded
+        setTimeout(() => {
+            window.legalChat.initialize(contextText);
+        }, 1000);
+    }
+});
+
 function copyToClipboard() {
     const analysisText = document.querySelector('.formatted-analysis').innerText;
     
