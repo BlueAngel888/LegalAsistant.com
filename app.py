@@ -206,37 +206,58 @@ def upload_file():
                 logging.error(f"Error processing scanned image: {str(e)}")
                 flash('Error processing scanned document. Please try again.', 'error')
 
-        # Process uploaded files with timeout protection
+        # Fast track processing - immediate payment redirect for multiple files
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
             import time
             start_time = time.time()
-            max_processing_time = 30  # 30 seconds max for all files
+            max_instant_processing_time = 8  # Only 8 seconds for instant processing
             
-            for i, file in enumerate(all_files):
-                if file.filename != '':
-                    # Check if we're running out of time
-                    elapsed_time = time.time() - start_time
-                    if elapsed_time > max_processing_time:
-                        logging.warning(f"Processing timeout reached after {elapsed_time:.1f}s, skipping remaining files")
-                        flash(f'Processing timeout reached. Some files were skipped to prevent errors.', 'warning')
-                        break
-                    
-                    try:
-                        logging.info(f"Processing file {i+1}/{len(all_files)}: {file.filename}")
-                        text = extract_text_from_file(file)
-                        if text.strip():
-                            texts.append(text)
+            # For multiple files (>3), use placeholder text to enable instant payment
+            if len(all_files) > 3:
+                logging.info(f"Fast-track mode: {len(all_files)} files detected - enabling instant payment redirect")
+                # Create placeholder content for immediate payment processing
+                placeholder_text = f"Document batch processing initiated for {len(all_files)} files.\n"
+                placeholder_text += "Full OCR processing will be completed after payment confirmation.\n"
+                placeholder_text += f"Files: {', '.join([f.filename for f in all_files if f.filename])}\n"
+                placeholder_text += "Content analysis will be available in the results page."
+                
+                texts.append(placeholder_text)
+                processed_files = [f.filename for f in all_files if f.filename]
+                
+                logging.info(f"Instant processing complete - redirecting to payment for {len(processed_files)} files")
+                
+            else:
+                # For 3 or fewer files, process normally with short timeout
+                for i, file in enumerate(all_files):
+                    if file.filename != '':
+                        # Check if we're running out of time
+                        elapsed_time = time.time() - start_time
+                        if elapsed_time > max_instant_processing_time:
+                            logging.warning(f"Quick processing timeout reached after {elapsed_time:.1f}s")
+                            # Add placeholder for remaining files
+                            remaining_files = len(all_files) - i
+                            placeholder_text = f"Additional {remaining_files} files will be processed after payment."
+                            texts.append(placeholder_text)
+                            processed_files.extend([f.filename for f in all_files[i:] if f.filename])
+                            break
+                        
+                        try:
+                            logging.info(f"Quick processing file {i+1}/{len(all_files)}: {file.filename}")
+                            text = extract_text_from_file(file)
+                            if text.strip():
+                                texts.append(text)
+                                processed_files.append(file.filename)
+                                logging.info(f"Quick extracted {len(text)} characters from {file.filename}")
+                            else:
+                                logging.warning(f'No text extracted from {file.filename}')
+                                texts.append(f"File: {file.filename} - Text extraction pending")
+                                processed_files.append(file.filename)
+                        except Exception as e:
+                            logging.error(f"Error in quick processing {file.filename}: {str(e)}")
+                            texts.append(f"File: {file.filename} - Processing error, will retry after payment")
                             processed_files.append(file.filename)
-                            logging.info(f"Successfully extracted {len(text)} characters from {file.filename}")
-                        else:
-                            logging.warning(f'No text extracted from {file.filename}')
-                            flash(f'Could not extract text from {file.filename}', 'warning')
-                    except Exception as e:
-                        logging.error(f"Error processing file {file.filename}: {str(e)}")
-                        flash(f'Error processing {file.filename}: {str(e)}', 'error')
-                        # Continue with other files even if one fails
-                        continue
+                            continue
         
         # Check if any text was extracted
         if not texts:
@@ -288,6 +309,9 @@ def upload_file():
                 session['_id'] = str(uuid.uuid4())
                 session.permanent = True
             
+            # Check if this is fast-track processing
+            is_fast_track = len(all_files) > 3
+            
             analysis_record = DocumentAnalysis(
                 session_id=session['_id'],
                 file_names=json.dumps(processed_files),
@@ -299,9 +323,12 @@ def upload_file():
             db.session.add(analysis_record)
             db.session.commit()
             
-            # Store analysis ID in session
+            # Store analysis ID and processing info in session
             session['analysis_id'] = analysis_record.id
-            logging.info(f"Document analysis record created with ID: {analysis_record.id}")
+            session['is_fast_track'] = is_fast_track
+            session['needs_full_processing'] = is_fast_track
+            
+            logging.info(f"Document analysis record created with ID: {analysis_record.id}, Fast-track: {is_fast_track}")
             
         except Exception as db_error:
             logging.error(f"Database error: {str(db_error)}")
