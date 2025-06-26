@@ -214,21 +214,9 @@ def upload_file():
             if len(all_files) >= 3:
                 logging.info(f"INSTANT MODE: {len(all_files)} files detected - processing will happen after payment")
                 
-                # Store files for later processing after payment
-                session['uploaded_files'] = []
+                # Store only filenames for later processing after payment
                 for file in all_files:
                     if file.filename != '':
-                        # Read and store file content in session for later processing
-                        file_content = file.read()
-                        file.seek(0)  # Reset file pointer
-                        
-                        import base64
-                        encoded_content = base64.b64encode(file_content).decode('utf-8')
-                        session['uploaded_files'].append({
-                            'filename': file.filename,
-                            'content': encoded_content,
-                            'mimetype': file.content_type
-                        })
                         processed_files.append(file.filename)
                 
                 # Create placeholder text for immediate payment
