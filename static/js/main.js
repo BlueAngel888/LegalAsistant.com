@@ -116,6 +116,9 @@ function initializeFileUpload() {
         selectedFiles = [...validFiles];
         console.log('Files processed:', selectedFiles.length, 'valid files');
         
+        // Update the file input with selected files
+        updateFileInputValue();
+        
         // Update display
         updateFileDisplay();
         
@@ -126,6 +129,21 @@ function initializeFileUpload() {
         if (selectedFiles.length > 0 && filePreview) {
             filePreview.style.display = 'block';
         }
+    }
+    
+    function updateFileInputValue() {
+        // Create a new DataTransfer object to set files in the input
+        const dt = new DataTransfer();
+        
+        // Add each selected file to the DataTransfer
+        selectedFiles.forEach(file => {
+            dt.items.add(file);
+        });
+        
+        // Set the files property of the input
+        fileInput.files = dt.files;
+        
+        console.log('Updated file input with', dt.files.length, 'files');
     }
 
     function updateFileDisplay() {
@@ -271,6 +289,31 @@ function initializeFileUpload() {
     if (languageSelect) languageSelect.addEventListener('change', updateSubmitButton);
     if (countrySelectCamera) countrySelectCamera.addEventListener('change', updateSubmitButton);
     if (languageSelectCamera) languageSelectCamera.addEventListener('change', updateSubmitButton);
+    
+    // Add explicit submit button click handler for debugging
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            console.log('Submit button clicked!');
+            console.log('Button disabled?', submitBtn.disabled);
+            console.log('Button type:', submitBtn.type);
+            
+            if (!submitBtn.disabled) {
+                console.log('Button is enabled, should trigger form submit');
+                // Check if we need to manually trigger form submission
+                const form = submitBtn.closest('form');
+                if (form) {
+                    console.log('Form found, triggering submission');
+                    // Don't prevent default - let normal form submission happen
+                } else {
+                    console.error('No form found for submit button!');
+                }
+            } else {
+                console.log('Button is disabled, preventing submission');
+                e.preventDefault();
+            }
+        });
+    }
     
     // Initialize submit button state
     updateSubmitButton();
