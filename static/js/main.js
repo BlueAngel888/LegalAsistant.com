@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all interactive elements
     initializeFileUpload();
     initializeFormValidation();
+    initializeLegalSelectors();
     initializeTooltips();
     initializeScrollEffects();
 });
@@ -143,8 +144,44 @@ function initializeFileUpload() {
 
     function updateSubmitButton() {
         const submitBtn = document.getElementById('submitBtn');
+        
         if (submitBtn) {
-            submitBtn.disabled = selectedFiles.length === 0;
+            // Check file upload tab
+            const hasFiles = selectedFiles.length > 0;
+            
+            // Check camera tab - if scanned image exists
+            const scannedInput = document.getElementById('scannedImage');
+            const hasScannedImage = scannedInput && scannedInput.value;
+            
+            // Check legal parameters for current active tab
+            const activeTab = document.querySelector('.nav-link.active');
+            let hasCountry = false;
+            let hasLanguage = false;
+            
+            if (activeTab && activeTab.id === 'camera-tab') {
+                // Camera tab validation
+                const countrySelect = document.getElementById('document_country_camera');
+                const languageSelect = document.getElementById('analysis_language_camera');
+                hasCountry = countrySelect && countrySelect.value && countrySelect.value !== '';
+                hasLanguage = languageSelect && languageSelect.value && languageSelect.value !== '';
+            } else {
+                // File upload tab validation
+                const countrySelect = document.getElementById('document_country');
+                const languageSelect = document.getElementById('analysis_language');
+                hasCountry = countrySelect && countrySelect.value && countrySelect.value !== '';
+                hasLanguage = languageSelect && languageSelect.value && languageSelect.value !== '';
+            }
+            
+            // Enable submit only if we have documents AND legal parameters
+            const hasDocuments = hasFiles || hasScannedImage;
+            submitBtn.disabled = !(hasDocuments && hasCountry && hasLanguage);
+            
+            // Visual feedback
+            if (hasDocuments && hasCountry && hasLanguage) {
+                submitBtn.classList.add('enhanced-ready');
+            } else {
+                submitBtn.classList.remove('enhanced-ready');
+            }
         }
     }
 
@@ -216,6 +253,105 @@ function initializeFileUpload() {
     updateSubmitButton();
 }
 
+// Camera functionality for document scanning
+let cameraStream = null;
+let capturedImages = [];
+
+function startCamera() {
+    const video = document.getElementById('cameraVideo');
+    const container = document.getElementById('cameraContainer');
+    const startBtn = document.getElementById('startCameraBtn');
+    
+    navigator.mediaDevices.getUserMedia({ 
+        video: { 
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+        } 
+    })
+    .then(stream => {
+        cameraStream = stream;
+        video.srcObject = stream;
+        container.style.display = 'block';
+        startBtn.style.display = 'none';
+        console.log('Camera started successfully');
+    })
+    .catch(err => {
+        console.error('Error accessing camera:', err);
+        alert('Unable to access camera. Please ensure you have granted camera permissions.');
+    });
+}
+
+function stopCamera() {
+    const video = document.getElementById('cameraVideo');
+    const container = document.getElementById('cameraContainer');
+    const startBtn = document.getElementById('startCameraBtn');
+    
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    
+    video.srcObject = null;
+    container.style.display = 'none';
+    startBtn.style.display = 'block';
+    console.log('Camera stopped');
+}
+
+function captureDocument() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('captureCanvas');
+    const preview = document.getElementById('capturedPreview');
+    const previewImg = document.getElementById('previewImage');
+    const scannedInput = document.getElementById('scannedImage');
+    
+    if (!video.videoWidth || !video.videoHeight) {
+        alert('Camera not ready. Please wait a moment and try again.');
+        return;
+    }
+    
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw video frame to canvas
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convert to data URL
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    
+    // Store captured image
+    capturedImages.push(dataUrl);
+    
+    // Update preview
+    previewImg.src = dataUrl;
+    preview.style.display = 'block';
+    
+    // Store in hidden input for form submission
+    scannedInput.value = dataUrl;
+    
+    // Update submit button state
+    if (window.updateSubmitButton) {
+        window.updateSubmitButton();
+    }
+    
+    console.log('Document captured successfully');
+}
+
+function captureAnother() {
+    const preview = document.getElementById('capturedPreview');
+    preview.style.display = 'none';
+    
+    // Keep camera running for another capture
+    console.log('Ready for another capture');
+    
+    // Update submit button to reflect multiple images
+    if (window.updateSubmitButton) {
+        window.updateSubmitButton();
+    }
+}
+
 // Enhanced Legal Selector Functions
 
 
@@ -228,6 +364,26 @@ function initializeLegalSelectors() {
     // Camera tab selectors
     const countrySelectCamera = document.getElementById('document_country_camera');
     const languageSelectCamera = document.getElementById('analysis_language_camera');
+    
+    // Tab switching listeners
+    const uploadTab = document.getElementById('file-tab');
+    const cameraTab = document.getElementById('camera-tab');
+    
+    if (uploadTab) {
+        uploadTab.addEventListener('click', function() {
+            setTimeout(() => {
+                if (window.updateSubmitButton) window.updateSubmitButton();
+            }, 100);
+        });
+    }
+    
+    if (cameraTab) {
+        cameraTab.addEventListener('click', function() {
+            setTimeout(() => {
+                if (window.updateSubmitButton) window.updateSubmitButton();
+            }, 100);
+        });
+    }
     
     // Handle upload tab selectors
     if (countrySelect && languageSelect) {
