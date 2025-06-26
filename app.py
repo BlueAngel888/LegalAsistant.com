@@ -210,18 +210,27 @@ def upload_file():
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
             
-            # For 3+ files, skip ALL processing and go directly to payment
+            # For 3+ files, do FAST processing of all files for instant payment
             if len(all_files) >= 3:
-                logging.info(f"INSTANT MODE: {len(all_files)} files detected - skipping processing, going directly to payment")
+                logging.info(f"FAST MODE: {len(all_files)} files detected - quick OCR processing then payment")
                 
-                # Create minimal placeholder for database
-                placeholder_text = f"BATCH PROCESSING: {len(all_files)} files ready for analysis after payment.\n"
-                placeholder_text += f"Files: {', '.join([f.filename for f in all_files if f.filename])}"
+                for i, file in enumerate(all_files):
+                    if file.filename != '':
+                        try:
+                            logging.info(f"Fast OCR processing file {i+1}/{len(all_files)}: {file.filename}")
+                            text = extract_text_from_file(file)
+                            if text.strip():
+                                texts.append(text)
+                                processed_files.append(file.filename)
+                                logging.info(f"Extracted {len(text)} characters from {file.filename}")
+                            else:
+                                logging.warning(f"No text extracted from {file.filename}")
+                                processed_files.append(f"{file.filename} (empty)")
+                        except Exception as e:
+                            logging.error(f"Error processing {file.filename}: {str(e)}")
+                            processed_files.append(f"{file.filename} (error)")
                 
-                texts.append(placeholder_text)
-                processed_files = [f.filename for f in all_files if f.filename]
-                
-                logging.info(f"INSTANT REDIRECT: Payment for {len(processed_files)} files")
+                logging.info(f"FAST MODE: Processed {len(processed_files)} files in seconds")
                 
             else:
                 # For 1-2 files, do quick processing
