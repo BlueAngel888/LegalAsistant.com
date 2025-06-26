@@ -109,9 +109,29 @@ def extract_text_from_image(file_content: bytes) -> str:
             image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
             logging.info(f"Resized image from {width}x{height} to {new_width}x{new_height} for faster processing")
         
-        # Use optimized OCR configuration for faster processing
-        custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?;:()\-\n '
-        text = pytesseract.image_to_string(image, lang='eng', config=custom_config)
+        # Use fast OCR configuration with timeout protection
+        custom_config = r'--oem 3 --psm 6'
+        
+        # Set timeout for OCR processing (max 10 seconds per image)
+        import signal
+        
+        def timeout_handler(signum, frame):
+            raise TimeoutError("OCR processing timeout")
+        
+        try:
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(10)  # 10 second timeout
+            text = pytesseract.image_to_string(image, lang='eng', config=custom_config)
+            signal.alarm(0)  # Cancel alarm
+        except TimeoutError:
+            signal.alarm(0)
+            logging.warning("OCR timeout - using fallback processing")
+            # Try simpler/faster config
+            text = pytesseract.image_to_string(image, lang='eng', config='--psm 8')
+        except Exception as ocr_error:
+            signal.alarm(0)
+            logging.error(f"OCR error: {str(ocr_error)}")
+            text = ""
         
         return text
         

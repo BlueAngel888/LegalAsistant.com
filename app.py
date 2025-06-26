@@ -210,27 +210,35 @@ def upload_file():
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
             
-            # For 3+ files, do FAST processing of all files for instant payment
+            # For 3+ files, skip processing and go directly to payment (INSTANT MODE)
             if len(all_files) >= 3:
-                logging.info(f"FAST MODE: {len(all_files)} files detected - quick OCR processing then payment")
+                logging.info(f"INSTANT MODE: {len(all_files)} files detected - processing will happen after payment")
                 
-                for i, file in enumerate(all_files):
+                # Store files for later processing after payment
+                session['uploaded_files'] = []
+                for file in all_files:
                     if file.filename != '':
-                        try:
-                            logging.info(f"Fast OCR processing file {i+1}/{len(all_files)}: {file.filename}")
-                            text = extract_text_from_file(file)
-                            if text.strip():
-                                texts.append(text)
-                                processed_files.append(file.filename)
-                                logging.info(f"Extracted {len(text)} characters from {file.filename}")
-                            else:
-                                logging.warning(f"No text extracted from {file.filename}")
-                                processed_files.append(f"{file.filename} (empty)")
-                        except Exception as e:
-                            logging.error(f"Error processing {file.filename}: {str(e)}")
-                            processed_files.append(f"{file.filename} (error)")
+                        # Read and store file content in session for later processing
+                        file_content = file.read()
+                        file.seek(0)  # Reset file pointer
+                        
+                        import base64
+                        encoded_content = base64.b64encode(file_content).decode('utf-8')
+                        session['uploaded_files'].append({
+                            'filename': file.filename,
+                            'content': encoded_content,
+                            'mimetype': file.content_type
+                        })
+                        processed_files.append(file.filename)
                 
-                logging.info(f"FAST MODE: Processed {len(processed_files)} files in seconds")
+                # Create placeholder text for immediate payment
+                placeholder_text = f"INSTANT UPLOAD: {len(processed_files)} files ready for analysis after payment.\n"
+                placeholder_text += f"Files: {', '.join(processed_files)}\n"
+                placeholder_text += "Full OCR analysis will be completed after payment confirmation."
+                texts.append(placeholder_text)
+                
+                session['needs_full_processing'] = True
+                logging.info(f"INSTANT MODE: {len(processed_files)} files stored for post-payment processing")
                 
             else:
                 # For 1-2 files, do quick processing
