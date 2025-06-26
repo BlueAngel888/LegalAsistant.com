@@ -282,16 +282,19 @@ def upload_file():
 
 @app.route('/checkout')
 def checkout():
-    # Debug session data
-    logging.info(f"Checkout route - Session keys: {list(session.keys())}")
+    # Enhanced debug session data
+    logging.info(f"Checkout route - Full session data: {dict(session)}")
+    logging.info(f"Checkout route - Session ID: {session.get('_id', 'None')}")
     logging.info(f"Checkout route - has_document: {session.get('has_document', False)}")
     logging.info(f"Checkout route - analysis_id: {session.get('analysis_id', 'None')}")
+    logging.info(f"Checkout route - processed_files: {session.get('processed_files', [])}")
     
     # Check if we have document data either in session metadata or database
     has_document = session.get('has_document', False)
     analysis_id = session.get('analysis_id')
     
     if not has_document and not analysis_id:
+        logging.error("No document found in session - redirecting to index")
         flash('No document found. Please upload a document first.', 'error')
         return redirect(url_for('index'))
     
@@ -300,14 +303,18 @@ def checkout():
         try:
             analysis = DocumentAnalysis.query.filter_by(id=analysis_id).first()
             if not analysis:
+                logging.error(f"Document analysis not found in database for ID: {analysis_id}")
                 flash('Document not found. Please upload a document again.', 'error')
                 return redirect(url_for('index'))
+            else:
+                logging.info(f"Document analysis found in database: {analysis.id}")
         except Exception as e:
             logging.error(f"Database error checking analysis: {str(e)}")
     
     lang = session.get('language', 'en')
     t = get_translation(lang)
     processed_files = session.get('processed_files', [])
+    logging.info(f"Rendering checkout with {len(processed_files)} files")
     return render_template('checkout.html', files=processed_files, t=t, lang=lang)
 
 @app.route('/create-checkout-session', methods=['POST'])
