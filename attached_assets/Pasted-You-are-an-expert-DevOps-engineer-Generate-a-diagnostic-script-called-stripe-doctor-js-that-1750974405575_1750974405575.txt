@@ -1,0 +1,43 @@
+You are an expert DevOps engineer.  
+Generate a **diagnostic script called `stripe-doctor.js`** that verifică automat, în ordinea de mai jos, cauzele comune pentru care pagina Stripe Checkout nu se încarcă dintr-un proiect Replit.
+
+🔹  Limbaj: Node.js (ESM)  
+🔹  Rulează local în Replit (port 3000)  
+🔹  Folosește doar pachetele `stripe` și `axios`  
+
+-----------------  CERINȚE CONCRETE  -----------------
+
+1️⃣  **Verificarea cheilor Stripe**
+     • Citește `STRIPE_SECRET_KEY` și `STRIPE_PUBLISHABLE_KEY` din `process.env`.
+     • Afișează dacă lipsesc sau dacă una este „live” și cealaltă „test”.
+     • Încearcă `stripe.accounts.retrieve()` – dacă eşuează, afișează err.message.
+
+2️⃣  **Verificarea endpoint-ului `/create-checkout-session`**
+     • Fă un `POST` local cu `axios` la `http://127.0.0.1:3000/create-checkout-session`.
+     • Așteaptă răspuns JSON cu `id` **sau** redirect 303.  
+     • Dacă cod ≠ 200|303, loghează status & body.
+
+3️⃣  **Validarea sesiunii primite**
+     • Dacă primești `id`, cheamă `stripe.checkout.sessions.retrieve(id)`  
+       și confirmă că status === "open" și url există.
+
+4️⃣  **Verificarea domeniului și HTTPS**
+     • Obține `SERVER_DOMAIN` (din env sau `process.env.REPL_SLUG.repl.co`).  
+     • Verifică dacă începe cu `https://`; altfel, avertizează “Stripe blochează http”.
+
+5️⃣  **Verificarea domeniului înregistrat în Stripe**
+     • Listează domeniile aprobate cu `stripe.checkout.sessions.list({limit:1})`,  
+       parsează url-ul și compară cu domeniul local.  
+       Dacă nu se pot lista sesiunile, afişează instrucțiuni manuale.
+
+6️⃣  **Raport final colorat**  
+     • Pentru fiecare pas scrie “✅ OK” sau “❌ Problemă” (folosește ANSI colors).  
+     • La final, rezumă într-o tabelă ce trebuie reparat.
+
+7️⃣  **Instrucțiuni de rulare**  
+     • În README scurt (<10 linii) explică:  
+       `npm install stripe axios` → `node stripe-doctor.js`
+
+Nu adăuga alt text în afara fișierului generat și a README-ului.
+
+-------------------------------------------------------
