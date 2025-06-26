@@ -344,8 +344,14 @@ function initializeFileUpload() {
             } 
             
             console.log('Button is enabled, triggering form submission');
-            // Manually submit the form to ensure it works
+            // For checkout forms, allow natural browser submission for proper redirects
             const form = submitBtn.closest('form');
+            if (form && form.action.includes('checkout')) {
+                console.log('Checkout form - allowing natural browser submission');
+                return true; // Let browser handle it naturally
+            }
+            
+            // For other forms, use manual submission
             if (form) {
                 console.log('Form found, submitting...');
                 e.preventDefault(); // Prevent default to avoid double submission
