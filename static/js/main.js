@@ -174,7 +174,19 @@ function initializeFileUpload() {
             
             // Enable submit only if we have documents AND legal parameters
             const hasDocuments = hasFiles || hasScannedImage;
-            submitBtn.disabled = !(hasDocuments && hasCountry && hasLanguage);
+            const shouldEnable = hasDocuments && hasCountry && hasLanguage;
+            
+            console.log('Submit button validation:', {
+                hasFiles,
+                hasScannedImage,
+                hasDocuments,
+                hasCountry,
+                hasLanguage,
+                shouldEnable,
+                activeTabId: activeTab ? activeTab.id : 'none'
+            });
+            
+            submitBtn.disabled = !shouldEnable;
             
             // Visual feedback
             if (hasDocuments && hasCountry && hasLanguage) {
@@ -249,6 +261,17 @@ function initializeFileUpload() {
         }
     };
 
+    // Add event listeners for legal parameters
+    const countrySelect = document.getElementById('document_country');
+    const languageSelect = document.getElementById('analysis_language');
+    const countrySelectCamera = document.getElementById('document_country_camera');
+    const languageSelectCamera = document.getElementById('analysis_language_camera');
+    
+    if (countrySelect) countrySelect.addEventListener('change', updateSubmitButton);
+    if (languageSelect) languageSelect.addEventListener('change', updateSubmitButton);
+    if (countrySelectCamera) countrySelectCamera.addEventListener('change', updateSubmitButton);
+    if (languageSelectCamera) languageSelectCamera.addEventListener('change', updateSubmitButton);
+    
     // Initialize submit button state
     updateSubmitButton();
 }
