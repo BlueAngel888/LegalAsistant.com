@@ -873,9 +873,15 @@ function initializeFormValidation() {
     
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
+            console.log('Form submit event triggered:', form.action);
+            console.log('Form method:', form.method);
+            console.log('Form data will be submitted...');
+            
             const submitButton = form.querySelector('button[type="submit"]');
             
             if (submitButton && !submitButton.disabled) {
+                console.log('Submit button is enabled, proceeding with form submission');
+                
                 // Add loading state
                 const originalText = submitButton.innerHTML;
                 submitButton.disabled = true;
@@ -896,6 +902,9 @@ function initializeFormValidation() {
                         submitButton.innerHTML = originalText;
                     }
                 }, 10000);
+            } else {
+                console.log('Submit button is disabled, form submission blocked');
+                e.preventDefault();
             }
         });
     });
