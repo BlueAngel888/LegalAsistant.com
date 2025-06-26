@@ -516,9 +516,23 @@ def create_checkout_session():
             # Store session ID for verification
             session['stripe_session_id'] = checkout_session.id
             
-            # Direct HTTP redirect to Stripe checkout
+            # Use meta refresh for reliable redirect
             logging.info(f"Redirecting to: {checkout_session.url}")
-            return redirect(checkout_session.url, code=303)
+            return f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta http-equiv="refresh" content="0; url={checkout_session.url}">
+                <title>Redirecting to Payment...</title>
+            </head>
+            <body>
+                <p>Redirecting to Stripe checkout...</p>
+                <script>
+                    window.location.href = '{checkout_session.url}';
+                </script>
+            </body>
+            </html>
+            '''
         else:
             logging.error("No redirect URL in Stripe session")
             flash('Payment session creation failed. Please try again.', 'error')
