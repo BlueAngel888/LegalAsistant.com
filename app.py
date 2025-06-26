@@ -145,6 +145,7 @@ def upload_file():
         session.pop('stripe_session_id', None)
         
         logging.info(f"Starting file upload process - Session ID: {session.get('_id', 'new')}")
+        logging.info(f"Upload request details - Country: {document_country}, Language: {analysis_language}")
         
         # Handle scanned image from camera
         scanned_base64 = request.form.get('scannedImage')
@@ -154,6 +155,9 @@ def upload_file():
         processed_files = []
         
         logging.info(f"Upload request - Files: {len(files)}, Camera files: {len(camera_files)}, Scanned: {bool(scanned_base64)}")
+        if files:
+            for i, f in enumerate(files):
+                logging.info(f"File {i+1}: {f.filename} (size: {f.content_length if hasattr(f, 'content_length') else 'unknown'})")
 
         # Process scanned image if provided
         if scanned_base64:

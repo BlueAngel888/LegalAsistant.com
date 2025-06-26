@@ -148,6 +148,14 @@ function initializeFileUpload() {
         }
     }
 
+    // Make updateSubmitButton global for compatibility
+    window.updateSubmitButton = updateSubmitButton;
+    
+    // Also make selectedFiles accessible if needed for validation
+    window.getSelectedFiles = function() {
+        return selectedFiles;
+    };
+
     function createFileItem(file, index) {
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item file-item-enhanced';
