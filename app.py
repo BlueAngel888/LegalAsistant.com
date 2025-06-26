@@ -123,6 +123,11 @@ def set_language():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
+        logging.info("=== UPLOAD ROUTE CALLED ===")
+        logging.info(f"Request method: {request.method}")
+        logging.info(f"Request form keys: {list(request.form.keys())}")
+        logging.info(f"Request files keys: {list(request.files.keys())}")
+        
         # Ensure session is properly initialized
         if 'language' not in session:
             session['language'] = 'en'
