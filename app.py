@@ -458,12 +458,13 @@ def create_checkout_session():
             flash('Payment system configuration error. Please contact support.', 'error')
             return redirect(url_for('checkout'))
         
+        # Create Stripe checkout session with better error handling
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
-                    'unit_amount': 10000,  # €100.00
+                    'unit_amount': 500,  # €5.00 for testing
                     'product_data': {
                         'name': 'Legal Document Analysis',
                         'description': 'Professional AI-powered legal document analysis and insights'
@@ -472,10 +473,15 @@ def create_checkout_session():
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=success_url,
+            success_url=success_url + '?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=cancel_url,
             allow_promotion_codes=False,
-            billing_address_collection='auto'
+            billing_address_collection='auto',
+            client_reference_id=session.get('analysis_id', ''),
+            metadata={
+                'analysis_id': session.get('analysis_id', ''),
+                'session_id': session.get('_id', '')
+            }
         )
         
         logging.info(f"Stripe session created successfully with ID: {checkout_session.id}")
