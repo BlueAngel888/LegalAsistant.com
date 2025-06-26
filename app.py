@@ -206,28 +206,28 @@ def upload_file():
                 logging.error(f"Error processing scanned image: {str(e)}")
                 flash('Error processing scanned document. Please try again.', 'error')
 
-        # Fast track processing - immediate payment redirect for multiple files
+        # Instant payment mode - skip all processing for multiple files
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
-            import time
-            start_time = time.time()
-            max_instant_processing_time = 8  # Only 8 seconds for instant processing
             
-            # For multiple files (>3), use placeholder text to enable instant payment
-            if len(all_files) > 3:
-                logging.info(f"Fast-track mode: {len(all_files)} files detected - enabling instant payment redirect")
-                # Create placeholder content for immediate payment processing
-                placeholder_text = f"Document batch processing initiated for {len(all_files)} files.\n"
-                placeholder_text += "Full OCR processing will be completed after payment confirmation.\n"
-                placeholder_text += f"Files: {', '.join([f.filename for f in all_files if f.filename])}\n"
-                placeholder_text += "Content analysis will be available in the results page."
+            # For 3+ files, skip ALL processing and go directly to payment
+            if len(all_files) >= 3:
+                logging.info(f"INSTANT MODE: {len(all_files)} files detected - skipping processing, going directly to payment")
+                
+                # Create minimal placeholder for database
+                placeholder_text = f"BATCH PROCESSING: {len(all_files)} files ready for analysis after payment.\n"
+                placeholder_text += f"Files: {', '.join([f.filename for f in all_files if f.filename])}"
                 
                 texts.append(placeholder_text)
                 processed_files = [f.filename for f in all_files if f.filename]
                 
-                logging.info(f"Instant processing complete - redirecting to payment for {len(processed_files)} files")
+                logging.info(f"INSTANT REDIRECT: Payment for {len(processed_files)} files")
                 
             else:
+                # For 1-2 files, do quick processing
+                import time
+                start_time = time.time()
+                max_instant_processing_time = 5  # Only 5 seconds max
                 # For 3 or fewer files, process normally with short timeout
                 for i, file in enumerate(all_files):
                     if file.filename != '':
