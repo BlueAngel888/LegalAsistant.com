@@ -337,19 +337,12 @@ function initializeFileUpload() {
             console.log('Button disabled?', submitBtn.disabled);
             console.log('Button type:', submitBtn.type);
             
-            if (!submitBtn.disabled) {
-                console.log('Button is enabled, should trigger form submit');
-                // Manually trigger form submission
-                const form = submitBtn.closest('form');
-                if (form) {
-                    console.log('Form found, manually triggering submission');
-                    form.submit();
-                } else {
-                    console.error('No form found for submit button!');
-                }
-            } else {
+            if (submitBtn.disabled) {
                 console.log('Button is disabled, preventing submission');
                 e.preventDefault();
+            } else {
+                console.log('Button is enabled, allowing natural form submission');
+                // Let the natural form submission happen - don't call form.submit()
             }
         });
     }
@@ -1262,26 +1255,30 @@ function initializeFormValidation() {
             
             const submitButton = form.querySelector('button[type="submit"]');
             
-            if (submitButton && !submitButton.disabled) {
-                console.log('Submit button is enabled, proceeding with form submission');
-                
-                // Add loading state but don't prevent form submission
+            // Only intercept if button is disabled - otherwise let form submit naturally
+            if (submitButton && submitButton.disabled) {
+                console.log('Submit button is disabled, form submission blocked');
+                e.preventDefault();
+                return;
+            }
+            
+            // For checkout forms, let natural redirect happen
+            if (form.action.includes('checkout')) {
+                console.log('Checkout form - allowing natural submission and redirect');
+                return;
+            }
+            
+            // Only add loading state for upload forms
+            if (submitButton && form.action.includes('upload')) {
+                console.log('Upload form - adding loading state');
                 const originalText = submitButton.innerHTML;
                 submitButton.classList.add('loading');
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing files...';
                 
-                // Update button text based on form action
-                if (form.action.includes('upload')) {
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing files...';
-                } else if (form.action.includes('checkout')) {
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecting to payment...';
-                }
-                
-                // Don't disable the button immediately - let form submit first
                 setTimeout(() => {
                     submitButton.disabled = true;
                 }, 100);
                 
-                // Reset button after a timeout (fallback)
                 setTimeout(() => {
                     if (submitButton.disabled) {
                         submitButton.disabled = false;
@@ -1289,9 +1286,6 @@ function initializeFormValidation() {
                         submitButton.innerHTML = originalText;
                     }
                 }, 15000);
-            } else if (submitButton && submitButton.disabled) {
-                console.log('Submit button is disabled, form submission blocked');
-                e.preventDefault();
             }
         });
     });
