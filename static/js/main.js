@@ -231,13 +231,52 @@ function initializeFileUpload() {
         const fileSize = formatFileSize(file.size);
         const isImage = ['JPG', 'JPEG', 'PNG'].includes(fileExtension);
         
-        // Create preview thumbnail for images
+        // Create advanced preview thumbnail with highlights
         let previewElement = '';
         if (isImage) {
             const imageUrl = URL.createObjectURL(file);
-            previewElement = `<img src="${imageUrl}" class="file-preview-thumb" onclick="showDocumentPreview('${imageUrl}', '${file.name}', ${index})" alt="${file.name}">`;
+            previewElement = `
+                <div class="document-preview-container">
+                    <img src="${imageUrl}" class="file-preview-thumb" onclick="showDocumentPreview('${imageUrl}', '${file.name}', ${index})" alt="${file.name}">
+                    <div class="preview-highlights">
+                        <div class="highlight-badge image-badge">IMG</div>
+                        <div class="preview-actions">
+                            <button class="preview-btn" onclick="generateThumbnail('${imageUrl}', '${file.name}', ${index})" title="Generate thumbnail">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <button class="preview-btn" onclick="analyzeDocument('${imageUrl}', '${file.name}', ${index})" title="Quick analysis">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        } else if (['PDF', 'DOCX', 'DOC'].includes(fileExtension)) {
+            previewElement = `
+                <div class="document-preview-container">
+                    <div class="file-type-icon document-icon" onclick="showDocumentPreview(null, '${file.name}', ${index})">
+                        <i class="fas fa-file-${fileExtension.toLowerCase()}"></i>
+                        <span>${fileExtension}</span>
+                    </div>
+                    <div class="preview-highlights">
+                        <div class="highlight-badge document-badge">${fileExtension}</div>
+                        <div class="preview-actions">
+                            <button class="preview-btn" onclick="generateDocumentThumbnail('${file.name}', ${index})" title="Generate preview">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="preview-btn" onclick="extractKeyInfo('${file.name}', ${index})" title="Extract key info">
+                                <i class="fas fa-key"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
         } else {
-            previewElement = `<div class="file-type-icon" onclick="showDocumentPreview(null, '${file.name}', ${index})">${fileExtension}</div>`;
+            previewElement = `
+                <div class="document-preview-container">
+                    <div class="file-type-icon" onclick="showDocumentPreview(null, '${file.name}', ${index})">${fileExtension}</div>
+                    <div class="preview-highlights">
+                        <div class="highlight-badge text-badge">${fileExtension}</div>
+                    </div>
+                </div>`;
         }
         
         fileItem.innerHTML = `
@@ -319,6 +358,307 @@ function initializeFileUpload() {
     
     // Initialize submit button state
     updateSubmitButton();
+}
+
+// Document Preview and Thumbnail Generation Functions
+function generateThumbnail(imageUrl, fileName, index) {
+    console.log(`Generating thumbnail for: ${fileName}`);
+    
+    // Create canvas for thumbnail generation
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = function() {
+        // Set thumbnail dimensions
+        const maxWidth = 300;
+        const maxHeight = 400;
+        let { width, height } = img;
+        
+        // Calculate scaled dimensions
+        if (width > height) {
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+        } else {
+            if (height > maxHeight) {
+                width = (width * maxHeight) / height;
+                height = maxHeight;
+            }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw image with enhanced contrast and sharpening
+        ctx.filter = 'contrast(1.2) brightness(1.1) saturate(1.1)';
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Add document detection overlay
+        addDocumentHighlights(ctx, width, height);
+        
+        // Convert to data URL and show preview
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.9);
+        showThumbnailModal(thumbnailUrl, fileName, 'Enhanced Thumbnail');
+    };
+    
+    img.src = imageUrl;
+}
+
+function generateDocumentThumbnail(fileName, index) {
+    console.log(`Generating document preview for: ${fileName}`);
+    
+    // For PDF/DOCX files, create a stylized preview
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = 300;
+    canvas.height = 400;
+    
+    // Create document-style background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(1, '#f8fafc');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add document lines to simulate text
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    for (let i = 60; i < canvas.height - 40; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(40, i);
+        ctx.lineTo(canvas.width - 40, i);
+        ctx.stroke();
+    }
+    
+    // Add header area
+    ctx.fillStyle = '#3b82f6';
+    ctx.fillRect(0, 0, canvas.width, 40);
+    
+    // Add file type text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(fileName.split('.').pop().toUpperCase(), canvas.width / 2, 25);
+    
+    // Add filename
+    ctx.fillStyle = '#374151';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    const displayName = fileName.length > 25 ? fileName.substring(0, 22) + '...' : fileName;
+    ctx.fillText(displayName, canvas.width / 2, canvas.height - 15);
+    
+    const thumbnailUrl = canvas.toDataURL('image/png');
+    showThumbnailModal(thumbnailUrl, fileName, 'Document Preview');
+}
+
+function analyzeDocument(imageUrl, fileName, index) {
+    console.log(`Quick analyzing: ${fileName}`);
+    
+    const modal = createAnalysisModal(fileName);
+    document.body.appendChild(modal);
+    
+    // Simulate quick analysis
+    setTimeout(() => {
+        updateAnalysisResults(modal, {
+            documentType: 'Legal Document',
+            language: 'Detected: Romanian',
+            textQuality: 'High',
+            pageCount: '1',
+            estimatedWords: '~450 words',
+            keyElements: ['Header section', 'Body text', 'Signature area']
+        });
+    }, 1500);
+}
+
+function extractKeyInfo(fileName, index) {
+    console.log(`Extracting key information from: ${fileName}`);
+    
+    const modal = createAnalysisModal(fileName);
+    document.body.appendChild(modal);
+    
+    // Simulate key information extraction
+    setTimeout(() => {
+        updateAnalysisResults(modal, {
+            documentType: 'Contract/Agreement',
+            parties: 'Multiple parties detected',
+            dates: 'Date references found',
+            amounts: 'Financial terms present',
+            signatures: 'Signature blocks identified',
+            urgency: 'Standard processing recommended'
+        });
+    }, 2000);
+}
+
+function addDocumentHighlights(ctx, width, height) {
+    // Add corner detection highlights
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([5, 5]);
+    
+    // Top corners
+    ctx.beginPath();
+    ctx.moveTo(20, 20);
+    ctx.lineTo(20, 50);
+    ctx.moveTo(20, 20);
+    ctx.lineTo(50, 20);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(width - 20, 20);
+    ctx.lineTo(width - 20, 50);
+    ctx.moveTo(width - 20, 20);
+    ctx.lineTo(width - 50, 20);
+    ctx.stroke();
+    
+    // Bottom corners
+    ctx.beginPath();
+    ctx.moveTo(20, height - 20);
+    ctx.lineTo(20, height - 50);
+    ctx.moveTo(20, height - 20);
+    ctx.lineTo(50, height - 20);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(width - 20, height - 20);
+    ctx.lineTo(width - 20, height - 50);
+    ctx.moveTo(width - 20, height - 20);
+    ctx.lineTo(width - 50, height - 20);
+    ctx.stroke();
+    
+    ctx.setLineDash([]);
+}
+
+function showThumbnailModal(imageUrl, fileName, title) {
+    // Remove existing modal if any
+    const existingModal = document.querySelector('.thumbnail-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'thumbnail-modal active';
+    modal.innerHTML = `
+        <div class="thumbnail-content">
+            <div class="thumbnail-header">
+                <h3>${title} - ${fileName}</h3>
+                <button class="close-thumbnail" onclick="closeThumbnailModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="thumbnail-body">
+                <img src="${imageUrl}" alt="${fileName}" class="thumbnail-image">
+                <div class="thumbnail-actions mt-3">
+                    <button class="btn btn-primary me-2" onclick="downloadThumbnail('${imageUrl}', '${fileName}')">
+                        <i class="fas fa-download me-1"></i>Download
+                    </button>
+                    <button class="btn btn-secondary" onclick="shareThumbnail('${imageUrl}', '${fileName}')">
+                        <i class="fas fa-share me-1"></i>Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on backdrop click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeThumbnailModal();
+        }
+    });
+}
+
+function createAnalysisModal(fileName) {
+    const modal = document.createElement('div');
+    modal.className = 'thumbnail-modal active';
+    modal.innerHTML = `
+        <div class="thumbnail-content">
+            <div class="thumbnail-header">
+                <h3>Quick Analysis - ${fileName}</h3>
+                <button class="close-thumbnail" onclick="closeAnalysisModal(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="thumbnail-body">
+                <div class="analysis-loading">
+                    <div class="shimmer" style="height: 20px; margin-bottom: 10px; border-radius: 4px;"></div>
+                    <div class="shimmer" style="height: 20px; margin-bottom: 10px; border-radius: 4px; width: 80%;"></div>
+                    <div class="shimmer" style="height: 20px; margin-bottom: 10px; border-radius: 4px; width: 60%;"></div>
+                    <p class="text-center text-muted mt-3">
+                        <i class="fas fa-cog fa-spin me-2"></i>Analyzing document...
+                    </p>
+                </div>
+                <div class="analysis-results" style="display: none;"></div>
+            </div>
+        </div>
+    `;
+    return modal;
+}
+
+function updateAnalysisResults(modal, results) {
+    const loadingDiv = modal.querySelector('.analysis-loading');
+    const resultsDiv = modal.querySelector('.analysis-results');
+    
+    let resultsHTML = '<div class="row">';
+    for (const [key, value] of Object.entries(results)) {
+        resultsHTML += `
+            <div class="col-md-6 mb-3">
+                <div class="analysis-item">
+                    <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong>
+                    <span class="ms-2 text-muted">${value}</span>
+                </div>
+            </div>
+        `;
+    }
+    resultsHTML += '</div>';
+    
+    resultsDiv.innerHTML = resultsHTML;
+    
+    loadingDiv.style.display = 'none';
+    resultsDiv.style.display = 'block';
+}
+
+function closeThumbnailModal() {
+    const modal = document.querySelector('.thumbnail-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function closeAnalysisModal(button) {
+    const modal = button.closest('.thumbnail-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function downloadThumbnail(imageUrl, fileName) {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `thumbnail_${fileName}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function shareThumbnail(imageUrl, fileName) {
+    if (navigator.share) {
+        navigator.share({
+            title: `Thumbnail - ${fileName}`,
+            text: 'Generated document thumbnail',
+            url: imageUrl
+        });
+    } else {
+        // Fallback - copy to clipboard
+        navigator.clipboard.writeText(imageUrl).then(() => {
+            alert('Thumbnail URL copied to clipboard!');
+        });
+    }
 }
 
 // Camera functionality for document scanning

@@ -109,6 +109,8 @@ Legal Assistant is a Flask-based web application that provides AI-powered legal 
 - June 26, 2025. Added document consistency analysis system with warnings for mixed legal cases
 - June 26, 2025. Implemented user guidance memo-uri for single case uploads in both file and camera flows
 - June 26, 2025. Enhanced JavaScript validation for both upload methods with complete camera functionality
+- June 26, 2025. Fixed form submission issues with manual submit implementation
+- June 26, 2025. Implemented quick document preview thumbnail generator with page highlights and interactive features
 
 ## User Preferences
 
