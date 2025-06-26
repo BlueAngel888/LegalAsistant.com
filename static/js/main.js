@@ -339,12 +339,11 @@ function initializeFileUpload() {
             
             if (!submitBtn.disabled) {
                 console.log('Button is enabled, should trigger form submit');
-                // Check if we need to manually trigger form submission
+                // Manually trigger form submission
                 const form = submitBtn.closest('form');
                 if (form) {
                     console.log('Form found, manually triggering submission');
-                    // Let the normal form submission happen
-                    console.log('Form found, allowing normal submission');
+                    form.submit();
                 } else {
                     console.error('No form found for submit button!');
                 }
