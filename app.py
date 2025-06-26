@@ -160,10 +160,16 @@ def upload_file():
         texts = []
         processed_files = []
         
-        logging.info(f"Upload request - Files: {len(files)}, Camera files: {len(camera_files)}, Scanned: {bool(scanned_base64)}")
+        total_files = len(files) + len(camera_files) + (1 if scanned_base64 else 0)
+        logging.info(f"Upload request - Files: {len(files)}, Camera files: {len(camera_files)}, Scanned: {bool(scanned_base64)}, Total: {total_files}")
+        
         if files:
             for i, f in enumerate(files):
                 logging.info(f"File {i+1}: {f.filename} (size: {f.content_length if hasattr(f, 'content_length') else 'unknown'})")
+        
+        # Add processing status for large batches
+        if total_files > 3:
+            logging.info(f"Processing {total_files} files - this may take a few moments...")
 
         # Process scanned image if provided
         if scanned_base64:
@@ -200,21 +206,37 @@ def upload_file():
                 logging.error(f"Error processing scanned image: {str(e)}")
                 flash('Error processing scanned document. Please try again.', 'error')
 
-        # Process uploaded files
+        # Process uploaded files with timeout protection
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
-            for file in all_files:
+            import time
+            start_time = time.time()
+            max_processing_time = 30  # 30 seconds max for all files
+            
+            for i, file in enumerate(all_files):
                 if file.filename != '':
+                    # Check if we're running out of time
+                    elapsed_time = time.time() - start_time
+                    if elapsed_time > max_processing_time:
+                        logging.warning(f"Processing timeout reached after {elapsed_time:.1f}s, skipping remaining files")
+                        flash(f'Processing timeout reached. Some files were skipped to prevent errors.', 'warning')
+                        break
+                    
                     try:
+                        logging.info(f"Processing file {i+1}/{len(all_files)}: {file.filename}")
                         text = extract_text_from_file(file)
                         if text.strip():
                             texts.append(text)
                             processed_files.append(file.filename)
+                            logging.info(f"Successfully extracted {len(text)} characters from {file.filename}")
                         else:
+                            logging.warning(f'No text extracted from {file.filename}')
                             flash(f'Could not extract text from {file.filename}', 'warning')
                     except Exception as e:
                         logging.error(f"Error processing file {file.filename}: {str(e)}")
                         flash(f'Error processing {file.filename}: {str(e)}', 'error')
+                        # Continue with other files even if one fails
+                        continue
         
         # Check if any text was extracted
         if not texts:

@@ -86,7 +86,7 @@ def extract_text_from_docx(file_content: bytes) -> str:
         raise
 
 def extract_text_from_image(file_content: bytes) -> str:
-    """Extract text from image using OCR."""
+    """Extract text from image using OCR with optimizations."""
     try:
         image = Image.open(io.BytesIO(file_content))
         
@@ -94,8 +94,24 @@ def extract_text_from_image(file_content: bytes) -> str:
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
-        # Use Tesseract OCR to extract text
-        text = pytesseract.image_to_string(image, lang='eng')
+        # Optimize image size for faster OCR processing
+        # Reduce size if image is very large
+        max_dimension = 2000
+        width, height = image.size
+        if width > max_dimension or height > max_dimension:
+            if width > height:
+                new_width = max_dimension
+                new_height = int((height * max_dimension) / width)
+            else:
+                new_height = max_dimension
+                new_width = int((width * max_dimension) / height)
+            
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            logging.info(f"Resized image from {width}x{height} to {new_width}x{new_height} for faster processing")
+        
+        # Use optimized OCR configuration for faster processing
+        custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?;:()\-\n '
+        text = pytesseract.image_to_string(image, lang='eng', config=custom_config)
         
         return text
         
