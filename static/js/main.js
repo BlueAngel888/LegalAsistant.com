@@ -340,9 +340,18 @@ function initializeFileUpload() {
             if (submitBtn.disabled) {
                 console.log('Button is disabled, preventing submission');
                 e.preventDefault();
+                return false;
+            } 
+            
+            console.log('Button is enabled, triggering form submission');
+            // Manually submit the form to ensure it works
+            const form = submitBtn.closest('form');
+            if (form) {
+                console.log('Form found, submitting...');
+                e.preventDefault(); // Prevent default to avoid double submission
+                form.submit();
             } else {
-                console.log('Button is enabled, allowing natural form submission');
-                // Let the natural form submission happen - don't call form.submit()
+                console.error('No form found!');
             }
         });
     }
