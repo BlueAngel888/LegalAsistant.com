@@ -596,7 +596,49 @@ def success():
         doc_text = analysis_record.document_text
         processed_files = json.loads(analysis_record.file_names) if analysis_record.file_names else []
         
-        if not doc_text:
+        # Check if this was INSTANT MODE and needs full OCR processing
+        if session.get('needs_full_processing') and doc_text and "INSTANT UPLOAD:" in doc_text:
+            logging.info("POST-PAYMENT OCR: Processing files uploaded in INSTANT MODE")
+            
+            # Process the previously uploaded images from attached_assets
+            real_text_content = []
+            
+            for filename in processed_files:
+                try:
+                    # Look for the file in attached_assets
+                    file_path = f"attached_assets/{filename}"
+                    if os.path.exists(file_path):
+                        logging.info(f"POST-PAYMENT OCR: Processing {filename}")
+                        
+                        # Extract text using OCR
+                        from utils.pdf_tools import extract_text_from_image
+                        with open(file_path, 'rb') as img_file:
+                            text = extract_text_from_image(img_file.read())
+                            if text.strip():
+                                real_text_content.append(f"=== {filename} ===\n{text}\n")
+                                logging.info(f"POST-PAYMENT OCR: Extracted {len(text)} characters from {filename}")
+                            else:
+                                logging.warning(f"POST-PAYMENT OCR: No text extracted from {filename}")
+                    else:
+                        logging.warning(f"POST-PAYMENT OCR: File not found: {file_path}")
+                        
+                except Exception as ocr_error:
+                    logging.error(f"POST-PAYMENT OCR error for {filename}: {str(ocr_error)}")
+            
+            # Update document text with real OCR content
+            if real_text_content:
+                doc_text = "\n".join(real_text_content)
+                
+                # Update database with real content
+                analysis_record.document_text = doc_text
+                db.session.commit()
+                
+                logging.info(f"POST-PAYMENT OCR: Updated analysis with {len(doc_text)} characters of real text")
+                session['needs_full_processing'] = False
+            else:
+                logging.error("POST-PAYMENT OCR: No text could be extracted from any images")
+        
+        if not doc_text or len(doc_text.strip()) < 10:
             flash('No document text found. Please start over.', 'error')
             return redirect(url_for('index'))
         
