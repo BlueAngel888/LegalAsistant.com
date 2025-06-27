@@ -124,10 +124,10 @@ def background_ocr_processing(analysis_id, files_data, app_context):
                         processed_count += 1
                         logging.info(f"BACKGROUND OCR: Extracted {len(text)} characters from {filename}")
                     else:
-                        logging.warning(f"BACKGROUND OCR: No text extracted from {filename}")
+                        logging.warning(f"BACKGROUND OCR: No text extracted from {file_info['filename']}")
                         
                 except Exception as file_error:
-                    logging.error(f"BACKGROUND OCR: Error processing {filename}: {str(file_error)}")
+                    logging.error(f"BACKGROUND OCR: Error processing {file_info['filename']}: {str(file_error)}")
                     continue
             
             # Update analysis record with real OCR content

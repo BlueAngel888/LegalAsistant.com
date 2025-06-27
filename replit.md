@@ -103,6 +103,18 @@ Legal Assistant is a Flask-based web application that provides AI-powered legal 
 - **Database**: PostgreSQL connection string for production
 - **Session Security**: Secret key for session encryption
 
+## Romanian Legal Analysis Format
+
+The system now implements a comprehensive 5-section Romanian legal analysis format as requested:
+
+1. **Identificarea și validitatea formală a documentului** - Document identification, parties, legal framework, formal aspects
+2. **Structura și conținutul legal** - Legal structure, rights/obligations, terms, special clauses
+3. **Verificarea legalității și conformității** - Legal compliance, consent issues, formal deficiencies
+4. **Analiza implicațiilor juridice** - Legal implications, execution risks, compatibility, legal remedies
+5. **Aspecte fiscale, civile sau penale** - Fiscal, civil, criminal aspects, damage assessment
+
+This format ensures comprehensive coverage of Romanian legal frameworks including Civil Code, Criminal Code, Labor Code, and Fiscal Code.
+
 ## Changelog
 
 - June 26, 2025. Initial setup
@@ -116,6 +128,8 @@ Legal Assistant is a Flask-based web application that provides AI-powered legal 
 - June 26, 2025. Implemented interactive legal chat system for document-specific Q&A
 - June 26, 2025. Enhanced AI analysis with multi-layer processing and performance metrics
 - June 26, 2025. Added security optimizations and timeout protection for large file batches
+- June 27, 2025. Implemented background OCR processing with threading for instant upload flow
+- June 27, 2025. Added comprehensive 5-section Romanian legal analysis format with detailed structure
 
 ## User Preferences
 

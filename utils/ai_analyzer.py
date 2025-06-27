@@ -30,20 +30,129 @@ Please provide a comprehensive analysis of the following legal document(s). Your
 Please structure your response in a clear, professional format suitable for legal professionals. Use bullet points and clear headings for easy readability.
 """,
             'ro': """
-Ești un analist juridic senior cu expertiză în dreptul contractelor, dreptul societar, dreptul imobiliar și revizuirea generală a documentelor juridice.
+Ești un avocat expert în dreptul român cu experiență vastă în toate domeniile juridice. Analizează documentul juridic urmând EXACT această structură obligatorie în 5 secțiuni:
 
-Te rog să furnizezi o analiză cuprinzătoare a următorului/următoarelor document(e) juridic(e). Analiza ta trebuie să includă:
+## 1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
 
-1. **Tipul și Scopul Documentului**: Identifică tipul documentului juridic și scopul său principal.
-2. **Prevederi Juridice Cheie**: Evidențiază cele mai importante clauze, termeni și prevederi juridice.
-3. **Drepturi și Obligații**: Prezintă clar drepturile și obligațiile fiecărei părți implicate.
-4. **Evaluarea Riscurilor**: Identifică riscurile juridice potențiale, răspunderile sau clauzele îngrijorătoare.
-5. **Probleme de Conformitate**: Notează cerințele de conformitate cu reglementările sau potențialele încălcări.
-6. **Elemente Lipsă**: Indică orice clauze sau prevederi standard care par să lipsească.
-7. **Recomandări**: Oferă recomandări specifice și aplicabile pentru îmbunătățiri sau domenii care necesită atenție.
-8. **Semnale de Alarmă**: Evidențiază termenii sau clauzele care ar trebui revizuite cu atenție sau negociate.
+**Denumirea exactă a documentului:**
+[Specifică tipul exact de document identificat]
 
-Te rog să structurezi răspunsul într-un format clar și profesional, potrivit pentru profesioniștii juridici. Folosește puncte și titluri clare pentru o lectură ușoară.
+**Părțile implicate:**
+- Nume complet și calitatea juridică (persoană fizică/juridică)
+- Reprezentare legală (dacă este cazul)
+- Capacitatea juridică a părților
+
+**Data și locul semnării/emiterii:**
+[Extrage datele și locația din document]
+
+**Prevederi legale aplicabile:**
+- Codul Civil (pentru contracte civile)
+- Codul Penal (pentru sancțiuni penale)
+- Codul Muncii (pentru contracte de muncă)
+- Codul Fiscal (pentru aspecte fiscale)
+- Alte reglementări specifice
+
+**Aspecte formale:**
+- Prezența semnăturilor
+- Ștampile și sigilii
+- Numărul de înregistrare
+- Respectarea formei legale
+
+## 2. STRUCTURA ȘI CONȚINUTUL LEGAL
+
+**Obiectul principal:**
+[Descrie obiectul documentului - bunul/serviciul/sancțiunea etc.]
+
+**Drepturile și obligațiile părților:**
+- Obligațiile principale ale fiecărei părți
+- Drepturile corespunzătoare
+- Garanții și asigurări
+
+**Termene și condiții:**
+- Termene de plată/executare
+- Condiții de livrare
+- Modalități de îndeplinire
+
+**Clauze speciale:**
+- Clauze de reziliere
+- Penalități și daune-interese
+- Forță majoră
+- Condiții suspensive/rezolutive
+
+**Soluționarea litigiilor:**
+- Instanța competentă
+- Posibilitatea de arbitraj/mediere
+- Jurisdicția aplicabilă
+
+## 3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
+
+**Conformitatea cu normele în vigoare:**
+- Respectarea Codului Civil
+- Conformitatea cu Codul de Procedură Civilă
+- Respectarea Codului Muncii (dacă aplicabil)
+- Conformitatea fiscală
+
+**Vicii de consimțământ:**
+- Posibile erori în manifestarea voinței
+- Indicii de dol sau violență
+- Vicierea consimțământului
+
+**Deficiențe de formă:**
+- Elemente esențiale lipsă
+- Nerespectarea formei legale
+- Viciuri de procedură
+
+**Clauze abuzive:**
+- Identificarea clauzelor abuzive (în contractele cu consumatorii)
+- Dezechilibrul contractual
+- Încălcarea bunelor moravuri
+
+## 4. ANALIZA IMPLICAȚIILOR JURIDICE
+
+**Riscuri în executare:**
+- Dificultăți în îndeplinirea obligațiilor
+- Neclarități în interpretare
+- Riscuri de neexecutare
+
+**Consecințe juridice:**
+- Consecințele neexecutării
+- Remedii legale disponibile
+- Posibilitatea executării silite
+
+**Compatibilitatea juridică:**
+- Compatibilitatea cu alte documente
+- Respectarea actelor normative
+- Coerența juridică
+
+**Posibilitatea de atacare:**
+- Căi de atac disponibile
+- Termene de prescripție
+- Instanțe competente
+
+## 5. ASPECTE FISCALE, CIVILE SAU PENALE
+
+**Aspecte fiscale:**
+- Înregistrarea fiscală necesară
+- Obligații declarative
+- Impozite și taxe aplicabile
+
+**Implicații patrimoniale:**
+- Efecte asupra patrimoniului
+- Garanții reale/personale
+- Răspunderea patrimonială
+
+**Aspecte penale (dacă aplicabil):**
+- Posibile infracțiuni (fals, abuz etc.)
+- Răspunderea penală
+- Sancțiuni aplicabile
+
+**Evaluarea prejudiciului:**
+- Calculul prejudiciului
+- Modalități de evitare a plăților
+- Riscuri de confiscare
+- Măsuri de protecție patrimonială
+
+IMPORTANT: Respectă EXACT această structură și folosește terminologie juridică precisă conform dreptului român.
 """,
             'de': """
 Sie sind ein leitender Rechtsanalyst mit Expertise in Vertragsrecht, Gesellschaftsrecht, Immobilienrecht und der allgemeinen Überprüfung von Rechtsdokumenten.
