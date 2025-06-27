@@ -2,6 +2,8 @@ import os
 import logging
 import json
 import uuid
+import threading
+import time
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -89,6 +91,62 @@ def get_domain():
 
 YOUR_DOMAIN = get_domain()
 logging.info(f"Application domain configured as: {YOUR_DOMAIN}")
+
+def background_ocr_processing(analysis_id, files_data, app_context):
+    """Process OCR in background thread after upload"""
+    with app_context:
+        try:
+            logging.info(f"BACKGROUND OCR: Starting processing for analysis {analysis_id}")
+            
+            # Get analysis record
+            analysis_record = DocumentAnalysis.query.get(analysis_id)
+            if not analysis_record:
+                logging.error(f"BACKGROUND OCR: Analysis record not found: {analysis_id}")
+                return
+            
+            # Process each file with OCR
+            all_text_content = []
+            processed_count = 0
+            
+            for file_info in files_data:
+                try:
+                    filename = file_info['filename']
+                    file_content = file_info['content']
+                    
+                    logging.info(f"BACKGROUND OCR: Processing {filename}")
+                    
+                    # Extract text using OCR with timeout protection
+                    from utils.pdf_tools import extract_text_from_image
+                    text = extract_text_from_image(file_content)
+                    
+                    if text and text.strip():
+                        all_text_content.append(f"=== {filename} ===\n{text}\n")
+                        processed_count += 1
+                        logging.info(f"BACKGROUND OCR: Extracted {len(text)} characters from {filename}")
+                    else:
+                        logging.warning(f"BACKGROUND OCR: No text extracted from {filename}")
+                        
+                except Exception as file_error:
+                    logging.error(f"BACKGROUND OCR: Error processing {filename}: {str(file_error)}")
+                    continue
+            
+            # Update analysis record with real OCR content
+            if all_text_content:
+                final_text = "\n".join(all_text_content)
+                analysis_record.document_text = final_text
+                
+                # Mark as fully processed
+                analysis_record.updated_at = datetime.utcnow()
+                
+                db.session.commit()
+                
+                logging.info(f"BACKGROUND OCR: Completed! Updated analysis {analysis_id} with {len(final_text)} characters from {processed_count} files")
+            else:
+                logging.error(f"BACKGROUND OCR: No text could be extracted from any files for analysis {analysis_id}")
+                
+        except Exception as e:
+            logging.error(f"BACKGROUND OCR: Fatal error for analysis {analysis_id}: {str(e)}")
+            # Don't let background processing crash the main app
 
 @app.route('/')
 def index():
@@ -206,27 +264,39 @@ def upload_file():
                 logging.error(f"Error processing scanned image: {str(e)}")
                 flash('Error processing scanned document. Please try again.', 'error')
 
+        # Initialize files_data for potential background processing
+        files_data = []
+        
         # Instant payment mode - skip all processing for multiple files
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
             
-            # For 3+ files, skip processing and go directly to payment (INSTANT MODE)
+            # For 3+ files, launch background OCR and go directly to payment (INSTANT MODE)
             if len(all_files) >= 3:
-                logging.info(f"INSTANT MODE: {len(all_files)} files detected - processing will happen after payment")
+                logging.info(f"INSTANT MODE: {len(all_files)} files detected - launching background OCR")
                 
-                # Store only filenames for later processing after payment
+                # Prepare files data for background processing
                 for file in all_files:
                     if file.filename != '':
+                        # Read file content
+                        file_content = file.read()
+                        file.seek(0)  # Reset file pointer
+                        
+                        files_data.append({
+                            'filename': file.filename,
+                            'content': file_content
+                        })
                         processed_files.append(file.filename)
                 
                 # Create placeholder text for immediate payment
-                placeholder_text = f"INSTANT UPLOAD: {len(processed_files)} files ready for analysis after payment.\n"
+                placeholder_text = f"INSTANT UPLOAD: {len(processed_files)} files uploaded successfully.\n"
                 placeholder_text += f"Files: {', '.join(processed_files)}\n"
-                placeholder_text += "Full OCR analysis will be completed after payment confirmation."
+                placeholder_text += "OCR processing started in background - analysis will be ready shortly after payment."
                 texts.append(placeholder_text)
                 
                 session['needs_full_processing'] = True
-                logging.info(f"INSTANT MODE: {len(processed_files)} files stored for post-payment processing")
+                session['background_processing'] = True
+                logging.info(f"INSTANT MODE: {len(processed_files)} files ready for background OCR")
                 
             else:
                 # For 1-2 files, do quick processing
@@ -334,6 +404,23 @@ def upload_file():
             session['needs_full_processing'] = is_fast_track
             
             logging.info(f"Document analysis record created with ID: {analysis_record.id}, Fast-track: {is_fast_track}")
+            
+            # Launch background OCR processing if in instant mode
+            if session.get('background_processing') and 'files_data' in locals():
+                logging.info(f"INSTANT MODE: Launching background OCR thread for analysis {analysis_record.id}")
+                
+                # Create application context for background thread
+                app_context = app.app_context()
+                
+                # Start background OCR processing
+                ocr_thread = threading.Thread(
+                    target=background_ocr_processing,
+                    args=(analysis_record.id, files_data, app_context),
+                    daemon=True
+                )
+                ocr_thread.start()
+                
+                logging.info(f"INSTANT MODE: Background OCR thread started successfully")
             
         except Exception as db_error:
             logging.error(f"Database error: {str(db_error)}")
@@ -596,47 +683,33 @@ def success():
         doc_text = analysis_record.document_text
         processed_files = json.loads(analysis_record.file_names) if analysis_record.file_names else []
         
-        # Check if this was INSTANT MODE and needs full OCR processing
-        if session.get('needs_full_processing') and doc_text and "INSTANT UPLOAD:" in doc_text:
-            logging.info("POST-PAYMENT OCR: Processing files uploaded in INSTANT MODE")
+        # Check if background OCR processing is complete
+        if session.get('background_processing') and doc_text and "INSTANT UPLOAD:" in doc_text:
+            logging.info("PAYMENT SUCCESS: Checking if background OCR processing is complete")
             
-            # Process the previously uploaded images from attached_assets
-            real_text_content = []
+            # Wait briefly for background processing to complete (if needed)
+            max_wait_time = 30  # Maximum 30 seconds
+            wait_interval = 2   # Check every 2 seconds
+            waited_time = 0
             
-            for filename in processed_files:
-                try:
-                    # Look for the file in attached_assets
-                    file_path = f"attached_assets/{filename}"
-                    if os.path.exists(file_path):
-                        logging.info(f"POST-PAYMENT OCR: Processing {filename}")
-                        
-                        # Extract text using OCR
-                        from utils.pdf_tools import extract_text_from_image
-                        with open(file_path, 'rb') as img_file:
-                            text = extract_text_from_image(img_file.read())
-                            if text.strip():
-                                real_text_content.append(f"=== {filename} ===\n{text}\n")
-                                logging.info(f"POST-PAYMENT OCR: Extracted {len(text)} characters from {filename}")
-                            else:
-                                logging.warning(f"POST-PAYMENT OCR: No text extracted from {filename}")
-                    else:
-                        logging.warning(f"POST-PAYMENT OCR: File not found: {file_path}")
-                        
-                except Exception as ocr_error:
-                    logging.error(f"POST-PAYMENT OCR error for {filename}: {str(ocr_error)}")
-            
-            # Update document text with real OCR content
-            if real_text_content:
-                doc_text = "\n".join(real_text_content)
+            while waited_time < max_wait_time:
+                # Refresh analysis record from database
+                db.session.refresh(analysis_record)
                 
-                # Update database with real content
-                analysis_record.document_text = doc_text
-                db.session.commit()
+                # Check if background processing updated the content
+                if "INSTANT UPLOAD:" not in analysis_record.document_text:
+                    logging.info(f"PAYMENT SUCCESS: Background OCR completed after {waited_time} seconds")
+                    doc_text = analysis_record.document_text
+                    break
                 
-                logging.info(f"POST-PAYMENT OCR: Updated analysis with {len(doc_text)} characters of real text")
-                session['needs_full_processing'] = False
-            else:
-                logging.error("POST-PAYMENT OCR: No text could be extracted from any images")
+                time.sleep(wait_interval)
+                waited_time += wait_interval
+                logging.info(f"PAYMENT SUCCESS: Waiting for background OCR... {waited_time}s")
+            
+            if "INSTANT UPLOAD:" in doc_text:
+                logging.warning("PAYMENT SUCCESS: Background OCR still in progress - proceeding with placeholder")
+            
+            session['background_processing'] = False
         
         if not doc_text or len(doc_text.strip()) < 10:
             flash('No document text found. Please start over.', 'error')
