@@ -504,6 +504,87 @@ def checkout():
     logging.info(f"Rendering checkout with {len(processed_files)} files")
     return render_template('checkout.html', files=processed_files, t=t, lang=lang)
 
+@app.route('/apply-discount', methods=['POST'])
+def apply_discount():
+    """Apply discount code and return discount information"""
+    try:
+        data = request.get_json()
+        code = data.get('code', '').strip().upper()
+        
+        # Define valid discount codes
+        discount_codes = {
+            'SAVE20': {'discount_percent': 20, 'free_access': False},
+            'SAVE50': {'discount_percent': 50, 'free_access': False},
+            'VIP': {'discount_percent': 75, 'free_access': False},
+            'FREE': {'discount_percent': 100, 'free_access': True},
+            'DEMO': {'discount_percent': 100, 'free_access': True},
+            'TRIAL': {'discount_percent': 100, 'free_access': True},
+            'LEGAL2025': {'discount_percent': 30, 'free_access': False},
+            'STUDENT': {'discount_percent': 60, 'free_access': False}
+        }
+        
+        if code in discount_codes:
+            discount_info = discount_codes[code]
+            
+            # Store discount in session
+            session['discount_code'] = code
+            session['discount_percent'] = discount_info['discount_percent']
+            session['free_access'] = discount_info['free_access']
+            
+            logging.info(f"Discount code applied: {code} - {discount_info['discount_percent']}% discount")
+            
+            return jsonify({
+                'success': True,
+                'discount_percent': discount_info['discount_percent'],
+                'free_access': discount_info['free_access'],
+                'message': f"Code {code} applied successfully"
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Invalid discount code'
+            })
+            
+    except Exception as e:
+        logging.error(f"Error applying discount: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Error processing discount code'
+        })
+
+@app.route('/free-access', methods=['POST'])
+def free_access():
+    """Handle free access with valid codes"""
+    try:
+        free_code = request.form.get('free_code', '').strip().upper()
+        
+        # Verify free access code from session
+        if session.get('free_access') and session.get('discount_code') == free_code:
+            logging.info(f"Free access granted with code: {free_code}")
+            
+            # Mark as free access in session
+            session['payment_status'] = 'free_access'
+            session['stripe_session_id'] = f'free_{free_code}_{int(time.time())}'
+            
+            # Update payment record if exists
+            analysis_id = session.get('analysis_id')
+            if analysis_id:
+                analysis_record = DocumentAnalysis.query.get(analysis_id)
+                if analysis_record:
+                    analysis_record.payment_status = 'free_access'
+                    analysis_record.stripe_session_id = session['stripe_session_id']
+                    db.session.commit()
+            
+            return redirect(url_for('success'))
+        else:
+            flash('Invalid free access code', 'error')
+            return redirect(url_for('checkout'))
+            
+    except Exception as e:
+        logging.error(f"Error processing free access: {str(e)}")
+        flash('Error processing free access', 'error')
+        return redirect(url_for('checkout'))
+
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:

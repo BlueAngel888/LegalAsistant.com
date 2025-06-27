@@ -147,11 +147,41 @@
                             </div>
                         </div>
 
+                        <!-- Discount Code Section -->
+                        <div class="discount-section mb-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-3">
+                                        <i class="fas fa-tag me-2"></i>
+                                        Do you have a discount code?
+                                    </h6>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="discountCode" 
+                                               placeholder="Enter discount code" maxlength="20">
+                                        <button class="btn btn-outline-primary" type="button" id="applyDiscountBtn">
+                                            Apply
+                                        </button>
+                                    </div>
+                                    <div id="discountMessage" class="mt-2" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Payment Button -->
                         <form action="{{ url_for('create_checkout_session') }}" method="POST" id="payment-form">
+                            <input type="hidden" name="discount_code" id="appliedDiscountCode" value="">
                             <button type="submit" class="btn btn-success btn-lg w-100 py-3" id="checkout-button">
                                 <i class="fas fa-lock me-2"></i>
-                                Secure Payment with Stripe - €100.00
+                                <span id="paymentBtnText">Secure Payment with Stripe - €100.00</span>
+                            </button>
+                        </form>
+
+                        <!-- Free Access Button (hidden by default) -->
+                        <form action="{{ url_for('free_access') }}" method="POST" id="free-access-form" style="display: none;">
+                            <input type="hidden" name="free_code" id="appliedFreeCode" value="">
+                            <button type="submit" class="btn btn-success btn-lg w-100 py-3">
+                                <i class="fas fa-gift me-2"></i>
+                                Access Analysis for Free
                             </button>
                         </form>
                         
@@ -190,8 +220,77 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const paymentForm = document.getElementById('payment-form');
+    const freeAccessForm = document.getElementById('free-access-form');
     const checkoutButton = document.getElementById('checkout-button');
     const errorMessage = document.getElementById('error-message');
+    const discountCodeInput = document.getElementById('discountCode');
+    const applyDiscountBtn = document.getElementById('applyDiscountBtn');
+    const discountMessage = document.getElementById('discountMessage');
+    const paymentBtnText = document.getElementById('paymentBtnText');
+    const appliedDiscountCode = document.getElementById('appliedDiscountCode');
+    const appliedFreeCode = document.getElementById('appliedFreeCode');
+
+    let currentDiscount = 0;
+    let originalPrice = 100.00;
+    
+    // Discount code validation
+    applyDiscountBtn.addEventListener('click', function() {
+        const code = discountCodeInput.value.trim().toUpperCase();
+        
+        if (!code) {
+            showDiscountMessage('Please enter a discount code', 'danger');
+            return;
+        }
+        
+        // Apply discount code via AJAX
+        fetch('/apply-discount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.free_access) {
+                    // Show free access button, hide payment button
+                    paymentForm.style.display = 'none';
+                    freeAccessForm.style.display = 'block';
+                    appliedFreeCode.value = code;
+                    showDiscountMessage(`🎉 Code "${code}" applied! You have FREE access!`, 'success');
+                } else {
+                    // Apply discount
+                    currentDiscount = data.discount_percent;
+                    const newPrice = originalPrice * (1 - currentDiscount / 100);
+                    paymentBtnText.textContent = `Secure Payment with Stripe - €${newPrice.toFixed(2)}`;
+                    appliedDiscountCode.value = code;
+                    showDiscountMessage(`✅ Code "${code}" applied! ${currentDiscount}% discount`, 'success');
+                }
+                discountCodeInput.disabled = true;
+                applyDiscountBtn.disabled = true;
+                applyDiscountBtn.textContent = 'Applied';
+            } else {
+                showDiscountMessage(data.message || 'Invalid discount code', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showDiscountMessage('Error applying discount code', 'danger');
+        });
+    });
+    
+    function showDiscountMessage(message, type) {
+        discountMessage.innerHTML = `<div class="alert alert-${type} py-2 mb-0">${message}</div>`;
+        discountMessage.style.display = 'block';
+    }
+    
+    // Enter key support for discount code
+    discountCodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyDiscountBtn.click();
+        }
+    });
     
     paymentForm.addEventListener('submit', function(e) {
         console.log('Form submitted');
