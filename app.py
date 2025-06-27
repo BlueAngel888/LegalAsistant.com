@@ -805,31 +805,101 @@ def success():
         
         if is_free_access:
             logging.info("FREE ACCESS: Providing instant analysis response")
+            # Get selected country for legal framework analysis
+            selected_country = session.get('country', 'Romania')
+            
+            # Determine legal framework based on country
+            legal_frameworks = {
+                'Romania': {
+                    'civil_code': 'Codul Civil românesc (Legea 287/2009)',
+                    'criminal_code': 'Codul Penal românesc (Legea 286/2009)', 
+                    'fiscal_code': 'Codul Fiscal (Legea 227/2015)',
+                    'administrative_code': 'Codul de Procedură Administrativă (Legea 554/2004)'
+                },
+                'Germany': {
+                    'civil_code': 'Bürgerliches Gesetzbuch (BGB)',
+                    'criminal_code': 'Strafgesetzbuch (StGB)',
+                    'fiscal_code': 'Abgabenordnung (AO)',
+                    'administrative_code': 'Verwaltungsverfahrensgesetz (VwVfG)'
+                },
+                'France': {
+                    'civil_code': 'Code Civil français',
+                    'criminal_code': 'Code Pénal français',
+                    'fiscal_code': 'Code général des impôts',
+                    'administrative_code': 'Code de justice administrative'
+                },
+                'Italy': {
+                    'civil_code': 'Codice Civile italiano',
+                    'criminal_code': 'Codice Penale italiano',
+                    'fiscal_code': 'Codice tributario',
+                    'administrative_code': 'Codice del processo amministrativo'
+                },
+                'Spain': {
+                    'civil_code': 'Código Civil español',
+                    'criminal_code': 'Código Penal español',
+                    'fiscal_code': 'Ley General Tributaria',
+                    'administrative_code': 'Ley de Procedimiento Administrativo'
+                }
+            }
+            
+            framework = legal_frameworks.get(selected_country, legal_frameworks['Romania'])
+            
             analysis = f"""
 ANALIZĂ JURIDICĂ GRATUITĂ - DOCUMENT PROCESAT
 
-Tip Document: Document juridic românesc
+Tip Document: Document juridic analizat
 Status: Procesat cu succes prin acces gratuit
 Limba: {analysis_language.upper()}
 Cod Utilizat: {session.get('discount_code', 'LETSGO')}
+Țara de origine: {selected_country}
+
+BAZA LEGALĂ DE ANALIZĂ
+Cadrul legal aplicabil pentru {selected_country}:
+- {framework['civil_code']}
+- {framework['criminal_code']}
+- {framework['fiscal_code']}
+- {framework['administrative_code']}
+
+VERIFICAREA NULITĂȚII DOCUMENTULUI
+Analiza potențialilor factori de nulitate conform legislației din {selected_country}:
+
+Nulitate absolută:
+- Verificare încălcare ordine publică
+- Respectarea formelor legale obligatorii
+- Competența autorității emitente
+
+Nulitate relativă:
+- Vicii de consimțământ (eroare, dol, violență)
+- Capacitatea juridică a părților
+- Defecte de formă nesancționate cu nulitate absolută
+
+Pentru amenzi și sancțiuni:
+- Verificarea competenței organului emitent
+- Respectarea procedurii legale de emitere
+- Respectarea dreptului la apărare
+- Prescripția aplicării sancțiunii
 
 1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
 
 Denumirea exactă a documentului:
-Document juridic în limba română identificat și procesat cu succes.
+Document juridic identificat și procesat conform standardelor din {selected_country}.
+
+Țara de origine și cadrul legal aplicabil:
+{selected_country} - analiză conform legislației naționale aplicabile
 
 Părțile implicate:
-- Documentul a fost analizat și părțile au fost identificate
-- Calitatea juridică a fost verificată conform legislației române
+- Identificarea părților conform documentului
+- Verificarea calității juridice (persoană fizică/juridică)
+- Analiza capacității de exercițiu
 
 Data și locul semnării/emiterii:
-Informațiile temporale și geografice au fost extrase din document.
+Informațiile temporale și geografice verificate conform cerințelor legale.
 
-Prevederi legale aplicabile:
-- Codul Civil românesc (Legea 287/2009)
-- Codul de Procedură Civilă (Legea 134/2010)
-- Codul Penal (Legea 286/2009) - dacă aplicabil
-- Codul Fiscal (Legea 227/2015) - pentru aspectele fiscale
+Prevederi legale aplicabile specifice pentru {selected_country}:
+- {framework['civil_code']}
+- {framework['criminal_code']}
+- {framework['fiscal_code']}
+- Legislație specială aplicabilă
 
 Aspecte formale:
 - Prezența semnăturilor verificată
@@ -839,77 +909,102 @@ Aspecte formale:
 2. STRUCTURA ȘI CONȚINUTUL LEGAL
 
 Obiectul principal:
-Documentul analizat prezintă obiectul juridic specific conform naturii sale legale.
+Documentul analizat prezintă obiectul juridic specific conform naturii sale legale din {selected_country}.
 
 Drepturile și obligațiile părților:
-- Obligațiile principale identificate și analizate
+- Obligațiile principale identificate conform {framework['civil_code']}
 - Drepturile corespunzătoare evaluate
-- Garanții și asigurări verificate
+- Garanții și asigurări verificate conform legislației naționale
+- Modalități de executare specifice pentru {selected_country}
 
 Termene și condiții:
-- Termene de executare analizate
+- Termene de executare analizate conform standardelor naționale
 - Condiții contractuale evaluate
 - Modalități de îndeplinire verificate
+- Prescripția drepturilor analizată
 
 Clauze speciale:
 - Clauze de reziliere identificate
-- Penalități și daune-interese analizate
+- Penalități și daune-interese conform {framework['civil_code']}
 - Prevederi de forță majoră evaluate
+- Jurisdicție și legea aplicabilă pentru {selected_country}
 
 3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
 
-Conformitatea cu normele în vigoare:
-- Respectarea Codului Civil verificată
-- Conformitatea cu legislația română confirmată
-- Aspectele fiscale evaluate conform Codului Fiscal
+Conformitatea cu normele în vigoare din {selected_country}:
+- Respectarea {framework['civil_code']} verificată
+- Conformitatea cu {framework['administrative_code']} confirmată
+- Aspectele fiscale evaluate conform {framework['fiscal_code']}
+- Legislație specială aplicabilă
 
-Vicii de consimțământ:
-- Manifestarea voinței analizată
+Vicii de consimțământ conform dreptului din {selected_country}:
+- Manifestarea voinței analizată conform standardelor naționale
 - Absența dolului și violenței verificată
 - Validitatea consimțământului confirmată
+- Capacitatea juridică verificată
 
 Deficiențe de formă:
-- Elemente esențiale verificate
-- Forma legală respectată
+- Elemente esențiale verificate conform cerințelor din {selected_country}
+- Forma legală respectată conform legislației naționale
 - Procedurile legale confirmate
+- Formalități specifice țării verificate
 
 4. ANALIZA IMPLICAȚIILOR JURIDICE
 
-Riscuri în executare:
+Riscuri în executare conform legislației din {selected_country}:
 - Dificultățile potențiale identificate
-- Neclaritățile analizate
+- Neclaritățile analizate conform standardelor naționale
 - Soluții pentru executare propuse
+- Proceduri de executare specifice
 
 Consecințe juridice:
-- Efectele neexecutării evaluate
+- Efectele neexecutării evaluate conform {framework['civil_code']}
 - Remedii legale disponibile identificate
-- Executarea silită analizată
+- Executarea silită analizată conform legislației naționale
+- Căi de atac și contestare
 
 Compatibilitatea juridică:
-- Compatibilitatea cu alte documente verificată
+- Compatibilitatea cu legislația din {selected_country} verificată
 - Respectarea cadrului normativ confirmat
+- Drept internațional aplicabil
+- Recunoașterea în alte jurisdicții
 
 5. ASPECTE FISCALE, CIVILE SAU PENALE
 
-Aspecte fiscale:
-- Obligații declarative identificate
+Aspecte fiscale conform {framework['fiscal_code']}:
+- Obligații declarative identificate pentru {selected_country}
 - Impozite și taxe aplicabile analizate
 - Înregistrarea fiscală verificată
+- Regimul fiscal specific
 
 Implicații patrimoniale:
-- Efecte asupra patrimoniului evaluate
+- Efecte asupra patrimoniului evaluate conform dreptului din {selected_country}
 - Garanții analizate
 - Răspunderea patrimonială clarificată
+- Măsuri conservatorii disponibile
 
-Aspecte penale:
-- Absența infracțiunilor confirmată
-- Respectarea legalității verificată
+Aspecte penale conform {framework['criminal_code']}:
+- Verificarea potențialelor infracțiuni
+- Respectarea legalității confirmat
+- Sancțiuni aplicabile analizate
+- Prescripția răspunderii penale
 
 Evaluarea prejudiciului:
-- Riscurile financiare analizate
+- Riscurile financiare analizate conform legislației din {selected_country}
 - Măsuri de protecție identificate
+- Calculul daunelor conform standardelor naționale
+- Modalități de recuperare
 
-Mulțumim că ați folosit codul de acces gratuit! Pentru analize mai detaliate, vă stăm la dispoziție.
+RECOMANDĂRI SPECIFICE PENTRU AMENZI ȘI SANCȚIUNI:
+Dacă documentul conține amenzi sau sancțiuni, verificați:
+- Competența organului emitent conform legislației din {selected_country}
+- Respectarea procedurii contradictorii
+- Termenele de contestare disponibile
+- Prescripția aplicării și executării sancțiunii
+- Posibilitatea reducerii sau anulării amenzii
+- Modalități de plată în rate (dacă sunt disponibile)
+
+Mulțumim că ați folosit codul de acces gratuit! Pentru analize AI detaliate bazate pe textul exact al documentului, vă stăm la dispoziție.
 """
         else:
             try:
