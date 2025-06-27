@@ -406,7 +406,7 @@ def upload_file():
             logging.info(f"Document analysis record created with ID: {analysis_record.id}, Fast-track: {is_fast_track}")
             
             # Launch background OCR processing if in instant mode
-            if session.get('background_processing') and 'files_data' in locals():
+            if session.get('background_processing') and files_data:
                 logging.info(f"INSTANT MODE: Launching background OCR thread for analysis {analysis_record.id}")
                 
                 # Create application context for background thread
