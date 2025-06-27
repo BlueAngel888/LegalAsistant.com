@@ -131,6 +131,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 - June 27, 2025. Implemented background OCR processing with threading for instant upload flow
 - June 27, 2025. Added comprehensive 5-section Romanian legal analysis format with detailed structure
 - June 27, 2025. Added discount code system with two main codes: 'letsgo' (100% free access) and 'letsgo50' (50% discount)
+- June 27, 2025. Confirmed unified functionality: all upload features (background OCR, discount codes, analysis format) work identically for both file upload and camera capture methods
 
 ## User Preferences
 
