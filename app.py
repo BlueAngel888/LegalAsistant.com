@@ -513,6 +513,8 @@ def apply_discount():
         
         # Define valid discount codes
         discount_codes = {
+            'LETSGO': {'discount_percent': 100, 'free_access': True},
+            'LETSGO50': {'discount_percent': 50, 'free_access': False},
             'SAVE20': {'discount_percent': 20, 'free_access': False},
             'SAVE50': {'discount_percent': 50, 'free_access': False},
             'VIP': {'discount_percent': 75, 'free_access': False},
