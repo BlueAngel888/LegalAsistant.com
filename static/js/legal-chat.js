@@ -488,20 +488,6 @@ class LegalChatSystem {
     }
 }
 
-// Initialize chat when document is ready
-document.addEventListener('DOMContentLoaded', function() {
-    // Only initialize on result pages
-    if (window.location.pathname.includes('/success') || document.querySelector('.analysis-result')) {
-        // Get analysis context from page
-        const analysisElement = document.querySelector('.analysis-content, .result-content');
-        const analysisContext = analysisElement ? analysisElement.textContent : '';
-        
-        // Initialize chat system
-        window.legalChat = new LegalChatSystem();
-        
-        // Delay initialization to ensure page is fully loaded
-        setTimeout(() => {
-            window.legalChat.initialize(analysisContext);
-        }, 1000);
-    }
-});
+// Disable floating chat - now using integrated chat in result.html
+// This file is kept for potential future use but floating chat is disabled
+console.log('Legal chat system loaded - using integrated chat interface');
