@@ -130,6 +130,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 - June 26, 2025. Added security optimizations and timeout protection for large file batches
 - June 27, 2025. Implemented background OCR processing with threading for instant upload flow
 - June 27, 2025. Added comprehensive 5-section Romanian legal analysis format with detailed structure
+- June 27, 2025. Added discount code system with two main codes: 'letsgo' (100% free access) and 'letsgo50' (50% discount)
 
 ## User Preferences
 

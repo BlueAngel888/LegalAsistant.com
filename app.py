@@ -514,15 +514,7 @@ def apply_discount():
         # Define valid discount codes
         discount_codes = {
             'LETSGO': {'discount_percent': 100, 'free_access': True},
-            'LETSGO50': {'discount_percent': 50, 'free_access': False},
-            'SAVE20': {'discount_percent': 20, 'free_access': False},
-            'SAVE50': {'discount_percent': 50, 'free_access': False},
-            'VIP': {'discount_percent': 75, 'free_access': False},
-            'FREE': {'discount_percent': 100, 'free_access': True},
-            'DEMO': {'discount_percent': 100, 'free_access': True},
-            'TRIAL': {'discount_percent': 100, 'free_access': True},
-            'LEGAL2025': {'discount_percent': 30, 'free_access': False},
-            'STUDENT': {'discount_percent': 60, 'free_access': False}
+            'LETSGO50': {'discount_percent': 50, 'free_access': False}
         }
         
         if code in discount_codes:
