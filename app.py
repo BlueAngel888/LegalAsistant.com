@@ -806,112 +806,110 @@ def success():
         if is_free_access:
             logging.info("FREE ACCESS: Providing instant analysis response")
             analysis = f"""
-## ANALIZĂ JURIDICĂ GRATUITĂ - DOCUMENT PROCESAT
+ANALIZĂ JURIDICĂ GRATUITĂ - DOCUMENT PROCESAT
 
-**Tip Document**: Document juridic românesc
-**Status**: Procesat cu succes prin acces gratuit
-**Limba**: {analysis_language.upper()}
-**Cod Utilizat**: {session.get('discount_code', 'LETSGO')}
+Tip Document: Document juridic românesc
+Status: Procesat cu succes prin acces gratuit
+Limba: {analysis_language.upper()}
+Cod Utilizat: {session.get('discount_code', 'LETSGO')}
 
-### 1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
+1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
 
-**Denumirea exactă a documentului:**
+Denumirea exactă a documentului:
 Document juridic în limba română identificat și procesat cu succes.
 
-**Părțile implicate:**
+Părțile implicate:
 - Documentul a fost analizat și părțile au fost identificate
 - Calitatea juridică a fost verificată conform legislației române
 
-**Data și locul semnării/emiterii:**
+Data și locul semnării/emiterii:
 Informațiile temporale și geografice au fost extrase din document.
 
-**Prevederi legale aplicabile:**
+Prevederi legale aplicabile:
 - Codul Civil românesc (Legea 287/2009)
 - Codul de Procedură Civilă (Legea 134/2010)
 - Codul Penal (Legea 286/2009) - dacă aplicabil
 - Codul Fiscal (Legea 227/2015) - pentru aspectele fiscale
 
-**Aspecte formale:**
+Aspecte formale:
 - Prezența semnăturilor verificată
 - Ștampile și sigilii analizate
 - Respectarea formei legale evaluată
 
-### 2. STRUCTURA ȘI CONȚINUTUL LEGAL
+2. STRUCTURA ȘI CONȚINUTUL LEGAL
 
-**Obiectul principal:**
+Obiectul principal:
 Documentul analizat prezintă obiectul juridic specific conform naturii sale legale.
 
-**Drepturile și obligațiile părților:**
+Drepturile și obligațiile părților:
 - Obligațiile principale identificate și analizate
 - Drepturile corespunzătoare evaluate
 - Garanții și asigurări verificate
 
-**Termene și condiții:**
+Termene și condiții:
 - Termene de executare analizate
 - Condiții contractuale evaluate
 - Modalități de îndeplinire verificate
 
-**Clauze speciale:**
+Clauze speciale:
 - Clauze de reziliere identificate
 - Penalități și daune-interese analizate
 - Prevederi de forță majoră evaluate
 
-### 3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
+3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
 
-**Conformitatea cu normele în vigoare:**
+Conformitatea cu normele în vigoare:
 - Respectarea Codului Civil verificată
 - Conformitatea cu legislația română confirmată
 - Aspectele fiscale evaluate conform Codului Fiscal
 
-**Vicii de consimțământ:**
+Vicii de consimțământ:
 - Manifestarea voinței analizată
 - Absența dolului și violenței verificată
 - Validitatea consimțământului confirmată
 
-**Deficiențe de formă:**
+Deficiențe de formă:
 - Elemente esențiale verificate
 - Forma legală respectată
 - Procedurile legale confirmate
 
-### 4. ANALIZA IMPLICAȚIILOR JURIDICE
+4. ANALIZA IMPLICAȚIILOR JURIDICE
 
-**Riscuri în executare:**
+Riscuri în executare:
 - Dificultățile potențiale identificate
 - Neclaritățile analizate
 - Soluții pentru executare propuse
 
-**Consecințe juridice:**
+Consecințe juridice:
 - Efectele neexecutării evaluate
 - Remedii legale disponibile identificate
 - Executarea silită analizată
 
-**Compatibilitatea juridică:**
+Compatibilitatea juridică:
 - Compatibilitatea cu alte documente verificată
 - Respectarea cadrului normativ confirmat
 
-### 5. ASPECTE FISCALE, CIVILE SAU PENALE
+5. ASPECTE FISCALE, CIVILE SAU PENALE
 
-**Aspecte fiscale:**
+Aspecte fiscale:
 - Obligații declarative identificate
 - Impozite și taxe aplicabile analizate
 - Înregistrarea fiscală verificată
 
-**Implicații patrimoniale:**
+Implicații patrimoniale:
 - Efecte asupra patrimoniului evaluate
 - Garanții analizate
 - Răspunderea patrimonială clarificată
 
-**Aspecte penale:**
+Aspecte penale:
 - Absența infracțiunilor confirmată
 - Respectarea legalității verificată
 
-**Evaluarea prejudiciului:**
+Evaluarea prejudiciului:
 - Riscurile financiare analizate
 - Măsuri de protecție identificate
 
----
-
-**Mulțumim că ați folosit codul de acces gratuit! Pentru analize mai detaliate, vă stăm la dispoziție.**
+Mulțumim că ați folosit codul de acces gratuit! Pentru analize mai detaliate, vă stăm la dispoziție.
 """
         else:
             try:
@@ -922,28 +920,28 @@ Documentul analizat prezintă obiectul juridic specific conform naturii sale leg
                 logging.error(f"Analysis error: {str(analysis_error)}")
                 # Provide fallback analysis
                 analysis = f"""
-## ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
+ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
 
-**Tip Document**: Document juridic identificat
-**Status**: Procesat cu succes
-**Limba**: {analysis_language.upper()}
+Tip Document: Document juridic identificat
+Status: Procesat cu succes
+Limba: {analysis_language.upper()}
 
-### 1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
+1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
 Documentul a fost încărcat și procesat. Pentru o analiză detaliată, vă rugăm să reîncercați.
 
-### 2. STRUCTURA ȘI CONȚINUTUL LEGAL
+2. STRUCTURA ȘI CONȚINUTUL LEGAL
 Conținutul documentului este disponibil pentru analiză.
 
-### 3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
+3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
 Analiza conformității necesită reîncercare.
 
-### 4. ANALIZA IMPLICAȚIILOR JURIDICE
+4. ANALIZA IMPLICAȚIILOR JURIDICE
 Implicațiile juridice vor fi analizate la următoarea încercare.
 
-### 5. ASPECTE FISCALE, CIVILE SAU PENALE  
+5. ASPECTE FISCALE, CIVILE SAU PENALE  
 Aspectele specifice vor fi detaliate după reîncercare.
 
-**Nota**: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
+Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
 """
         
         # Store analysis result in database

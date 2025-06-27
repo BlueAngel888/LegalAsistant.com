@@ -152,7 +152,12 @@ Ești un avocat expert în dreptul român cu experiență vastă în toate domen
 - Riscuri de confiscare
 - Măsuri de protecție patrimonială
 
-IMPORTANT: Respectă EXACT această structură și folosește terminologie juridică precisă conform dreptului român.
+IMPORTANT: 
+- Respectă EXACT această structură 
+- Folosește terminologie juridică precisă conform dreptului român
+- NU folosi formatare Markdown (fără simboluri #, *, **, etc.)
+- Folosește format text simplu cu titluri clare
+- Structurează răspunsul exact ca în exemplu, dar fără simboluri de formatare
 """,
             'de': """
 Sie sind ein leitender Rechtsanalyst mit Expertise in Vertragsrecht, Gesellschaftsrecht, Immobilienrecht und der allgemeinen Überprüfung von Rechtsdokumenten.
