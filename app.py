@@ -1004,7 +1004,7 @@ Dacă documentul conține amenzi sau sancțiuni, verificați:
 - Posibilitatea reducerii sau anulării amenzii
 - Modalități de plată în rate (dacă sunt disponibile)
 
-Mulțumim că ați folosit codul de acces gratuit! Pentru analize AI detaliate bazate pe textul exact al documentului, vă stăm la dispoziție.
+Pentru analize AI detaliate bazate pe textul exact al documentului, vă stăm la dispoziție cu versiunea completă.
 """
         else:
             try:

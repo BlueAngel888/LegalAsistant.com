@@ -1,10 +1,32 @@
 import os
 import logging
+import re
 from openai import OpenAI
 from config import OPENAI_API_KEY
 
 # Initialize OpenAI client
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
+
+def clean_markdown_symbols(text: str) -> str:
+    """
+    Remove markdown symbols from text for cleaner display
+    """
+    if not text:
+        return text
+    
+    # Remove markdown formatting symbols
+    cleaned_text = text.replace('**', '')  # Remove bold formatting
+    cleaned_text = cleaned_text.replace('*', '')   # Remove italic formatting  
+    cleaned_text = cleaned_text.replace('##', '')  # Remove h2 headers
+    cleaned_text = cleaned_text.replace('#', '')   # Remove h1 headers
+    cleaned_text = cleaned_text.replace('###', '') # Remove h3 headers
+    cleaned_text = cleaned_text.replace('####', '')# Remove h4 headers
+    
+    # Clean up any double spaces that might result from removing symbols
+    cleaned_text = re.sub(r'\s+', ' ', cleaned_text)
+    cleaned_text = re.sub(r'\n\s*\n', '\n\n', cleaned_text)
+    
+    return cleaned_text.strip()
 
 def analyze_with_gpt4(text: str, language: str = 'en') -> str:
     """
@@ -348,15 +370,19 @@ def get_legal_chat_response(message: str, analysis_context: str = '', conversati
         Contextul documentului analizat:
         {analysis_context[:3000] if analysis_context else 'Nu este disponibil contextul documentului.'}
         
-        Instrucțiuni:
+        Instrucțiuni pentru răspuns:
         1. Răspunde doar la întrebări despre aspectele legale ale documentului specific
         2. Dacă întrebarea nu este legată de document, explică că nu poți răspunde
-        3. Oferă răspunsuri practice și clare
-        4. Menționează că sfaturile sunt generale și nu înlocuiesc consultarea unui avocat
-        5. Folosește limba română
-        6. Limitează răspunsul la 300 de cuvinte maximum
-        7. Evidențiază riscurile importante cu ⚠️
-        8. Folosește puncte pentru claritate
+        3. Oferă răspunsuri practice și clare în limba română
+        4. Limitează răspunsul la 250 de cuvinte maximum
+        5. NU folosi simboluri markdown (#, *, **, etc.) în răspuns
+        6. NU include disclaimere sau avertismente legale în răspuns  
+        7. Folosește o structură simplă și ușor de citit:
+           - Incepe cu un răspuns direct la întrebare
+           - Continua cu detalii importante pe paragrafe separate
+           - Folosește alineat nou pentru fiecare idee principală
+           - Evită aglomerarea textului
+        8. Pentru riscuri importante folosește doar cuvinte (ATENȚIE, IMPORTANT, OBSERVAȚIE)
         
         Exemple de întrebări la care poți răspunde:
         - Obligațiile părților din contract
@@ -396,9 +422,8 @@ def get_legal_chat_response(message: str, analysis_context: str = '', conversati
         
         chat_response = response.choices[0].message.content.strip()
         
-        # Add disclaimer to response
-        if not "consultați un avocat" in chat_response.lower():
-            chat_response += "\n\n💡 **Disclaimer**: Aceste informații sunt generale. Pentru sfaturi juridice specifice, consultați un avocat calificat."
+        # Clean markdown symbols from response
+        chat_response = clean_markdown_symbols(chat_response)
         
         return chat_response
         
