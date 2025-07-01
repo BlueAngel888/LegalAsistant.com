@@ -77,7 +77,7 @@ def test_complete_workflow():
     print("💰 Step 2: Testing discount code...")
     
     discount_response = session.post('http://localhost:5000/apply-discount',
-                                   json={'discount_code': 'letsgo'},
+                                   json={'code': 'letsgo'},
                                    headers={'Content-Type': 'application/json'},
                                    timeout=10)
     
@@ -96,7 +96,7 @@ def test_complete_workflow():
     print("🆓 Step 3: Testing free access...")
     
     free_response = session.post('http://localhost:5000/free-access',
-                                data={'discount_code': 'letsgo'},
+                                data={'free_code': 'LETSGO'},
                                 allow_redirects=False,
                                 timeout=30)
     
