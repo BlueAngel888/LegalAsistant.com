@@ -140,6 +140,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 - July 1, 2025. Added comprehensive Terms & Conditions page with legal disclaimers and protection notices
 - July 1, 2025. Enhanced footer with GDPR compliance badge and legal warnings
 - July 1, 2025. Significantly improved analysis text formatting with structured sections, color-coded headers, styled bullet points, and responsive design for optimal readability
+- July 1, 2025. Replaced Copy Analysis button with Download Analysis button that generates and downloads a professionally formatted PDF report with structured sections, headers, and proper typography
 
 ## User Preferences
 

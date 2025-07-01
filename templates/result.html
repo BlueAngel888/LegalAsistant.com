@@ -139,9 +139,9 @@
                         </a>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <button onclick="copyToClipboard()" class="btn btn-outline-secondary btn-lg w-100" id="copyBtn">
-                            <i class="fas fa-copy me-2"></i>
-                            Copy Analysis
+                        <button onclick="downloadAnalysisPDF()" class="btn btn-outline-success btn-lg w-100" id="downloadBtn">
+                            <i class="fas fa-download me-2"></i>
+                            Download Analysis
                         </button>
                     </div>
                 </div>
@@ -376,54 +376,279 @@ function initializeIntegratedChat(analysisContext) {
     }
 }
 
-function copyToClipboard() {
-    const analysisText = document.querySelector('.formatted-analysis').innerText;
+function downloadAnalysisPDF() {
+    const downloadBtn = document.getElementById('downloadBtn');
+    const originalText = downloadBtn.innerHTML;
     
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(analysisText).then(function() {
-            const copyBtn = document.getElementById('copyBtn');
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
-            copyBtn.classList.remove('btn-outline-secondary');
-            copyBtn.classList.add('btn-success');
+    // Change button state to loading
+    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
+    downloadBtn.disabled = true;
+    
+    try {
+        // Get analysis content and structure it
+        const analysisContent = document.querySelector('.formatted-analysis');
+        const documentFiles = Array.from(document.querySelectorAll('.badge')).map(badge => badge.textContent.trim()).join(', ');
+        
+        // Create PDF content with proper formatting
+        const pdfContent = formatAnalysisForPDF(analysisContent, documentFiles);
+        
+        // Generate and download PDF
+        generatePDF(pdfContent).then(() => {
+            // Reset button state
+            downloadBtn.innerHTML = '<i class="fas fa-check me-2"></i>Downloaded!';
+            downloadBtn.classList.remove('btn-outline-success');
+            downloadBtn.classList.add('btn-success');
             
-            setTimeout(function() {
-                copyBtn.innerHTML = originalText;
-                copyBtn.classList.remove('btn-success');
-                copyBtn.classList.add('btn-outline-secondary');
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.classList.remove('btn-success');
+                downloadBtn.classList.add('btn-outline-success');
+                downloadBtn.disabled = false;
             }, 2000);
-        }).catch(function(err) {
-            console.error('Could not copy text: ', err);
-            fallbackCopyTextToClipboard(analysisText);
+        }).catch(error => {
+            console.error('PDF generation error:', error);
+            downloadBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Error';
+            downloadBtn.classList.add('btn-danger');
+            
+            setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.classList.remove('btn-danger');
+                downloadBtn.classList.add('btn-outline-success');
+                downloadBtn.disabled = false;
+            }, 3000);
         });
-    } else {
-        fallbackCopyTextToClipboard(analysisText);
+    } catch (error) {
+        console.error('PDF preparation error:', error);
+        downloadBtn.innerHTML = originalText;
+        downloadBtn.disabled = false;
     }
 }
 
-function fallbackCopyTextToClipboard(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
+function formatAnalysisForPDF(analysisElement, documentFiles) {
+    let pdfText = '';
     
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
+    // Add header
+    pdfText += 'LEGAL ASSISTANT - DOCUMENT ANALYSIS REPORT\n';
+    pdfText += '='.repeat(60) + '\n\n';
     
-    try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-            const copyBtn = document.getElementById('copyBtn');
-            copyBtn.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
-            copyBtn.classList.add('btn-success');
-        }
-    } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
+    // Add document info
+    if (documentFiles) {
+        pdfText += 'ANALYZED DOCUMENTS:\n';
+        pdfText += documentFiles + '\n\n';
     }
     
-    document.body.removeChild(textArea);
+    pdfText += 'GENERATION DATE: ' + new Date().toLocaleDateString('ro-RO') + '\n';
+    pdfText += 'TIME: ' + new Date().toLocaleTimeString('ro-RO') + '\n\n';
+    pdfText += '='.repeat(60) + '\n\n';
+    
+    // Process analysis sections
+    const sections = analysisElement.querySelectorAll('.analysis-section, .intro-section');
+    
+    sections.forEach((section, index) => {
+        if (section.classList.contains('analysis-section')) {
+            // Main section
+            const header = section.querySelector('.section-header');
+            if (header) {
+                pdfText += header.textContent.trim().toUpperCase() + '\n';
+                pdfText += '-'.repeat(header.textContent.trim().length) + '\n\n';
+            }
+            
+            // Process content
+            const content = section.querySelector('.section-content');
+            if (content) {
+                pdfText += processSectionContent(content) + '\n\n';
+            }
+        } else {
+            // Intro section
+            pdfText += processIntroSection(section) + '\n\n';
+        }
+    });
+    
+    // Add footer
+    pdfText += '\n' + '='.repeat(60) + '\n';
+    pdfText += 'IMPORTANT NOTICE:\n';
+    pdfText += 'This analysis is generated by AI for informational purposes.\n';
+    pdfText += 'For specific legal matters, consult a qualified attorney.\n';
+    pdfText += '='.repeat(60);
+    
+    return pdfText;
+}
+
+function processSectionContent(contentElement) {
+    let text = '';
+    const children = contentElement.children;
+    
+    for (let child of children) {
+        if (child.classList.contains('subsection-header')) {
+            text += '\n' + child.textContent.trim() + '\n';
+        } else if (child.classList.contains('bullet-point')) {
+            const bulletText = child.querySelector('span');
+            if (bulletText) {
+                text += '  • ' + bulletText.textContent.trim() + '\n';
+            }
+        } else if (child.classList.contains('analysis-paragraph')) {
+            text += child.textContent.trim() + '\n\n';
+        }
+    }
+    
+    return text;
+}
+
+function processIntroSection(sectionElement) {
+    let text = '';
+    const children = sectionElement.children;
+    
+    for (let child of children) {
+        if (child.tagName === 'H6') {
+            text += child.textContent.trim() + '\n';
+        } else if (child.classList.contains('bullet-point')) {
+            const bulletText = child.querySelector('span');
+            if (bulletText) {
+                text += '  • ' + bulletText.textContent.trim() + '\n';
+            }
+        } else if (child.tagName === 'P') {
+            text += child.textContent.trim() + '\n\n';
+        }
+    }
+    
+    return text;
+}
+
+async function generatePDF(content) {
+    // Use browser's built-in functionality to generate PDF
+    // Create a new window for PDF generation
+    const printWindow = window.open('', '_blank');
+    
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Legal Analysis Report</title>
+            <style>
+                body {
+                    font-family: 'Times New Roman', serif;
+                    line-height: 1.6;
+                    margin: 20px;
+                    color: #333;
+                }
+                .header {
+                    text-align: center;
+                    border-bottom: 2px solid #333;
+                    padding-bottom: 20px;
+                    margin-bottom: 30px;
+                }
+                .title {
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+                .subtitle {
+                    font-size: 14px;
+                    color: #666;
+                }
+                .section {
+                    margin-bottom: 25px;
+                    page-break-inside: avoid;
+                }
+                .section-title {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #0056b3;
+                    border-bottom: 1px solid #0056b3;
+                    padding-bottom: 5px;
+                    margin-bottom: 15px;
+                }
+                .subsection {
+                    margin-left: 20px;
+                    margin-bottom: 15px;
+                }
+                .subsection-title {
+                    font-weight: bold;
+                    margin-bottom: 8px;
+                }
+                .bullet-point {
+                    margin-left: 40px;
+                    margin-bottom: 5px;
+                }
+                .footer {
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 1px solid #333;
+                    font-size: 12px;
+                    color: #666;
+                }
+                @media print {
+                    body { margin: 0; }
+                    .header { margin-top: 20px; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">LEGAL ASSISTANT</div>
+                <div class="subtitle">Document Analysis Report</div>
+                <div class="subtitle">Generated on ${new Date().toLocaleDateString('ro-RO')} at ${new Date().toLocaleTimeString('ro-RO')}</div>
+            </div>
+            
+            ${convertTextToHTML(content)}
+            
+            <div class="footer">
+                <strong>IMPORTANT NOTICE:</strong><br>
+                This analysis is generated by AI for informational purposes only.<br>
+                For specific legal matters, always consult a qualified attorney.
+            </div>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    
+    // Wait for content to load then trigger print dialog
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    };
+    
+    return Promise.resolve();
+}
+
+function convertTextToHTML(text) {
+    const lines = text.split('\n');
+    let html = '';
+    let inSection = false;
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) {
+            html += '<br>';
+            continue;
+        }
+        
+        // Check for main sections (numbered)
+        if (line.match(/^\d+\.\s/) || line.includes('IDENTIFICAREA') || line.includes('STRUCTURA') || line.includes('VERIFICAREA') || line.includes('ANALIZA') || line.includes('ASPECTE')) {
+            if (inSection) html += '</div>';
+            html += `<div class="section"><div class="section-title">${line}</div>`;
+            inSection = true;
+        }
+        // Check for subsections (ending with :)
+        else if (line.endsWith(':') && !line.startsWith('•') && !line.startsWith('-')) {
+            html += `<div class="subsection"><div class="subsection-title">${line}</div>`;
+        }
+        // Check for bullet points
+        else if (line.startsWith('•') || line.startsWith('-')) {
+            html += `<div class="bullet-point">${line}</div>`;
+        }
+        // Regular text
+        else {
+            html += `<p>${line}</p>`;
+        }
+    }
+    
+    if (inSection) html += '</div>';
+    
+    return html;
 }
 
 // Print styles
