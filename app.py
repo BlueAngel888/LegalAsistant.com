@@ -553,6 +553,10 @@ def free_access():
         free_code = request.form.get('free_code', '').strip().upper()
         
         # Verify free access code from session
+        logging.info(f"Free access attempt - Code provided: {free_code}")
+        logging.info(f"Session free_access: {session.get('free_access')}")
+        logging.info(f"Session discount_code: {session.get('discount_code')}")
+        
         if session.get('free_access') and session.get('discount_code') == free_code:
             logging.info(f"Free access granted with code: {free_code}")
             
@@ -806,11 +810,18 @@ def success():
         
         # Analyze the document with safer error handling
         lang = session.get('language', 'en')
-        t = get_translation(lang)
+        try:
+            t = get_translation(lang)
+        except Exception as trans_error:
+            logging.error(f"Translation error: {str(trans_error)}")
+            t = {}  # Empty dict as fallback
         session_id = session.get('session_id', session.get('_id', 'anonymous'))
         
         # Use AI analysis for all cases - whether free access or paid
         try:
+            logging.info(f"Starting AI analysis with language: {analysis_language}, country: {document_country}")
+            logging.info(f"Document text length: {len(doc_text)}")
+            
             # Use AI analyzer for all access types
             analysis = analyze_with_gpt4(doc_text, analysis_language)
             logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
@@ -1148,10 +1159,17 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
     except Exception as e:
         logging.error(f"Analysis error: {str(e)}")
         lang = session.get('language', 'en')
-        t = get_translation(lang)
+        try:
+            t = get_translation(lang)
+        except:
+            t = {}  # Fallback empty dict
+        
+        error_title = t.get('error_occurred', 'Analysis Failed')
+        error_message = 'We encountered an error while analyzing your document. Please contact support if this issue persists.'
+        
         return render_template('error.html', 
-                             error_title=t.get('error_occurred', 'Analysis Failed'),
-                             error_message='We encountered an error while analyzing your document. Please contact support if this issue persists.',
+                             error_title=error_title,
+                             error_message=error_message,
                              t=t, lang=lang)
 
 @app.route('/legal-chat', methods=['POST'])
