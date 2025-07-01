@@ -26,21 +26,15 @@ class LegalLoadingManager {
                 </div>
                 <div class="loading-text" id="loading-text">Processing Document...</div>
                 <div class="loading-subtext" id="loading-subtext">Please wait while we analyze your legal document</div>
-                <div class="loading-progress">
-                    <div class="loading-progress-bar" id="loading-progress-bar"></div>
-                </div>
-                <div class="legal-status">
-                    <div class="status-item">
-                        <div class="status-dot" id="status-upload"></div>
-                        <span>Upload</span>
+                <div class="progress-steps">
+                    <div class="progress-step" id="step-upload">
+                        <span class="step-label">Upload</span>
                     </div>
-                    <div class="status-item">
-                        <div class="status-dot" id="status-process"></div>
-                        <span>Process</span>
+                    <div class="progress-step" id="step-process">
+                        <span class="step-label">Process</span>
                     </div>
-                    <div class="status-item">
-                        <div class="status-dot" id="status-analyze"></div>
-                        <span>Analyze</span>
+                    <div class="progress-step" id="step-analyze">
+                        <span class="step-label">Analyze</span>
                     </div>
                 </div>
             </div>
@@ -167,28 +161,28 @@ class LegalLoadingManager {
     }
 
     startStatusUpdates() {
-        const statusDots = [
-            document.getElementById('status-upload'),
-            document.getElementById('status-process'),
-            document.getElementById('status-analyze')
+        const progressSteps = [
+            document.getElementById('step-upload'),
+            document.getElementById('step-process'),
+            document.getElementById('step-analyze')
         ];
 
-        let currentStatus = 0;
+        let currentStep = 0;
         
-        // Activate first status immediately
-        statusDots[0].className = 'status-dot active';
+        // Activate first step immediately
+        progressSteps[0].classList.add('active');
 
         this.statusTimer = setInterval(() => {
-            if (currentStatus < statusDots.length - 1) {
-                currentStatus++;
-                statusDots[currentStatus].className = 'status-dot processing';
+            if (currentStep < progressSteps.length - 1) {
+                // Complete current step
+                progressSteps[currentStep].classList.remove('active');
+                progressSteps[currentStep].classList.add('completed');
                 
-                // Complete previous status
-                if (currentStatus > 0) {
-                    statusDots[currentStatus - 1].className = 'status-dot active';
-                }
+                // Move to next step
+                currentStep++;
+                progressSteps[currentStep].classList.add('active');
             }
-        }, 2500);
+        }, 3000); // 3 seconds per step
     }
 
     clearTimers() {
