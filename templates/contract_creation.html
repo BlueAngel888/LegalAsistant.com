@@ -198,6 +198,18 @@ document.addEventListener('DOMContentLoaded', function() {
             languageSelect.value = languageMap[country];
         }
     });
+    
+    // Add loading animation on form submission
+    const contractForm = document.querySelector('form');
+    if (contractForm) {
+        contractForm.addEventListener('submit', function(e) {
+            setTimeout(() => {
+                if (window.legalLoader) {
+                    window.legalLoader.showContractGeneration();
+                }
+            }, 100);
+        });
+    }
 });
 </script>
 {% endblock %}

@@ -226,6 +226,18 @@ document.addEventListener('DOMContentLoaded', function() {
             languageSelect.value = languageMap[country];
         }
     });
+    
+    // Add loading animation on form submission
+    const requestForm = document.querySelector('form');
+    if (requestForm) {
+        requestForm.addEventListener('submit', function(e) {
+            setTimeout(() => {
+                if (window.legalLoader) {
+                    window.legalLoader.showLegalResearch();
+                }
+            }, 100);
+        });
+    }
 });
 </script>
 {% endblock %}

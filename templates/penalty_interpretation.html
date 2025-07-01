@@ -261,6 +261,18 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     });
+    
+    // Add loading animation on form submission
+    const penaltyForm = document.querySelector('form');
+    if (penaltyForm) {
+        penaltyForm.addEventListener('submit', function(e) {
+            setTimeout(() => {
+                if (window.legalLoader) {
+                    window.legalLoader.showDocumentAnalysis();
+                }
+            }, 100);
+        });
+    }
 });
 </script>
 {% endblock %}

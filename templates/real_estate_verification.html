@@ -357,6 +357,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Language change handler
     languageSelect.addEventListener('change', updateSubmitButton);
+    
+    // Add loading animation on form submission
+    const estateForm = document.querySelector('form');
+    if (estateForm) {
+        estateForm.addEventListener('submit', function(e) {
+            setTimeout(() => {
+                if (window.legalLoader) {
+                    window.legalLoader.showLegalResearch();
+                }
+            }, 100);
+        });
+    }
 });
 </script>
 {% endblock %}
