@@ -163,55 +163,68 @@ function initializeFileUpload() {
     function updateSubmitButton() {
         const submitBtn = document.getElementById('submitBtn');
         
-        if (submitBtn) {
-            // Check file upload tab
-            const hasFiles = selectedFiles.length > 0;
+        if (!submitBtn) {
+            console.log('Submit button not found');
+            return;
+        }
+        
+        // Check file upload tab
+        const hasFiles = selectedFiles.length > 0;
+        
+        // Check camera tab - if scanned image exists
+        const scannedInput = document.getElementById('scannedImage');
+        const hasScannedImage = scannedInput && scannedInput.value;
+        
+        // Check legal parameters for current active tab
+        const activeTab = document.querySelector('.nav-link.active');
+        let hasCountry = false;
+        let hasLanguage = false;
+        
+        if (activeTab && activeTab.id === 'camera-tab') {
+            // Camera tab validation
+            const countrySelect = document.getElementById('document_country_camera');
+            const languageSelect = document.getElementById('analysis_language_camera');
+            hasCountry = countrySelect && countrySelect.value && countrySelect.value !== '';
+            hasLanguage = languageSelect && languageSelect.value && languageSelect.value !== '';
+        } else {
+            // File upload tab validation - wait for elements to be available
+            const countrySelect = document.getElementById('document_country');
+            const languageSelect = document.getElementById('analysis_language');
             
-            // Check camera tab - if scanned image exists
-            const scannedInput = document.getElementById('scannedImage');
-            const hasScannedImage = scannedInput && scannedInput.value;
-            
-            // Check legal parameters for current active tab
-            const activeTab = document.querySelector('.nav-link.active');
-            let hasCountry = false;
-            let hasLanguage = false;
-            
-            if (activeTab && activeTab.id === 'camera-tab') {
-                // Camera tab validation
-                const countrySelect = document.getElementById('document_country_camera');
-                const languageSelect = document.getElementById('analysis_language_camera');
-                hasCountry = countrySelect && countrySelect.value && countrySelect.value !== '';
-                hasLanguage = languageSelect && languageSelect.value && languageSelect.value !== '';
+            if (countrySelect && languageSelect) {
+                hasCountry = countrySelect.value && countrySelect.value !== '';
+                hasLanguage = languageSelect.value && languageSelect.value !== '';
             } else {
-                // File upload tab validation
-                const countrySelect = document.getElementById('document_country');
-                const languageSelect = document.getElementById('analysis_language');
-                hasCountry = countrySelect && countrySelect.value && countrySelect.value !== '';
-                hasLanguage = languageSelect && languageSelect.value && languageSelect.value !== '';
+                // Elements not ready yet, try again shortly
+                setTimeout(updateSubmitButton, 100);
+                return;
             }
-            
-            // Enable submit only if we have documents AND legal parameters
-            const hasDocuments = hasFiles || hasScannedImage;
-            const shouldEnable = hasDocuments && hasCountry && hasLanguage;
-            
+        }
+        
+        // Enable submit only if we have documents AND legal parameters
+        const hasDocuments = hasFiles || hasScannedImage;
+        const shouldEnable = hasDocuments && hasCountry && hasLanguage;
+        
+        // Only log when debugging is needed
+        if (hasFiles || hasScannedImage) {
             console.log('Submit button validation:', {
                 hasFiles,
-                hasScannedImage,
-                hasDocuments,
-                hasCountry,
-                hasLanguage,
-                shouldEnable,
-                activeTabId: activeTab ? activeTab.id : 'none'
+                hasScannedImage: hasScannedImage ? 'yes' : 'no',
+                hasDocuments: hasDocuments ? 'yes' : 'no',
+                hasCountry: hasCountry ? 'yes' : 'no',
+                hasLanguage: hasLanguage ? 'yes' : 'no',
+                shouldEnable: shouldEnable ? 'yes' : 'no',
+                activeTabId: activeTab ? activeTab.id : 'file-tab'
             });
-            
-            submitBtn.disabled = !shouldEnable;
-            
-            // Visual feedback
-            if (hasDocuments && hasCountry && hasLanguage) {
-                submitBtn.classList.add('enhanced-ready');
-            } else {
-                submitBtn.classList.remove('enhanced-ready');
-            }
+        }
+        
+        submitBtn.disabled = !shouldEnable;
+        
+        // Visual feedback
+        if (hasDocuments && hasCountry && hasLanguage) {
+            submitBtn.classList.add('enhanced-ready');
+        } else {
+            submitBtn.classList.remove('enhanced-ready');
         }
     }
 
@@ -1260,50 +1273,75 @@ function updateEnhancement(property, value) {
 
 // Form Validation
 function initializeFormValidation() {
-    const forms = document.querySelectorAll('form');
-    
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            console.log('Form submit event triggered:', form.action);
-            console.log('Form method:', form.method);
-            console.log('Form data will be submitted...');
-            
-            const submitButton = form.querySelector('button[type="submit"]');
-            
-            // Only intercept if button is disabled - otherwise let form submit naturally
-            if (submitButton && submitButton.disabled) {
-                console.log('Submit button is disabled, form submission blocked');
-                e.preventDefault();
-                return;
-            }
-            
-            // For checkout forms, let natural redirect happen
-            if (form.action.includes('checkout')) {
-                console.log('Checkout form - allowing natural submission and redirect');
-                return;
-            }
-            
-            // Only add loading state for upload forms
-            if (submitButton && form.action.includes('upload')) {
-                console.log('Upload form - adding loading state');
-                const originalText = submitButton.innerHTML;
-                submitButton.classList.add('loading');
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing files...';
-                
-                setTimeout(() => {
-                    submitButton.disabled = true;
-                }, 100);
-                
-                setTimeout(() => {
-                    if (submitButton.disabled) {
-                        submitButton.disabled = false;
-                        submitButton.classList.remove('loading');
-                        submitButton.innerHTML = originalText;
+    // Wait for DOM to be fully loaded
+    setTimeout(() => {
+        const forms = document.querySelectorAll('form');
+        
+        // Initialize dropdown listeners
+        const countrySelect = document.getElementById('document_country');
+        const languageSelect = document.getElementById('analysis_language');
+        const countrySelectCamera = document.getElementById('document_country_camera');
+        const languageSelectCamera = document.getElementById('analysis_language_camera');
+        
+        // Add change listeners to update submit button state
+        [countrySelect, languageSelect, countrySelectCamera, languageSelectCamera].forEach(select => {
+            if (select) {
+                select.addEventListener('change', function() {
+                    console.log('Dropdown changed:', this.id, 'value:', this.value);
+                    validateLegalOption(this);
+                    updateSubmitButtonState();
+                    if (this.id.includes('country')) {
+                        showCountryInfo(this.value);
                     }
-                }, 15000);
+                });
             }
         });
-    });
+        
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                console.log('Form submit event triggered:', form.action);
+                console.log('Form method:', form.method);
+                console.log('Form data will be submitted...');
+                
+                const submitButton = form.querySelector('button[type="submit"]');
+                
+                // Only intercept if button is disabled - otherwise let form submit naturally
+                if (submitButton && submitButton.disabled) {
+                    console.log('Submit button is disabled, form submission blocked');
+                    e.preventDefault();
+                    return;
+                }
+                
+                // For checkout forms, let natural redirect happen
+                if (form.action.includes('checkout')) {
+                    console.log('Checkout form - allowing natural submission and redirect');
+                    return;
+                }
+                
+                // Only add loading state for upload forms
+                if (submitButton && form.action.includes('upload')) {
+                    console.log('Upload form - adding loading state');
+                    const originalText = submitButton.innerHTML;
+                    submitButton.classList.add('loading');
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing files...';
+                    
+                    setTimeout(() => {
+                        submitButton.disabled = true;
+                    }, 100);
+                    
+                    setTimeout(() => {
+                        if (submitButton.disabled) {
+                            submitButton.disabled = false;
+                            submitButton.classList.remove('loading');
+                            submitButton.innerHTML = originalText;
+                        }
+                    }, 15000);
+                }
+            });
+        });
+        
+        console.log('Form validation and dropdown listeners initialized');
+    }, 200);
 }
 
 // Initialize Bootstrap Tooltips
