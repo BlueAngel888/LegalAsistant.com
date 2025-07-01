@@ -146,18 +146,8 @@ class LegalLoadingManager {
     }
 
     startProgressAnimation(duration) {
-        const progressBar = document.getElementById('loading-progress-bar');
-        let progress = 0;
-        const increment = 100 / (duration / 100);
-
-        this.progressTimer = setInterval(() => {
-            progress += increment;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(this.progressTimer);
-            }
-            progressBar.style.width = `${progress}%`;
-        }, 100);
+        // New progress animation is handled by startStatusUpdates()
+        // No longer using the old progress bar
     }
 
     startStatusUpdates() {
