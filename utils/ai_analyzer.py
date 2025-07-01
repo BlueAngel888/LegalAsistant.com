@@ -279,7 +279,23 @@ Provide your analysis:
             max_tokens=4000
         )
         
-        return response.choices[0].message.content
+        # Clean the response by removing all markdown formatting symbols
+        analysis_content = response.choices[0].message.content
+        
+        # Remove markdown formatting symbols
+        analysis_content = analysis_content.replace('**', '')  # Remove bold formatting
+        analysis_content = analysis_content.replace('*', '')   # Remove italic formatting
+        analysis_content = analysis_content.replace('##', '')  # Remove h2 headers
+        analysis_content = analysis_content.replace('#', '')   # Remove h1 headers
+        analysis_content = analysis_content.replace('###', '') # Remove h3 headers
+        analysis_content = analysis_content.replace('####', '')# Remove h4 headers
+        
+        # Clean up any double spaces that might result from removing symbols
+        import re
+        analysis_content = re.sub(r'\s+', ' ', analysis_content)
+        analysis_content = re.sub(r'\n\s*\n', '\n\n', analysis_content)
+        
+        return analysis_content
         
     except Exception as e:
         logging.error(f"Error analyzing document with GPT-4: {str(e)}")
