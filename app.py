@@ -569,6 +569,7 @@ def free_access():
                     analysis_record.stripe_session_id = session['stripe_session_id']
                     db.session.commit()
             
+            # Redirect to results page to trigger AI analysis
             return redirect(url_for('success'))
         else:
             flash('Invalid free access code', 'error')
