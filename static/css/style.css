@@ -44,6 +44,82 @@ body {
     font-size: 1.1rem;
 }
 
+/* Futuristic Dropdown Styles */
+.futuristic-dropdown .dropdown-toggle {
+    position: relative;
+    background: linear-gradient(45deg, rgba(30, 58, 138, 0.1), rgba(59, 130, 246, 0.1));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    color: #e2e8f0 !important;
+}
+
+.futuristic-dropdown .dropdown-toggle:hover {
+    background: linear-gradient(45deg, rgba(30, 58, 138, 0.2), rgba(59, 130, 246, 0.2));
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.futuristic-menu {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
+    padding: 8px 0;
+    margin-top: 8px;
+    min-width: 280px;
+}
+
+.futuristic-menu .dropdown-item {
+    color: #e2e8f0;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 2px 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.futuristic-menu .dropdown-item:hover {
+    background: linear-gradient(45deg, rgba(30, 58, 138, 0.3), rgba(59, 130, 246, 0.2));
+    color: #ffffff;
+    transform: translateX(4px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.futuristic-menu .dropdown-item:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), transparent);
+    transition: width 0.3s ease;
+}
+
+.futuristic-menu .dropdown-item:hover:before {
+    width: 100%;
+}
+
+.futuristic-menu .dropdown-item i {
+    color: #3b82f6;
+    transition: color 0.3s ease;
+}
+
+.futuristic-menu .dropdown-item:hover i {
+    color: #60a5fa;
+}
+
+.futuristic-menu .dropdown-divider {
+    border-color: rgba(59, 130, 246, 0.3);
+    margin: 8px 0;
+    opacity: 0.6;
+}
+
 /* Cards and Shadows */
 .card {
     border-radius: 12px;

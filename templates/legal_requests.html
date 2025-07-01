@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Legal Requests & Petitions - {{ t.site_title if t else 'Legal Assistant' }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-file-alt me-3"></i>
+                    Legal Requests & Petitions
+                </h1>
+                <p class="lead mb-4">
+                    Generate professional legal requests, petitions, and formal letters according to your country's legal standards.
+                </p>
+                <div class="features-list">
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Jurisdiction-specific formatting
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Professional legal language
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Proper legal citations and references
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="text-center">
+                    <i class="fas fa-scroll display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Legal Requests Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-white py-4">
+                        <h2 class="text-center mb-0">
+                            <i class="fas fa-pen text-primary me-2"></i>
+                            Create Legal Request
+                        </h2>
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="requestForm" method="POST" action="/generate-legal-request">
+                            
+                            <!-- Country and Language Selection -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="requestCountry" class="form-label fw-bold">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Jurisdiction
+                                    </label>
+                                    <select class="form-select form-select-lg" id="requestCountry" name="country" required>
+                                        <option value="">Select jurisdiction...</option>
+                                        <option value="Romania">🇷🇴 Romania</option>
+                                        <option value="Germany">🇩🇪 Germany</option>
+                                        <option value="France">🇫🇷 France</option>
+                                        <option value="Italy">🇮🇹 Italy</option>
+                                        <option value="Spain">🇪🇸 Spain</option>
+                                        <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                                        <option value="United States">🇺🇸 United States</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="requestLanguage" class="form-label fw-bold">
+                                        <i class="fas fa-language me-2"></i>Document Language
+                                    </label>
+                                    <select class="form-select form-select-lg" id="requestLanguage" name="language" required>
+                                        <option value="">Select language...</option>
+                                        <option value="en">English</option>
+                                        <option value="ro">Română</option>
+                                        <option value="de">Deutsch</option>
+                                        <option value="fr">Français</option>
+                                        <option value="it">Italiano</option>
+                                        <option value="es">Español</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Request Type Selection -->
+                            <div class="mb-4">
+                                <label for="requestType" class="form-label fw-bold">
+                                    <i class="fas fa-clipboard-list me-2"></i>Type of Request
+                                </label>
+                                <select class="form-select form-select-lg" id="requestType" name="request_type" required>
+                                    <option value="">Choose request type...</option>
+                                    <optgroup label="Administrative Requests">
+                                        <option value="information_request">Information Request (FOIA)</option>
+                                        <option value="document_request">Official Document Request</option>
+                                        <option value="certificate_request">Certificate Request</option>
+                                        <option value="permit_application">Permit Application</option>
+                                    </optgroup>
+                                    <optgroup label="Legal Petitions">
+                                        <option value="court_petition">Court Petition</option>
+                                        <option value="appeal_petition">Appeal Petition</option>
+                                        <option value="name_change">Name Change Petition</option>
+                                        <option value="custody_petition">Custody Petition</option>
+                                    </optgroup>
+                                    <optgroup label="Formal Complaints">
+                                        <option value="complaint_letter">Formal Complaint Letter</option>
+                                        <option value="consumer_complaint">Consumer Protection Complaint</option>
+                                        <option value="employment_complaint">Employment Complaint</option>
+                                        <option value="discrimination_complaint">Discrimination Complaint</option>
+                                    </optgroup>
+                                    <optgroup label="Legal Notices">
+                                        <option value="demand_letter">Demand Letter</option>
+                                        <option value="cease_desist">Cease and Desist Letter</option>
+                                        <option value="notice_to_quit">Notice to Quit</option>
+                                        <option value="breach_notice">Breach of Contract Notice</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <!-- Recipient Information -->
+                            <div class="mb-4">
+                                <label for="recipient" class="form-label fw-bold">
+                                    <i class="fas fa-user me-2"></i>Recipient Information
+                                </label>
+                                <textarea class="form-control" id="recipient" name="recipient" rows="3" 
+                                          placeholder="Provide recipient details:
+- Name/Organization
+- Title/Position
+- Address
+- Any reference numbers"></textarea>
+                            </div>
+
+                            <!-- Request Details -->
+                            <div class="mb-4">
+                                <label for="requestDetails" class="form-label fw-bold">
+                                    <i class="fas fa-info-circle me-2"></i>Request Details
+                                </label>
+                                <textarea class="form-control" id="requestDetails" name="details" rows="8" 
+                                          placeholder="Provide detailed information about your request:
+- Background and context
+- Specific information or action requested
+- Relevant dates and deadlines
+- Supporting facts and evidence
+- Legal basis for the request
+- Desired outcome or resolution"></textarea>
+                            </div>
+
+                            <!-- Urgency and Additional Options -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="urgency" class="form-label fw-bold">
+                                        <i class="fas fa-clock me-2"></i>Urgency Level
+                                    </label>
+                                    <select class="form-select" id="urgency" name="urgency">
+                                        <option value="normal">Normal</option>
+                                        <option value="urgent">Urgent</option>
+                                        <option value="emergency">Emergency</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="deadline" class="form-label fw-bold">
+                                        <i class="fas fa-calendar me-2"></i>Response Deadline
+                                    </label>
+                                    <input type="date" class="form-control" id="deadline" name="deadline">
+                                </div>
+                            </div>
+
+                            <!-- Additional Options -->
+                            <div class="mb-4">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="includeReferences" name="include_references">
+                                    <label class="form-check-label" for="includeReferences">
+                                        Include relevant legal references and citations
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="formalTone" name="formal_tone" checked>
+                                    <label class="form-check-label" for="formalTone">
+                                        Use formal legal language and tone
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Generate Request - €100.00
+                                </button>
+                                <p class="text-muted mt-3">
+                                    <i class="fas fa-certificate me-1"></i>
+                                    Professional legal document with proper formatting
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('requestCountry');
+    const languageSelect = document.getElementById('requestLanguage');
+    
+    // Auto-select language based on country
+    countrySelect.addEventListener('change', function() {
+        const country = this.value;
+        const languageMap = {
+            'Romania': 'ro',
+            'Germany': 'de',
+            'France': 'fr',
+            'Italy': 'it',
+            'Spain': 'es',
+            'United Kingdom': 'en',
+            'United States': 'en'
+        };
+        
+        if (languageMap[country]) {
+            languageSelect.value = languageMap[country];
+        }
+    });
+});
+</script>
+{% endblock %}

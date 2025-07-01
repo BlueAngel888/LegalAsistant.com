@@ -1195,6 +1195,44 @@ def terms():
     t = get_translation(lang)
     return render_template('terms.html', t=t, lang=lang)
 
+# New Legal Services Routes
+@app.route('/document-analysis')
+def document_analysis():
+    """Document Analysis Service - redirect to main upload"""
+    return redirect(url_for('index'))
+
+@app.route('/contract-creation')
+def contract_creation():
+    """Contract Creation Service"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    
+    return render_template('contract_creation.html', t=t, lang=lang)
+
+@app.route('/legal-requests')
+def legal_requests():
+    """Legal Requests & Petitions Service"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    
+    return render_template('legal_requests.html', t=t, lang=lang)
+
+@app.route('/penalty-interpretation')
+def penalty_interpretation():
+    """Penalty & Process Interpretation Service"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    
+    return render_template('penalty_interpretation.html', t=t, lang=lang)
+
+@app.route('/real-estate-verification')
+def real_estate_verification():
+    """Real Estate Verification Service"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    
+    return render_template('real_estate_verification.html', t=t, lang=lang)
+
 @app.route('/clear-session')
 def clear_session():
     session.clear()

@@ -34,6 +34,33 @@
                             <i class="fas fa-home me-1"></i>Home
                         </a>
                     </li>
+                    
+                    <!-- Legal Services Dropdown -->
+                    <li class="nav-item dropdown futuristic-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-briefcase me-1"></i>Legal Services
+                        </a>
+                        <ul class="dropdown-menu futuristic-menu" aria-labelledby="servicesDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('document_analysis') }}">
+                                <i class="fas fa-search me-2"></i>Document Analysis
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('contract_creation') }}">
+                                <i class="fas fa-file-contract me-2"></i>Contract Creation
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('legal_requests') }}">
+                                <i class="fas fa-file-alt me-2"></i>Legal Requests & Petitions
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('penalty_interpretation') }}">
+                                <i class="fas fa-gavel me-2"></i>Penalty & Process Interpretation
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('real_estate_verification') }}">
+                                <i class="fas fa-home me-2"></i>Real Estate Verification
+                            </a></li>
+                        </ul>
+                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('clear_session') }}">
                             <i class="fas fa-refresh me-1"></i>New Analysis

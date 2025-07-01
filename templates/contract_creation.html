@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Contract Creation - {{ t.site_title if t else 'Legal Assistant' }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-file-contract me-3"></i>
+                    Contract Creation Service
+                </h1>
+                <p class="lead mb-4">
+                    Create professional legal contracts tailored to your jurisdiction's laws and requirements.
+                </p>
+                <div class="features-list">
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Country-specific legal frameworks
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Professional contract templates
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        AI-powered clause suggestions
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="text-center">
+                    <i class="fas fa-handshake display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contract Creation Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-white py-4">
+                        <h2 class="text-center mb-0">
+                            <i class="fas fa-plus-circle text-primary me-2"></i>
+                            Create New Contract
+                        </h2>
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="contractForm" method="POST" action="/generate-contract">
+                            
+                            <!-- Country and Language Selection -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="contractCountry" class="form-label fw-bold">
+                                        <i class="fas fa-globe me-2"></i>Contract Country/Jurisdiction
+                                    </label>
+                                    <select class="form-select form-select-lg" id="contractCountry" name="country" required>
+                                        <option value="">Select jurisdiction...</option>
+                                        <option value="Romania">🇷🇴 Romania</option>
+                                        <option value="Germany">🇩🇪 Germany</option>
+                                        <option value="France">🇫🇷 France</option>
+                                        <option value="Italy">🇮🇹 Italy</option>
+                                        <option value="Spain">🇪🇸 Spain</option>
+                                        <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                                        <option value="United States">🇺🇸 United States</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="contractLanguage" class="form-label fw-bold">
+                                        <i class="fas fa-language me-2"></i>Contract Language
+                                    </label>
+                                    <select class="form-select form-select-lg" id="contractLanguage" name="language" required>
+                                        <option value="">Select language...</option>
+                                        <option value="en">English</option>
+                                        <option value="ro">Română</option>
+                                        <option value="de">Deutsch</option>
+                                        <option value="fr">Français</option>
+                                        <option value="it">Italiano</option>
+                                        <option value="es">Español</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Contract Type Selection -->
+                            <div class="mb-4">
+                                <label for="contractType" class="form-label fw-bold">
+                                    <i class="fas fa-list me-2"></i>Contract Type
+                                </label>
+                                <select class="form-select form-select-lg" id="contractType" name="contract_type" required>
+                                    <option value="">Choose contract type...</option>
+                                    <optgroup label="Sales & Purchase">
+                                        <option value="sale_purchase">Sale and Purchase Agreement</option>
+                                        <option value="real_estate_sale">Real Estate Sale Contract</option>
+                                        <option value="vehicle_sale">Vehicle Sale Agreement</option>
+                                    </optgroup>
+                                    <optgroup label="Services">
+                                        <option value="service_agreement">Service Agreement</option>
+                                        <option value="consulting">Consulting Agreement</option>
+                                        <option value="freelance">Freelance Contract</option>
+                                    </optgroup>
+                                    <optgroup label="Employment">
+                                        <option value="employment">Employment Contract</option>
+                                        <option value="nda">Non-Disclosure Agreement</option>
+                                        <option value="non_compete">Non-Compete Agreement</option>
+                                    </optgroup>
+                                    <optgroup label="Rental & Lease">
+                                        <option value="rental_residential">Residential Rental Agreement</option>
+                                        <option value="rental_commercial">Commercial Lease</option>
+                                        <option value="equipment_lease">Equipment Lease</option>
+                                    </optgroup>
+                                    <optgroup label="Partnership & Business">
+                                        <option value="partnership">Partnership Agreement</option>
+                                        <option value="joint_venture">Joint Venture Agreement</option>
+                                        <option value="supplier">Supplier Agreement</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <!-- Contract Details -->
+                            <div class="mb-4">
+                                <label for="contractDetails" class="form-label fw-bold">
+                                    <i class="fas fa-edit me-2"></i>Contract Details & Requirements
+                                </label>
+                                <textarea class="form-control" id="contractDetails" name="details" rows="6" 
+                                          placeholder="Describe the specific terms, conditions, and requirements for your contract. Include:
+- Parties involved (names, addresses, roles)
+- Subject matter and scope
+- Duration and termination conditions
+- Payment terms and amounts
+- Special clauses or conditions
+- Any specific legal requirements"></textarea>
+                            </div>
+
+                            <!-- Additional Options -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="includeArbitration" name="include_arbitration">
+                                        <label class="form-check-label" for="includeArbitration">
+                                            Include arbitration clause
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="includeForceM ajeure" name="include_force_majeure">
+                                        <label class="form-check-label" for="includeForceMajeure">
+                                            Include force majeure clause
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                                    <i class="fas fa-magic me-2"></i>
+                                    Generate Contract - €100.00
+                                </button>
+                                <p class="text-muted mt-3">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Professional legal contract with country-specific compliance
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('contractCountry');
+    const languageSelect = document.getElementById('contractLanguage');
+    
+    // Auto-select language based on country
+    countrySelect.addEventListener('change', function() {
+        const country = this.value;
+        const languageMap = {
+            'Romania': 'ro',
+            'Germany': 'de',
+            'France': 'fr',
+            'Italy': 'it',
+            'Spain': 'es',
+            'United Kingdom': 'en',
+            'United States': 'en'
+        };
+        
+        if (languageMap[country]) {
+            languageSelect.value = languageMap[country];
+        }
+    });
+});
+</script>
+{% endblock %}
