@@ -1076,6 +1076,20 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
         if 'full_doc_text' in session:
             del session['full_doc_text']
         
+        # GDPR Compliance: Auto-delete document text after analysis completion
+        try:
+            analysis_id = session.get('analysis_id')
+            if analysis_id:
+                analysis_record = DocumentAnalysis.query.get(analysis_id)
+                if analysis_record and analysis_record.document_text:
+                    # Keep only essential metadata, remove actual document content
+                    original_text_length = len(analysis_record.document_text)
+                    analysis_record.document_text = f"[GDPR_DELETED_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}] Original document content removed for privacy compliance (was {original_text_length} characters)"
+                    db.session.commit()
+                    logging.info(f"GDPR: Document text deleted for analysis ID: {analysis_id}, original length: {original_text_length}")
+        except Exception as gdpr_error:
+            logging.error(f"GDPR deletion error: {str(gdpr_error)}")
+        
         return render_template('result.html', 
                              analysis=analysis, 
                              files=processed_files, 
@@ -1145,6 +1159,13 @@ def legal_chat():
     except Exception as e:
         logging.error(f"Legal chat error: {str(e)}")
         return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/terms')
+def terms():
+    """Terms and Conditions page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('terms.html', t=t, lang=lang)
 
 @app.route('/clear-session')
 def clear_session():

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Terms and Conditions - Legal Assistant{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h1 class="mb-0 h3">
+                            <i class="fas fa-file-contract me-2"></i>
+                            Terms and Conditions
+                        </h1>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="terms-content">
+                            <div class="alert alert-warning mb-4">
+                                <h5 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Important Legal Disclaimer
+                                </h5>
+                                <p class="mb-0">
+                                    The information provided by Legal Assistant is for <strong>informational purposes only</strong> and does not constitute legal advice. 
+                                    Always consult with a qualified attorney for specific legal matters.
+                                </p>
+                            </div>
+
+                            <h4 class="text-primary mt-4 mb-3">1. Service Description</h4>
+                            <p>
+                                Legal Assistant is an AI-powered document analysis platform that provides automated analysis of legal documents. 
+                                Our service is designed to assist with initial document review but does not replace professional legal counsel.
+                            </p>
+
+                            <h4 class="text-primary mt-4 mb-3">2. Information Disclaimer</h4>
+                            <div class="bg-light p-3 border-left-primary mb-3">
+                                <strong>NO LEGAL ADVICE:</strong> The analysis provided by our AI system is for informational purposes only. 
+                                It does not constitute legal advice, legal opinions, or legal recommendations. The information should not be 
+                                relied upon for making legal decisions.
+                            </div>
+                            <p>
+                                Users must seek advice from qualified legal professionals before taking any action based on information 
+                                provided by this service. We disclaim any liability for decisions made based on our AI analysis.
+                            </p>
+
+                            <h4 class="text-primary mt-4 mb-3">3. Data Privacy and GDPR Compliance</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <svg width="60" height="40" viewBox="0 0 60 40" class="me-3">
+                                    <rect width="60" height="40" fill="#0052CC" rx="3"/>
+                                    <text x="30" y="15" text-anchor="middle" fill="white" font-size="8" font-weight="bold">GDPR</text>
+                                    <text x="30" y="25" text-anchor="middle" fill="white" font-size="6">COMPLIANT</text>
+                                    <circle cx="15" cy="30" r="3" fill="#FFD700"/>
+                                    <text x="15" y="32" text-anchor="middle" fill="#0052CC" font-size="4">✓</text>
+                                </svg>
+                                <div>
+                                    <strong>GDPR Compliance:</strong> We automatically delete all document content after analysis completion 
+                                    to ensure your privacy and comply with data protection regulations.
+                                </div>
+                            </div>
+                            <ul>
+                                <li><strong>Automatic Deletion:</strong> Document text is permanently removed from our database after analysis</li>
+                                <li><strong>Minimal Data Retention:</strong> We only retain analysis metadata for service improvement</li>
+                                <li><strong>No Personal Data Storage:</strong> We do not store personal information beyond session data</li>
+                                <li><strong>Secure Processing:</strong> All document processing uses encrypted connections</li>
+                            </ul>
+
+                            <h4 class="text-primary mt-4 mb-3">4. Limitation of Liability</h4>
+                            <div class="alert alert-danger">
+                                <h6 class="alert-heading">Legal Protection Notice</h6>
+                                <p class="mb-0">
+                                    <strong>NO WARRANTIES:</strong> This service is provided "as is" without any warranties, express or implied. 
+                                    We disclaim all liability for any damages arising from the use of this service, including but not limited to:
+                                </p>
+                            </div>
+                            <ul>
+                                <li>Inaccurate or incomplete analysis results</li>
+                                <li>Decisions made based on AI-generated content</li>
+                                <li>Technical errors or service interruptions</li>
+                                <li>Loss of data or documents</li>
+                                <li>Any legal consequences resulting from reliance on our analysis</li>
+                            </ul>
+
+                            <h4 class="text-primary mt-4 mb-3">5. User Responsibilities</h4>
+                            <p>By using this service, users agree to:</p>
+                            <ul>
+                                <li>Use the service for lawful purposes only</li>
+                                <li>Not upload confidential or sensitive documents without proper authorization</li>
+                                <li>Seek professional legal advice for all legal decisions</li>
+                                <li>Not rely solely on AI analysis for legal matters</li>
+                                <li>Understand that AI analysis may contain errors or omissions</li>
+                            </ul>
+
+                            <h4 class="text-primary mt-4 mb-3">6. Accuracy and Errors</h4>
+                            <div class="bg-warning p-3 mb-3">
+                                <strong>AI Limitations:</strong> Artificial Intelligence analysis may contain errors, omissions, or 
+                                inaccuracies. The analysis is based on pattern recognition and does not constitute human legal expertise.
+                            </div>
+                            <p>
+                                Users acknowledge that AI-generated analysis can have limitations and should always be verified 
+                                by qualified legal professionals.
+                            </p>
+
+                            <h4 class="text-primary mt-4 mb-3">7. Payment and Refunds</h4>
+                            <p>
+                                Payments are processed securely through Stripe. Due to the nature of digital services, 
+                                refunds may be considered on a case-by-case basis for technical issues only.
+                            </p>
+
+                            <h4 class="text-primary mt-4 mb-3">8. Governing Law</h4>
+                            <p>
+                                These terms are governed by Romanian law. Any disputes shall be resolved in Romanian courts, 
+                                subject to applicable international regulations including GDPR.
+                            </p>
+
+                            <h4 class="text-primary mt-4 mb-3">9. Contact Information</h4>
+                            <p>
+                                For questions about these terms or our service, please contact us through the platform's 
+                                support system. We are committed to addressing your concerns promptly.
+                            </p>
+
+                            <div class="alert alert-info mt-4">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Last Updated
+                                </h6>
+                                <p class="mb-0">These terms were last updated on July 1, 2025. We reserve the right to modify these terms with appropriate notice to users.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Back to Legal Assistant
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.border-left-primary {
+    border-left: 4px solid #007bff;
+}
+.terms-content h4 {
+    color: #0056b3;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+.terms-content ul {
+    margin-bottom: 1.5rem;
+}
+.terms-content li {
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}
