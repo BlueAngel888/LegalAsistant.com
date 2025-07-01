@@ -62,7 +62,63 @@
                         <div class="analysis-content">
                             {% if analysis %}
                                 <div class="formatted-analysis">
-                                    {{ analysis|replace('\n', '<br>')|safe }}
+                                    {% set analysis_sections = analysis.split('\n\n') %}
+                                    {% for section in analysis_sections %}
+                                        {% if section.strip() %}
+                                            {% set lines = section.split('\n') %}
+                                            {% set first_line = lines[0].strip() %}
+                                            
+                                            <!-- Check if this is a main section header (numbered) -->
+                                            {% if first_line and (first_line.startswith('1.') or first_line.startswith('2.') or first_line.startswith('3.') or first_line.startswith('4.') or first_line.startswith('5.') or first_line.upper().startswith('ANALIZĂ') or first_line.upper().startswith('COMPREHENSIVE')) %}
+                                                <div class="analysis-section mb-4">
+                                                    <h4 class="section-header text-primary mb-3 pb-2 border-bottom">
+                                                        <i class="fas fa-bookmark me-2"></i>{{ first_line }}
+                                                    </h4>
+                                                    <div class="section-content ps-3">
+                                                        {% for line in lines[1:] %}
+                                                            {% if line.strip() %}
+                                                                {% set trimmed = line.strip() %}
+                                                                <!-- Sub-headers -->
+                                                                {% if trimmed.endswith(':') and not trimmed.startswith('-') %}
+                                                                    <h6 class="subsection-header text-dark mt-3 mb-2 fw-bold">
+                                                                        <i class="fas fa-chevron-right me-2 text-secondary small"></i>{{ trimmed }}
+                                                                    </h6>
+                                                                <!-- Bullet points -->
+                                                                {% elif trimmed.startswith('-') %}
+                                                                    <div class="bullet-point ms-3 mb-2">
+                                                                        <i class="fas fa-circle me-2 text-primary" style="font-size: 0.5rem; vertical-align: middle;"></i>
+                                                                        <span>{{ trimmed[1:].strip() }}</span>
+                                                                    </div>
+                                                                <!-- Regular paragraphs -->
+                                                                {% else %}
+                                                                    <p class="analysis-paragraph mb-2">{{ trimmed }}</p>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <!-- Non-main sections or introductory text -->
+                                                <div class="intro-section mb-4 p-3 bg-light rounded">
+                                                    {% for line in lines %}
+                                                        {% if line.strip() %}
+                                                            {% set trimmed = line.strip() %}
+                                                            {% if trimmed.endswith(':') and not trimmed.startswith('-') %}
+                                                                <h6 class="text-dark fw-bold mb-2">{{ trimmed }}</h6>
+                                                            {% elif trimmed.startswith('-') %}
+                                                                <div class="bullet-point ms-3 mb-1">
+                                                                    <i class="fas fa-dot-circle me-2 text-secondary" style="font-size: 0.6rem;"></i>
+                                                                    <span>{{ trimmed[1:].strip() }}</span>
+                                                                </div>
+                                                            {% else %}
+                                                                <p class="mb-2">{{ trimmed }}</p>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             {% else %}
                                 <div class="alert alert-warning">
@@ -438,5 +494,181 @@ const chatStyles = `
 const chatStyleSheet = document.createElement("style");
 chatStyleSheet.innerText = chatStyles;
 document.head.appendChild(chatStyleSheet);
+
+// Add specialized CSS for analysis formatting
+const analysisStyles = `
+    .formatted-analysis {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+    }
+    
+    .analysis-section {
+        border-left: 4px solid #007bff;
+        padding-left: 0;
+        margin-bottom: 2rem;
+        background: linear-gradient(to right, rgba(0,123,255,0.05), transparent 100px);
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .section-header {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #0056b3 !important;
+        border-bottom: 2px solid #e9ecef !important;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .section-content {
+        padding-left: 1.5rem;
+        padding-right: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .subsection-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057 !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 0.75rem !important;
+        padding: 0.5rem 0;
+        border-left: 3px solid #28a745;
+        padding-left: 1rem;
+        background-color: rgba(40, 167, 69, 0.1);
+        border-radius: 0 5px 5px 0;
+    }
+    
+    .bullet-point {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        background-color: rgba(0, 123, 255, 0.03);
+        border-radius: 6px;
+        border-left: 2px solid #007bff;
+        transition: all 0.2s ease;
+    }
+    
+    .bullet-point:hover {
+        background-color: rgba(0, 123, 255, 0.08);
+        transform: translateX(2px);
+    }
+    
+    .bullet-point i {
+        margin-top: 0.3rem;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .bullet-point span {
+        flex: 1;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .analysis-paragraph {
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: 1rem;
+        text-align: justify;
+        color: #444;
+        padding: 0.5rem 0;
+    }
+    
+    .intro-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .intro-section h6 {
+        color: #495057;
+        border-bottom: 1px solid #ced4da;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .intro-section .bullet-point {
+        background-color: rgba(255, 255, 255, 0.7);
+        border-left-color: #6c757d;
+    }
+    
+    /* Enhanced visual hierarchy */
+    .formatted-analysis h4:first-child {
+        margin-top: 0;
+        padding-top: 1rem;
+    }
+    
+    /* Typography improvements */
+    .formatted-analysis strong {
+        color: #0056b3;
+        font-weight: 600;
+    }
+    
+    .formatted-analysis em {
+        color: #6610f2;
+        font-style: normal;
+        font-weight: 500;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .section-header {
+            font-size: 1.2rem;
+        }
+        
+        .subsection-header {
+            font-size: 1rem;
+        }
+        
+        .section-content {
+            padding-left: 1rem;
+        }
+        
+        .bullet-point {
+            margin-bottom: 0.5rem;
+            padding: 0.4rem;
+        }
+        
+        .analysis-paragraph {
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Print-friendly styles */
+    @media print {
+        .analysis-section {
+            border-left: 2px solid #333;
+            background: none;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            color: #000 !important;
+            border-bottom: 1px solid #333 !important;
+        }
+        
+        .bullet-point {
+            background: none;
+            border: none;
+            margin-bottom: 0.5rem;
+        }
+        
+        .intro-section {
+            background: none;
+            border: 1px solid #333;
+        }
+    }
+`;
+
+const analysisStyleSheet = document.createElement("style");
+analysisStyleSheet.innerText = analysisStyles;
+document.head.appendChild(analysisStyleSheet);
 </script>
 {% endblock %}
