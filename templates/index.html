@@ -655,5 +655,51 @@ function showSuccessMessage(message) {
         }
     }, 5000);
 }
+
+// Enhanced Loading Animation Integration
+document.addEventListener('DOMContentLoaded', function() {
+    // Override form submission to show appropriate loading animations
+    const uploadForm = document.getElementById('upload-form');
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            // Check if this is going to checkout or free access
+            const hasDiscountCode = sessionStorage.getItem('free_access');
+            
+            if (hasDiscountCode) {
+                // Free access - show document analysis animation
+                setTimeout(() => {
+                    if (window.legalLoader) {
+                        window.legalLoader.showDocumentAnalysis();
+                    }
+                }, 100);
+            } else {
+                // Regular flow - show upload animation
+                setTimeout(() => {
+                    if (window.legalLoader) {
+                        window.legalLoader.showDocumentUpload();
+                    }
+                }, 100);
+            }
+        });
+    }
+
+    // Monitor for discount code applications
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'apply-discount-btn') {
+            const discountCode = document.getElementById('discount-code').value.trim().toLowerCase();
+            if (discountCode === 'letsgo') {
+                // Store free access flag
+                sessionStorage.setItem('free_access', 'true');
+                sessionStorage.setItem('discount_code', discountCode);
+            }
+        }
+    });
+
+    // Clear storage on page load
+    if (window.location.pathname === '/') {
+        sessionStorage.removeItem('free_access');
+        sessionStorage.removeItem('discount_code');
+    }
+});
 </script>
 {% endblock %}

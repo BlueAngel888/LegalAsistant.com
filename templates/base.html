@@ -13,6 +13,7 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading-animations.css') }}">
     
     <meta name="description" content="Professional AI-powered legal document analysis service. Get detailed insights and legal recommendations for your contracts and legal documents.">
 </head>
@@ -192,6 +193,9 @@
         form.submit();
     }
     </script>
+    
+    <!-- Loading Animations -->
+    <script src="{{ url_for('static', filename='js/loading-animations.js') }}"></script>
     
     {% block scripts %}{% endblock %}
 </body>
