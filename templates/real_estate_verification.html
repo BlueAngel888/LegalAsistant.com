@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Real Estate Verification - {{ t.site_title if t else 'Legal Assistant' }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-home me-3"></i>
+                    Real Estate Verification
+                </h1>
+                <p class="lead mb-4">
+                    Comprehensive verification of real estate documents, sale contracts, and property titles with country-specific legal analysis.
+                </p>
+                <div class="features-list">
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Property title verification
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Contract compliance analysis
+                    </div>
+                    <div class="feature-item mb-2">
+                        <i class="fas fa-check-circle text-warning me-2"></i>
+                        Legal risk assessment
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="text-center">
+                    <i class="fas fa-building display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Real Estate Verification Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-white py-4">
+                        <h2 class="text-center mb-0">
+                            <i class="fas fa-search-plus text-primary me-2"></i>
+                            Verify Real Estate Documents
+                        </h2>
+                    </div>
+                    <div class="card-body p-5">
+                        
+                        <!-- Document Type Selection -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-clipboard-list me-2"></i>Document Type
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="card border-primary document-type-card" data-type="sale_contract">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-handshake fa-2x text-primary mb-2"></i>
+                                                <h6>Sale Contract</h6>
+                                                <p class="small text-muted">Purchase agreements</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card border-primary document-type-card" data-type="property_title">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-certificate fa-2x text-primary mb-2"></i>
+                                                <h6>Property Title</h6>
+                                                <p class="small text-muted">Ownership documents</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card border-primary document-type-card" data-type="lease_agreement">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-key fa-2x text-primary mb-2"></i>
+                                                <h6>Lease Agreement</h6>
+                                                <p class="small text-muted">Rental contracts</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="realEstateForm" method="POST" action="/verify-real-estate" enctype="multipart/form-data">
+                            <input type="hidden" id="selectedDocType" name="document_type" value="">
+                            
+                            <!-- Country and Language Selection -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="estateCountry" class="form-label fw-bold">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Property Location/Jurisdiction
+                                    </label>
+                                    <select class="form-select form-select-lg" id="estateCountry" name="country" required>
+                                        <option value="">Select property location...</option>
+                                        <option value="Romania">🇷🇴 Romania</option>
+                                        <option value="Germany">🇩🇪 Germany</option>
+                                        <option value="France">🇫🇷 France</option>
+                                        <option value="Italy">🇮🇹 Italy</option>
+                                        <option value="Spain">🇪🇸 Spain</option>
+                                        <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                                        <option value="United States">🇺🇸 United States</option>
+                                        <option value="Canada">🇨🇦 Canada</option>
+                                        <option value="Australia">🇦🇺 Australia</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="estateLanguage" class="form-label fw-bold">
+                                        <i class="fas fa-language me-2"></i>Analysis Language
+                                    </label>
+                                    <select class="form-select form-select-lg" id="estateLanguage" name="language" required>
+                                        <option value="">Select language...</option>
+                                        <option value="en">English</option>
+                                        <option value="ro">Română</option>
+                                        <option value="de">Deutsch</option>
+                                        <option value="fr">Français</option>
+                                        <option value="it">Italiano</option>
+                                        <option value="es">Español</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Property Information -->
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <label for="propertyAddress" class="form-label fw-bold">
+                                        <i class="fas fa-map-pin me-2"></i>Property Address
+                                    </label>
+                                    <textarea class="form-control" id="propertyAddress" name="property_address" rows="2" 
+                                              placeholder="Enter complete property address including city, postal code"></textarea>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="propertyValue" class="form-label fw-bold">
+                                        <i class="fas fa-euro-sign me-2"></i>Property Value
+                                    </label>
+                                    <input type="text" class="form-control" id="propertyValue" name="property_value" 
+                                           placeholder="€ or local currency">
+                                </div>
+                            </div>
+
+                            <!-- Document Upload -->
+                            <div class="mb-4">
+                                <label for="realEstateDocuments" class="form-label fw-bold">
+                                    <i class="fas fa-file-upload me-2"></i>Upload Documents
+                                </label>
+                                <div class="upload-zone border-2 border-dashed border-primary rounded p-4 text-center">
+                                    <input type="file" class="form-control d-none" id="realEstateDocuments" name="files" 
+                                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                                    <div class="upload-content">
+                                        <i class="fas fa-cloud-upload-alt fa-4x text-primary mb-3"></i>
+                                        <h5>Upload Real Estate Documents</h5>
+                                        <p class="text-muted mb-3">
+                                            Contracts, titles, deeds, surveys, inspection reports
+                                        </p>
+                                        <button type="button" class="btn btn-outline-primary btn-lg" onclick="document.getElementById('realEstateDocuments').click()">
+                                            <i class="fas fa-plus me-2"></i>Select Files
+                                        </button>
+                                        <p class="small text-muted mt-2">
+                                            Supported: PDF, DOC, DOCX, JPG, PNG (max 10MB each)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="fileList" class="mt-3" style="display: none;"></div>
+                            </div>
+
+                            <!-- Verification Focus -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-bullseye me-2"></i>Verification Focus
+                                </label>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="titleVerification" name="verification_focus" value="title_verification" checked>
+                                            <label class="form-check-label" for="titleVerification">
+                                                <strong>Title & Ownership Verification</strong><br>
+                                                <small class="text-muted">Chain of title, liens, encumbrances</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="contractReview" name="verification_focus" value="contract_review" checked>
+                                            <label class="form-check-label" for="contractReview">
+                                                <strong>Contract Compliance Review</strong><br>
+                                                <small class="text-muted">Terms, conditions, legal requirements</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="riskAssessment" name="verification_focus" value="risk_assessment" checked>
+                                            <label class="form-check-label" for="riskAssessment">
+                                                <strong>Legal Risk Assessment</strong><br>
+                                                <small class="text-muted">Potential issues, red flags</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="complianceCheck" name="verification_focus" value="compliance_check">
+                                            <label class="form-check-label" for="complianceCheck">
+                                                <strong>Regulatory Compliance</strong><br>
+                                                <small class="text-muted">Local laws, zoning, permits</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Information -->
+                            <div class="mb-4">
+                                <label for="additionalInfo" class="form-label fw-bold">
+                                    <i class="fas fa-info-circle me-2"></i>Additional Information
+                                </label>
+                                <textarea class="form-control" id="additionalInfo" name="additional_info" rows="3" 
+                                          placeholder="Any specific concerns, questions, or details about the transaction that should be considered in the analysis"></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-3" disabled id="submitBtn">
+                                    <i class="fas fa-search me-2"></i>
+                                    Verify Documents - €100.00
+                                </button>
+                                <p class="text-muted mt-3">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Comprehensive real estate legal verification
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.document-type-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.document-type-card:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.document-type-card.selected {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: #0d6efd !important;
+    border-width: 2px !important;
+}
+
+.upload-zone {
+    transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('estateCountry');
+    const languageSelect = document.getElementById('estateLanguage');
+    const documentTypeCards = document.querySelectorAll('.document-type-card');
+    const selectedDocType = document.getElementById('selectedDocType');
+    const submitBtn = document.getElementById('submitBtn');
+    const fileInput = document.getElementById('realEstateDocuments');
+    const uploadZone = document.querySelector('.upload-zone');
+    const fileList = document.getElementById('fileList');
+    
+    // Auto-select language based on country
+    countrySelect.addEventListener('change', function() {
+        const country = this.value;
+        const languageMap = {
+            'Romania': 'ro',
+            'Germany': 'de',
+            'France': 'fr',
+            'Italy': 'it',
+            'Spain': 'es',
+            'United Kingdom': 'en',
+            'United States': 'en',
+            'Canada': 'en',
+            'Australia': 'en'
+        };
+        
+        if (languageMap[country]) {
+            languageSelect.value = languageMap[country];
+        }
+        
+        updateSubmitButton();
+    });
+
+    // Document type selection
+    documentTypeCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selected class from all cards
+            documentTypeCards.forEach(c => c.classList.remove('selected'));
+            // Add selected class to clicked card
+            this.classList.add('selected');
+            // Update hidden input
+            selectedDocType.value = this.dataset.type;
+            
+            updateSubmitButton();
+        });
+    });
+
+    // File upload handling
+    fileInput.addEventListener('change', function() {
+        const files = this.files;
+        if (files.length > 0) {
+            displayFileList(files);
+            updateSubmitButton();
+        }
+    });
+
+    function displayFileList(files) {
+        const fileNames = Array.from(files).map(file => 
+            `<div class="badge bg-primary me-2 mb-2">${file.name}</div>`
+        ).join('');
+        
+        fileList.innerHTML = `
+            <div class="border rounded p-3 bg-light">
+                <strong>Selected Files:</strong><br>
+                ${fileNames}
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="document.getElementById('realEstateDocuments').click()">
+                    <i class="fas fa-plus me-1"></i>Add More Files
+                </button>
+            </div>
+        `;
+        fileList.style.display = 'block';
+    }
+
+    function updateSubmitButton() {
+        const hasCountry = countrySelect.value !== '';
+        const hasLanguage = languageSelect.value !== '';
+        const hasDocType = selectedDocType.value !== '';
+        const hasFiles = fileInput.files.length > 0;
+        
+        submitBtn.disabled = !(hasCountry && hasLanguage && hasDocType && hasFiles);
+    }
+
+    // Language change handler
+    languageSelect.addEventListener('change', updateSubmitButton);
+});
+</script>
+{% endblock %}

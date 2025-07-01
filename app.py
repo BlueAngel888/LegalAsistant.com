@@ -1233,6 +1233,177 @@ def real_estate_verification():
     
     return render_template('real_estate_verification.html', t=t, lang=lang)
 
+# Processing routes for new services
+@app.route('/generate-contract', methods=['POST'])
+def generate_contract():
+    """Generate contract based on user specifications"""
+    try:
+        country = request.form.get('country')
+        language = request.form.get('language', 'en')
+        contract_type = request.form.get('contract_type')
+        details = request.form.get('details', '')
+        
+        session['service_type'] = 'contract_creation'
+        session['country'] = country
+        session['language'] = language
+        
+        # Generate contract using AI
+        contract_prompt = f"""
+Generate a professional legal contract in {language} for {country} jurisdiction.
+
+Contract Type: {contract_type}
+Details: {details}
+
+Include:
+1. Complete contract structure
+2. Country-specific legal clauses
+3. Standard terms and conditions
+4. Signature blocks and dates
+5. Legal disclaimers appropriate for {country}
+"""
+        
+        contract_content = analyze_with_gpt4(contract_prompt, language)
+        
+        # Store in session for result display
+        analysis_id = str(uuid.uuid4())
+        session['analysis_id'] = analysis_id
+        session['document_text'] = contract_prompt
+        session['analysis_result'] = contract_content
+        session['payment_status'] = 'pending'
+        
+        return redirect(url_for('checkout'))
+        
+    except Exception as e:
+        logging.error(f"Contract generation error: {str(e)}")
+        flash('Error generating contract. Please try again.', 'error')
+        return redirect(url_for('contract_creation'))
+
+@app.route('/generate-legal-request', methods=['POST'])
+def generate_legal_request():
+    """Generate legal request or petition"""
+    try:
+        country = request.form.get('country')
+        language = request.form.get('language', 'en')
+        request_type = request.form.get('request_type')
+        recipient = request.form.get('recipient', '')
+        details = request.form.get('details', '')
+        urgency = request.form.get('urgency', 'normal')
+        
+        session['service_type'] = 'legal_request'
+        session['country'] = country
+        session['language'] = language
+        
+        # Generate legal request using AI
+        request_prompt = f"""
+Generate a professional legal request/petition in {language} for {country} jurisdiction.
+
+Request Type: {request_type}
+Recipient: {recipient}
+Details: {details}
+Urgency: {urgency}
+
+Include:
+1. Proper legal formatting for {country}
+2. Formal legal language
+3. Relevant legal citations
+4. Professional structure and tone
+5. Appropriate closing and signature block
+"""
+        
+        request_content = analyze_with_gpt4(request_prompt, language)
+        
+        # Store in session for result display
+        analysis_id = str(uuid.uuid4())
+        session['analysis_id'] = analysis_id
+        session['document_text'] = request_prompt
+        session['analysis_result'] = request_content
+        session['payment_status'] = 'pending'
+        
+        return redirect(url_for('checkout'))
+        
+    except Exception as e:
+        logging.error(f"Legal request generation error: {str(e)}")
+        flash('Error generating legal request. Please try again.', 'error')
+        return redirect(url_for('legal_requests'))
+
+@app.route('/analyze-penalty', methods=['POST'])
+def analyze_penalty():
+    """Analyze penalty or legal process documents"""
+    try:
+        country = request.form.get('country')
+        language = request.form.get('language', 'en')
+        
+        session['service_type'] = 'penalty_analysis'
+        session['country'] = country
+        session['language'] = language
+        
+        # Handle file upload
+        files = request.files.getlist('files')
+        if not files or not files[0].filename:
+            flash('Please upload at least one document.', 'error')
+            return redirect(url_for('penalty_interpretation'))
+        
+        # Process uploaded files 
+        all_text = ""
+        for file in files:
+            if file and file.filename:
+                # Basic text content for analysis (will be processed on payment)
+                all_text += f"\n\n=== {file.filename} ===\nFile uploaded for analysis: {file.filename}"
+        
+        session['document_text'] = all_text
+        
+        # Generate analysis ID for tracking
+        analysis_id = str(uuid.uuid4())
+        session['analysis_id'] = analysis_id
+        session['payment_status'] = 'pending'
+        
+        return redirect(url_for('checkout'))
+        
+    except Exception as e:
+        logging.error(f"Penalty analysis error: {str(e)}")
+        flash('Error processing penalty documents. Please try again.', 'error')
+        return redirect(url_for('penalty_interpretation'))
+
+@app.route('/verify-real-estate', methods=['POST'])
+def verify_real_estate():
+    """Verify real estate documents"""
+    try:
+        country = request.form.get('country')
+        language = request.form.get('language', 'en')
+        document_type = request.form.get('document_type')
+        property_address = request.form.get('property_address', '')
+        
+        session['service_type'] = 'real_estate_verification'
+        session['country'] = country
+        session['language'] = language
+        
+        # Handle file upload
+        files = request.files.getlist('files')
+        if not files or not files[0].filename:
+            flash('Please upload at least one document.', 'error')
+            return redirect(url_for('real_estate_verification'))
+        
+        # Process uploaded files
+        all_text = f"Property Address: {property_address}\nDocument Type: {document_type}\n\n"
+        for file in files:
+            if file and file.filename:
+                # File uploaded for analysis (will be processed on payment)
+                all_text += f"\n\n=== {file.filename} ===\nFile uploaded for analysis: {file.filename}"
+        
+        session['document_text'] = all_text
+        
+        # Generate analysis ID for tracking
+        analysis_id = str(uuid.uuid4())
+        session['analysis_id'] = analysis_id
+        session['payment_status'] = 'pending'
+        
+        return redirect(url_for('checkout'))
+        
+    except Exception as e:
+        logging.error(f"Real estate verification error: {str(e)}")
+        flash('Error processing real estate documents. Please try again.', 'error')
+        return redirect(url_for('real_estate_verification'))
+
 @app.route('/clear-session')
 def clear_session():
     session.clear()
