@@ -28,10 +28,149 @@
                         Secure and confidential processing
                     </div>
                 </div>
+                
+                <!-- Quick Access Legal Services -->
+                <div class="quick-services mt-4">
+                    <h6 class="text-light opacity-75 mb-3">Quick Access Legal Services:</h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="{{ url_for('contract_creation') }}" class="btn btn-outline-light btn-sm w-100">
+                                <i class="fas fa-file-contract me-1"></i>
+                                Create Contracts
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('legal_requests') }}" class="btn btn-outline-light btn-sm w-100">
+                                <i class="fas fa-file-alt me-1"></i>
+                                Legal Requests
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('penalty_interpretation') }}" class="btn btn-outline-light btn-sm w-100">
+                                <i class="fas fa-gavel me-1"></i>
+                                Interpret Penalties
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ url_for('real_estate_verification') }}" class="btn btn-outline-light btn-sm w-100">
+                                <i class="fas fa-home me-1"></i>
+                                Real Estate
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-lg-6">
                 <div class="text-center">
                     <i class="fas fa-file-contract display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Legal Services Overview Section -->
+<section class="legal-services-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="fw-bold mb-3">
+                    <i class="fas fa-briefcase text-primary me-2"></i>
+                    Professional Legal Services
+                </h2>
+                <p class="lead text-muted">Comprehensive AI-powered legal assistance with country-specific analysis</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <!-- Document Analysis -->
+            <div class="col-lg-3 col-md-6">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-search fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title mb-3">Document Analysis</h5>
+                        <p class="card-text text-muted mb-3">
+                            Upload and analyze legal documents with AI-powered insights and risk assessment.
+                        </p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-upload me-2"></i>Analyze Documents
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contract Creation -->
+            <div class="col-lg-3 col-md-6">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-file-contract fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title mb-3">Contract Creation</h5>
+                        <p class="card-text text-muted mb-3">
+                            Generate professional contracts tailored to your jurisdiction's legal requirements.
+                        </p>
+                        <a href="{{ url_for('contract_creation') }}" class="btn btn-success w-100">
+                            <i class="fas fa-plus-circle me-2"></i>Create Contract
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Legal Requests -->
+            <div class="col-lg-3 col-md-6">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-file-alt fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title mb-3">Legal Requests</h5>
+                        <p class="card-text text-muted mb-3">
+                            Draft formal legal requests, petitions, and official correspondence.
+                        </p>
+                        <a href="{{ url_for('legal_requests') }}" class="btn btn-warning w-100">
+                            <i class="fas fa-pen me-2"></i>Draft Request
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Penalty Interpretation -->
+            <div class="col-lg-3 col-md-6">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-gavel fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="card-title mb-3">Penalty Analysis</h5>
+                        <p class="card-text text-muted mb-3">
+                            Interpret fines, penalties, and legal processes with defense strategies.
+                        </p>
+                        <a href="{{ url_for('penalty_interpretation') }}" class="btn btn-danger w-100">
+                            <i class="fas fa-search me-2"></i>Analyze Penalty
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Real Estate Row -->
+        <div class="row g-4 mt-2">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="service-card card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon mb-3">
+                            <i class="fas fa-home fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title mb-3">Real Estate Verification</h5>
+                        <p class="card-text text-muted mb-3">
+                            Comprehensive verification of property documents, sale contracts, and title deeds.
+                        </p>
+                        <a href="{{ url_for('real_estate_verification') }}" class="btn btn-info w-100">
+                            <i class="fas fa-check-circle me-2"></i>Verify Property
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
