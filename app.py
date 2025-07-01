@@ -645,7 +645,7 @@ def create_checkout_session():
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
-                    'unit_amount': 500,  # €5.00 for testing
+                    'unit_amount': 100,  # €1.00
                     'product_data': {
                         'name': 'Legal Document Analysis',
                         'description': 'Professional AI-powered legal document analysis and insights'
@@ -675,7 +675,7 @@ def create_checkout_session():
                 payment_record = PaymentRecord(
                     stripe_session_id=checkout_session.id,
                     document_analysis_id=analysis_id,
-                    amount=10000,  # €100.00 in cents
+                    amount=100,  # €1.00 in cents
                     currency='EUR',
                     status='pending'
                 )
@@ -735,6 +735,8 @@ def create_checkout_session():
 @app.route('/success')
 def success():
     try:
+        logging.info("SUCCESS route called - starting analysis process")
+        
         # Update payment status in database
         try:
             stripe_session_id = session.get('stripe_session_id')
@@ -760,17 +762,25 @@ def success():
         
         # Retrieve document data from database
         analysis_id = session.get('analysis_id')
+        logging.info(f"SUCCESS: Looking for analysis_id: {analysis_id}")
+        
         if not analysis_id:
+            logging.error("SUCCESS: No analysis_id found in session")
             flash('No document found. Please start over.', 'error')
             return redirect(url_for('index'))
         
         analysis_record = DocumentAnalysis.query.get(analysis_id)
+        logging.info(f"SUCCESS: Retrieved analysis record: {analysis_record is not None}")
+        
         if not analysis_record:
+            logging.error(f"SUCCESS: No analysis record found for ID: {analysis_id}")
             flash('Document not found. Please start over.', 'error')
             return redirect(url_for('index'))
         
         doc_text = analysis_record.document_text
         processed_files = json.loads(analysis_record.file_names) if analysis_record.file_names else []
+        logging.info(f"SUCCESS: Document text length: {len(doc_text) if doc_text else 0}")
+        logging.info(f"SUCCESS: Processed files: {processed_files}")
         
         # Check if background OCR processing is complete
         if session.get('background_processing') and doc_text and "INSTANT UPLOAD:" in doc_text:
@@ -1113,9 +1123,21 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
             logging.error(f"Database error storing analysis: {str(db_error)}")
         
         # Track gamification progress for completed analysis
-        analysis_gamification = GamificationService.track_document_analysis(
-            session.get('session_id', session.get('_id', 'anonymous'))
-        )
+        try:
+            logging.info("SUCCESS: Starting gamification tracking")
+            analysis_gamification = GamificationService.track_document_analysis(
+                session.get('session_id', session.get('_id', 'anonymous'))
+            )
+            logging.info("SUCCESS: Gamification tracking completed")
+        except Exception as gamif_error:
+            logging.error(f"SUCCESS: Gamification error: {str(gamif_error)}")
+            # Provide fallback gamification data
+            analysis_gamification = {
+                'xp_gained': 0,
+                'level_up': False,
+                'new_level': 1,
+                'earned_achievements': []
+            }
         
         # Store analysis gamification results in session
         session['analysis_gamification'] = {
@@ -1127,9 +1149,23 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
         }
         
         # Get complete user stats for display
-        user_stats = GamificationService.get_user_stats(
-            session.get('session_id', session.get('_id', 'anonymous'))
-        )
+        try:
+            logging.info("SUCCESS: Getting user stats")
+            user_stats = GamificationService.get_user_stats(
+                session.get('session_id', session.get('_id', 'anonymous'))
+            )
+            logging.info("SUCCESS: User stats retrieved successfully")
+        except Exception as stats_error:
+            logging.error(f"SUCCESS: User stats error: {str(stats_error)}")
+            # Provide fallback user stats
+            user_stats = {
+                'level': 1,
+                'xp': 0,
+                'documents_uploaded': 0,
+                'documents_analyzed': 0,
+                'achievements': [],
+                'progress_to_next_level': 0
+            }
         
         # Clear the full document text from session after analysis
         if 'full_doc_text' in session:
@@ -1149,6 +1185,7 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
         except Exception as gdpr_error:
             logging.error(f"GDPR deletion error: {str(gdpr_error)}")
         
+        logging.info("SUCCESS: About to render result.html template")
         return render_template('result.html', 
                              analysis=analysis, 
                              files=processed_files, 
