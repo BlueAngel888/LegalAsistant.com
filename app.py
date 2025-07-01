@@ -567,7 +567,15 @@ def free_access():
                 if analysis_record:
                     analysis_record.payment_status = 'free_access'
                     analysis_record.stripe_session_id = session['stripe_session_id']
+                    
+                    # Ensure we have all needed parameters for analysis
+                    if not session.get('document_country'):
+                        session['document_country'] = 'RO'
+                    if not session.get('analysis_language'):
+                        session['analysis_language'] = 'ro'
+                    
                     db.session.commit()
+                    logging.info(f"Free access analysis record updated with ID: {analysis_id}")
             
             # Redirect to results page to trigger AI analysis
             return redirect(url_for('success'))
