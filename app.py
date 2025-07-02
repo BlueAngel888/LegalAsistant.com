@@ -553,10 +553,6 @@ def free_access():
         free_code = request.form.get('free_code', '').strip().upper()
         
         # Verify free access code from session
-        logging.info(f"Free access attempt - Code provided: {free_code}")
-        logging.info(f"Session free_access: {session.get('free_access')}")
-        logging.info(f"Session discount_code: {session.get('discount_code')}")
-        
         if session.get('free_access') and session.get('discount_code') == free_code:
             logging.info(f"Free access granted with code: {free_code}")
             
@@ -571,17 +567,8 @@ def free_access():
                 if analysis_record:
                     analysis_record.payment_status = 'free_access'
                     analysis_record.stripe_session_id = session['stripe_session_id']
-                    
-                    # Ensure we have all needed parameters for analysis
-                    if not session.get('document_country'):
-                        session['document_country'] = 'RO'
-                    if not session.get('analysis_language'):
-                        session['analysis_language'] = 'ro'
-                    
                     db.session.commit()
-                    logging.info(f"Free access analysis record updated with ID: {analysis_id}")
             
-            # Redirect to results page to trigger AI analysis
             return redirect(url_for('success'))
         else:
             flash('Invalid free access code', 'error')
@@ -645,7 +632,7 @@ def create_checkout_session():
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
-                    'unit_amount': 100,  # €1.00
+                    'unit_amount': 500,  # €5.00 for testing
                     'product_data': {
                         'name': 'Legal Document Analysis',
                         'description': 'Professional AI-powered legal document analysis and insights'
@@ -675,7 +662,7 @@ def create_checkout_session():
                 payment_record = PaymentRecord(
                     stripe_session_id=checkout_session.id,
                     document_analysis_id=analysis_id,
-                    amount=100,  # €1.00 in cents
+                    amount=10000,  # €100.00 in cents
                     currency='EUR',
                     status='pending'
                 )
@@ -735,8 +722,6 @@ def create_checkout_session():
 @app.route('/success')
 def success():
     try:
-        logging.info("SUCCESS route called - starting analysis process")
-        
         # Update payment status in database
         try:
             stripe_session_id = session.get('stripe_session_id')
@@ -762,25 +747,17 @@ def success():
         
         # Retrieve document data from database
         analysis_id = session.get('analysis_id')
-        logging.info(f"SUCCESS: Looking for analysis_id: {analysis_id}")
-        
         if not analysis_id:
-            logging.error("SUCCESS: No analysis_id found in session")
             flash('No document found. Please start over.', 'error')
             return redirect(url_for('index'))
         
         analysis_record = DocumentAnalysis.query.get(analysis_id)
-        logging.info(f"SUCCESS: Retrieved analysis record: {analysis_record is not None}")
-        
         if not analysis_record:
-            logging.error(f"SUCCESS: No analysis record found for ID: {analysis_id}")
             flash('Document not found. Please start over.', 'error')
             return redirect(url_for('index'))
         
         doc_text = analysis_record.document_text
         processed_files = json.loads(analysis_record.file_names) if analysis_record.file_names else []
-        logging.info(f"SUCCESS: Document text length: {len(doc_text) if doc_text else 0}")
-        logging.info(f"SUCCESS: Processed files: {processed_files}")
         
         # Check if background OCR processing is complete
         if session.get('background_processing') and doc_text and "INSTANT UPLOAD:" in doc_text:
@@ -820,60 +797,41 @@ def success():
         
         # Analyze the document with safer error handling
         lang = session.get('language', 'en')
-        try:
-            t = get_translation(lang)
-        except Exception as trans_error:
-            logging.error(f"Translation error: {str(trans_error)}")
-            t = {}  # Empty dict as fallback
+        t = get_translation(lang)
         session_id = session.get('session_id', session.get('_id', 'anonymous'))
         
         # Use AI analysis for all cases - whether free access or paid
         try:
-            logging.info(f"Starting AI analysis with language: {analysis_language}, country: {document_country}")
-            logging.info(f"Document text length: {len(doc_text)}")
-            
             # Use AI analyzer for all access types
             analysis = analyze_with_gpt4(doc_text, analysis_language)
             logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
         except Exception as analysis_error:
             logging.error(f"Analysis error: {str(analysis_error)}")
-            # Provide fallback analysis with Romanian legal format
-            analysis = """BAZA LEGALĂ DE ANALIZĂ
-Documentul a fost analizat conform legislației române aplicabile. Analiza se bazează pe Codul Civil (Legea 287/2009), Codul Penal (Legea 286/2009), și alte acte normative relevante.
+            # Provide fallback analysis for any errors
+            analysis = f"""
+ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
 
-VERIFICAREA NULITĂȚII DOCUMENTULUI
-În baza analizei preliminare, nu au fost identificate vicii evidente care să conducă la nulitatea documentului. Pentru o verificare detaliată, se recomandă consultarea unui avocat specializat.
+Tip Document: Document juridic identificat
+Status: Procesat cu succes
+Limba: {analysis_language.upper()}
 
 1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
-
-Denumirea exactă a documentului: Document juridic procesat cu succes
-Țara de origine și cadrul legal aplicabil: România - Legislația română aplicabilă
-Părțile implicate: Părțile documentului au fost identificate pentru analiză
-Data și locul semnării/emiterii: Conform informațiilor din document
-Prevederi legale aplicabile: Codul Civil (Legea 287/2009), Codul de Procedură Civilă (Legea 134/2010)
+Documentul a fost încărcat și procesat. Pentru o analiză detaliată, vă rugăm să reîncercați.
 
 2. STRUCTURA ȘI CONȚINUTUL LEGAL
-
-Obiectul principal: Documentul conține prevederi juridice relevante pentru analiza legală
-Drepturile și obligațiile părților: Drepturile și obligațiile sunt definite conform prevederilor legale
-Termene și condiții: Termenii documentului sunt analizați conform legislației
+Conținutul documentului este disponibil pentru analiză.
 
 3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
-
-Conformitatea cu normele în vigoare: Documentul a fost verificat pentru conformitatea cu legislația română
-Vicii de consimțământ: Nu au fost identificate vicii evidente ale consimțământului
+Analiza conformității necesită reîncercare.
 
 4. ANALIZA IMPLICAȚIILOR JURIDICE
+Implicațiile juridice vor fi analizate la următoarea încercare.
 
-Riscuri în executare: Riscurile vor fi evaluate în contextul legislației aplicabile
-Consecințe juridice: Consecințele respectă cadrul legal românesc
+5. ASPECTE FISCALE, CIVILE SAU PENALE  
+Aspectele specifice vor fi detaliate după reîncercare.
 
-5. ASPECTE FISCALE, CIVILE SAU PENALE
-
-Aspecte fiscale: Vor fi analizate conform Codului Fiscal român
-Implicații patrimoniale: Efectele patrimoniale sunt evaluate conform legii
-
-Nota: Pentru o analiză completă și detaliată, se recomandă consultarea unui avocat specializat."""
+Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
+"""
             # Get selected country for legal framework analysis
             selected_country = session.get('country', 'Romania')
             
@@ -1123,21 +1081,9 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
             logging.error(f"Database error storing analysis: {str(db_error)}")
         
         # Track gamification progress for completed analysis
-        try:
-            logging.info("SUCCESS: Starting gamification tracking")
-            analysis_gamification = GamificationService.track_document_analysis(
-                session.get('session_id', session.get('_id', 'anonymous'))
-            )
-            logging.info("SUCCESS: Gamification tracking completed")
-        except Exception as gamif_error:
-            logging.error(f"SUCCESS: Gamification error: {str(gamif_error)}")
-            # Provide fallback gamification data
-            analysis_gamification = {
-                'xp_gained': 0,
-                'level_up': False,
-                'new_level': 1,
-                'earned_achievements': []
-            }
+        analysis_gamification = GamificationService.track_document_analysis(
+            session.get('session_id', session.get('_id', 'anonymous'))
+        )
         
         # Store analysis gamification results in session
         session['analysis_gamification'] = {
@@ -1149,23 +1095,9 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
         }
         
         # Get complete user stats for display
-        try:
-            logging.info("SUCCESS: Getting user stats")
-            user_stats = GamificationService.get_user_stats(
-                session.get('session_id', session.get('_id', 'anonymous'))
-            )
-            logging.info("SUCCESS: User stats retrieved successfully")
-        except Exception as stats_error:
-            logging.error(f"SUCCESS: User stats error: {str(stats_error)}")
-            # Provide fallback user stats
-            user_stats = {
-                'level': 1,
-                'xp': 0,
-                'documents_uploaded': 0,
-                'documents_analyzed': 0,
-                'achievements': [],
-                'progress_to_next_level': 0
-            }
+        user_stats = GamificationService.get_user_stats(
+            session.get('session_id', session.get('_id', 'anonymous'))
+        )
         
         # Clear the full document text from session after analysis
         if 'full_doc_text' in session:
@@ -1185,7 +1117,6 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
         except Exception as gdpr_error:
             logging.error(f"GDPR deletion error: {str(gdpr_error)}")
         
-        logging.info("SUCCESS: About to render result.html template")
         return render_template('result.html', 
                              analysis=analysis, 
                              files=processed_files, 
@@ -1196,17 +1127,10 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
     except Exception as e:
         logging.error(f"Analysis error: {str(e)}")
         lang = session.get('language', 'en')
-        try:
-            t = get_translation(lang)
-        except:
-            t = {}  # Fallback empty dict
-        
-        error_title = t.get('error_occurred', 'Analysis Failed')
-        error_message = 'We encountered an error while analyzing your document. Please contact support if this issue persists.'
-        
+        t = get_translation(lang)
         return render_template('error.html', 
-                             error_title=error_title,
-                             error_message=error_message,
+                             error_title=t.get('error_occurred', 'Analysis Failed'),
+                             error_message='We encountered an error while analyzing your document. Please contact support if this issue persists.',
                              t=t, lang=lang)
 
 @app.route('/legal-chat', methods=['POST'])
@@ -1269,215 +1193,6 @@ def terms():
     lang = session.get('language', 'en')
     t = get_translation(lang)
     return render_template('terms.html', t=t, lang=lang)
-
-# New Legal Services Routes
-@app.route('/document-analysis')
-def document_analysis():
-    """Document Analysis Service - redirect to main upload"""
-    return redirect(url_for('index'))
-
-@app.route('/contract-creation')
-def contract_creation():
-    """Contract Creation Service"""
-    lang = session.get('language', 'en')
-    t = get_translation(lang)
-    
-    return render_template('contract_creation.html', t=t, lang=lang)
-
-@app.route('/legal-requests')
-def legal_requests():
-    """Legal Requests & Petitions Service"""
-    lang = session.get('language', 'en')
-    t = get_translation(lang)
-    
-    return render_template('legal_requests.html', t=t, lang=lang)
-
-@app.route('/penalty-interpretation')
-def penalty_interpretation():
-    """Penalty & Process Interpretation Service"""
-    lang = session.get('language', 'en')
-    t = get_translation(lang)
-    
-    return render_template('penalty_interpretation.html', t=t, lang=lang)
-
-@app.route('/real-estate-verification')
-def real_estate_verification():
-    """Real Estate Verification Service"""
-    lang = session.get('language', 'en')
-    t = get_translation(lang)
-    
-    return render_template('real_estate_verification.html', t=t, lang=lang)
-
-# Processing routes for new services
-@app.route('/generate-contract', methods=['POST'])
-def generate_contract():
-    """Generate contract based on user specifications"""
-    try:
-        country = request.form.get('country')
-        language = request.form.get('language', 'en')
-        contract_type = request.form.get('contract_type')
-        details = request.form.get('details', '')
-        
-        session['service_type'] = 'contract_creation'
-        session['country'] = country
-        session['language'] = language
-        
-        # Generate contract using AI
-        contract_prompt = f"""
-Generate a professional legal contract in {language} for {country} jurisdiction.
-
-Contract Type: {contract_type}
-Details: {details}
-
-Include:
-1. Complete contract structure
-2. Country-specific legal clauses
-3. Standard terms and conditions
-4. Signature blocks and dates
-5. Legal disclaimers appropriate for {country}
-"""
-        
-        contract_content = analyze_with_gpt4(contract_prompt, language)
-        
-        # Store in session for result display
-        analysis_id = str(uuid.uuid4())
-        session['analysis_id'] = analysis_id
-        session['document_text'] = contract_prompt
-        session['analysis_result'] = contract_content
-        session['payment_status'] = 'pending'
-        
-        return redirect(url_for('checkout'))
-        
-    except Exception as e:
-        logging.error(f"Contract generation error: {str(e)}")
-        flash('Error generating contract. Please try again.', 'error')
-        return redirect(url_for('contract_creation'))
-
-@app.route('/generate-legal-request', methods=['POST'])
-def generate_legal_request():
-    """Generate legal request or petition"""
-    try:
-        country = request.form.get('country')
-        language = request.form.get('language', 'en')
-        request_type = request.form.get('request_type')
-        recipient = request.form.get('recipient', '')
-        details = request.form.get('details', '')
-        urgency = request.form.get('urgency', 'normal')
-        
-        session['service_type'] = 'legal_request'
-        session['country'] = country
-        session['language'] = language
-        
-        # Generate legal request using AI
-        request_prompt = f"""
-Generate a professional legal request/petition in {language} for {country} jurisdiction.
-
-Request Type: {request_type}
-Recipient: {recipient}
-Details: {details}
-Urgency: {urgency}
-
-Include:
-1. Proper legal formatting for {country}
-2. Formal legal language
-3. Relevant legal citations
-4. Professional structure and tone
-5. Appropriate closing and signature block
-"""
-        
-        request_content = analyze_with_gpt4(request_prompt, language)
-        
-        # Store in session for result display
-        analysis_id = str(uuid.uuid4())
-        session['analysis_id'] = analysis_id
-        session['document_text'] = request_prompt
-        session['analysis_result'] = request_content
-        session['payment_status'] = 'pending'
-        
-        return redirect(url_for('checkout'))
-        
-    except Exception as e:
-        logging.error(f"Legal request generation error: {str(e)}")
-        flash('Error generating legal request. Please try again.', 'error')
-        return redirect(url_for('legal_requests'))
-
-@app.route('/analyze-penalty', methods=['POST'])
-def analyze_penalty():
-    """Analyze penalty or legal process documents"""
-    try:
-        country = request.form.get('country')
-        language = request.form.get('language', 'en')
-        
-        session['service_type'] = 'penalty_analysis'
-        session['country'] = country
-        session['language'] = language
-        
-        # Handle file upload
-        files = request.files.getlist('files')
-        if not files or not files[0].filename:
-            flash('Please upload at least one document.', 'error')
-            return redirect(url_for('penalty_interpretation'))
-        
-        # Process uploaded files 
-        all_text = ""
-        for file in files:
-            if file and file.filename:
-                # Basic text content for analysis (will be processed on payment)
-                all_text += f"\n\n=== {file.filename} ===\nFile uploaded for analysis: {file.filename}"
-        
-        session['document_text'] = all_text
-        
-        # Generate analysis ID for tracking
-        analysis_id = str(uuid.uuid4())
-        session['analysis_id'] = analysis_id
-        session['payment_status'] = 'pending'
-        
-        return redirect(url_for('checkout'))
-        
-    except Exception as e:
-        logging.error(f"Penalty analysis error: {str(e)}")
-        flash('Error processing penalty documents. Please try again.', 'error')
-        return redirect(url_for('penalty_interpretation'))
-
-@app.route('/verify-real-estate', methods=['POST'])
-def verify_real_estate():
-    """Verify real estate documents"""
-    try:
-        country = request.form.get('country')
-        language = request.form.get('language', 'en')
-        document_type = request.form.get('document_type')
-        property_address = request.form.get('property_address', '')
-        
-        session['service_type'] = 'real_estate_verification'
-        session['country'] = country
-        session['language'] = language
-        
-        # Handle file upload
-        files = request.files.getlist('files')
-        if not files or not files[0].filename:
-            flash('Please upload at least one document.', 'error')
-            return redirect(url_for('real_estate_verification'))
-        
-        # Process uploaded files
-        all_text = f"Property Address: {property_address}\nDocument Type: {document_type}\n\n"
-        for file in files:
-            if file and file.filename:
-                # File uploaded for analysis (will be processed on payment)
-                all_text += f"\n\n=== {file.filename} ===\nFile uploaded for analysis: {file.filename}"
-        
-        session['document_text'] = all_text
-        
-        # Generate analysis ID for tracking
-        analysis_id = str(uuid.uuid4())
-        session['analysis_id'] = analysis_id
-        session['payment_status'] = 'pending'
-        
-        return redirect(url_for('checkout'))
-        
-    except Exception as e:
-        logging.error(f"Real estate verification error: {str(e)}")
-        flash('Error processing real estate documents. Please try again.', 'error')
-        return redirect(url_for('real_estate_verification'))
 
 @app.route('/clear-session')
 def clear_session():
