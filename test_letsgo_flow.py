@@ -21,7 +21,7 @@ def test_letsgo_flow():
     
     # Step 2: Upload a document with proper parameters
     print("2. Uploading test document...")
-    files = {'files': ('test.txt', 'Contract de vanzare-cumparare\n\nVanzator: Ion Popescu\nCumparator: Maria Ionescu\nPret: 100000 EUR', 'text/plain')}
+    files = {'file': ('test.txt', 'Contract de vanzare-cumparare\n\nVanzator: Ion Popescu\nCumparator: Maria Ionescu\nPret: 100000 EUR', 'text/plain')}
     data = {
         'document_country': 'RO',
         'analysis_language': 'ro'

@@ -4,8 +4,12 @@ import re
 from openai import OpenAI
 from config import OPENAI_API_KEY
 
-# Initialize OpenAI client
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+# Initialize OpenAI client with timeout settings
+openai_client = OpenAI(
+    api_key=OPENAI_API_KEY,
+    timeout=30.0,  # 30 second timeout
+    max_retries=2   # Retry failed requests twice
+)
 
 def clean_markdown_symbols(text: str) -> str:
     """
@@ -285,6 +289,7 @@ Provide your analysis:
         
         system_message = system_messages.get(language, system_messages['en'])
         
+        # Try OpenAI request with timeout handling
         response = openai_client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -301,8 +306,8 @@ Provide your analysis:
             max_tokens=4000
         )
         
-        # Clean the response by removing all markdown formatting symbols
-        analysis_content = response.choices[0].message.content
+        # Extract and clean the response
+        analysis_content = response.choices[0].message.content or ""
         
         # Remove markdown formatting symbols
         analysis_content = analysis_content.replace('**', '')  # Remove bold formatting
