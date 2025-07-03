@@ -6,11 +6,62 @@ from datetime import datetime
 from typing import Dict, List, Optional
 import re
 
+def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_language: str = 'ro') -> str:
+    """
+    Enhanced legal analysis using GPT-4o-mini with country-specific laws
+    """
+    try:
+        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        # Country-specific legal framework
+        legal_frameworks = {
+            'RO': 'legislația română (Codul Civil 287/2009, Codul Penal 286/2009)',
+            'DE': 'legislația germană (BGB, HGB, StGB)',
+            'FR': 'legislația franceză (Code Civil, Code de Commerce)',
+            'IT': 'legislația italiană (Codice Civile, Codice Penale)',
+            'US': 'legislația americană (Federal și State Laws)',
+            'UK': 'legislația britanică (Common Law)',
+            'AE': 'legislația din EAU (UAE Federal Laws)'
+        }
+        
+        country_law = legal_frameworks.get(country_code, legal_frameworks['RO'])
+        
+        system_prompt = f"""
+        Ești un expert juridic cu specializare în {country_law}. 
+        Analizează documentul următor oferind o analiză completă și detaliată conform legilor din {country_code}.
+        
+        Structura obligatorie:
+        1. IDENTIFICAREA DOCUMENTULUI
+        2. ANALIZA JURIDICĂ DETALIATĂ
+        3. VERIFICAREA LEGALITĂȚII
+        4. RISCURI ȘI RECOMANDĂRI
+        5. ASPECTE FISCALE ȘI CIVILE
+        
+        Folosește terminologie juridică precisă și oferă sfaturi concrete.
+        """
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Analizează acest document juridic:\n\n{text}"}
+            ],
+            temperature=0.3,
+            max_tokens=4000
+        )
+        
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        logging.error(f"Error in enhanced GPT-4o-mini analysis: {str(e)}")
+        return f"Eroare în analiza documentului: {str(e)}"
+
 class EnhancedLegalAnalyzer:
     """Enhanced legal analyzer with country-specific laws and web research capabilities"""
     
     def __init__(self):
         self.openai_client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        self.model = "gpt-4o-mini"  # Using GPT-4o-mini for efficient legal analysis
         
         # Legal frameworks by country
         self.legal_frameworks = {

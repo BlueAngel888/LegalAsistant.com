@@ -291,7 +291,7 @@ Provide your analysis:
         
         # Try OpenAI request with timeout handling
         response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system", 
@@ -343,7 +343,7 @@ Document excerpt: {text[:1000]}...
 """
 
         response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
             max_tokens=200
@@ -432,7 +432,7 @@ def get_legal_chat_response(message: str, analysis_context: str = '', conversati
         
         openai_client = OpenAI(api_key=OPENAI_API_KEY)
         response = openai_client.chat.completions.create(
-            model="gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+            model="gpt-4o-mini",
             messages=messages,
             max_tokens=500,
             temperature=0.3,
