@@ -723,17 +723,17 @@ IDENTICAL LEGAL SITUATIONS FOUND:
             prompt += f"""
 Case {i}: {case['title']}
 Facts: {case['facts']}
-.*?```', '', text, flags=re.DOTALL)
-        text = re.sub(r'`(.*?)`', r'\1', text)
+Resolution: {case['resolution']}
+"""
 
-        # Remove bullet points and replace with dashes
-        text = re.sub(r'^\s*[-*+]\s+', '- ', text, flags=re.MULTILINE)
+        prompt += f"""
 
-        # Clean up extra whitespace
-        text = re.sub(r'\n\s*\n', '\n\n', text)
-        text = text.strip()
+LEGAL CONCEPTS IDENTIFIED:
+{', '.join(legal_concepts)}
 
-        return text
+Provide a comprehensive legal analysis in {analysis_language} language without markdown formatting.
+"""
+        return prompt
 
     def extract_document_type(self, text: str) -> str:
         """Extract document type from text content"""
