@@ -17,19 +17,20 @@ def clean_markdown_symbols(text: str) -> str:
     """
     if not text:
         return text
-    
+
     # Remove markdown formatting symbols
     cleaned_text = text.replace('**', '')  # Remove bold formatting
+    cleaned_text = cleaned_text.replace('*', '')   # Remove italic formatting  
     cleaned_text = cleaned_text.replace('*', '')   # Remove italic formatting  
     cleaned_text = cleaned_text.replace('##', '')  # Remove h2 headers
     cleaned_text = cleaned_text.replace('#', '')   # Remove h1 headers
     cleaned_text = cleaned_text.replace('###', '') # Remove h3 headers
     cleaned_text = cleaned_text.replace('####', '')# Remove h4 headers
-    
+
     # Clean up any double spaces that might result from removing symbols
     cleaned_text = re.sub(r'\s+', ' ', cleaned_text)
     cleaned_text = re.sub(r'\n\s*\n', '\n\n', cleaned_text)
-    
+
     return cleaned_text.strip()
 
 def analyze_with_gpt4(text: str, language: str = 'en') -> str:
@@ -266,7 +267,7 @@ Por favor, estructura tu respuesta en un formato claro y profesional adecuado pa
 يرجى تنظيم إجابتك في تنسيق واضح ومهني مناسب للمهنيين القانونيين. استخدم النقاط والعناوين الواضحة للقراءة السهلة.
 """
         }
-        
+
         base_prompt = language_prompts.get(language, language_prompts['en'])
         prompt = f"""{base_prompt}
 
@@ -286,9 +287,9 @@ Provide your analysis:
             'es': "Eres un analista legal senior que proporciona análisis profesionales de documentos legales. Siempre proporciona información exhaustiva, precisa y procesable manteniendo estándares legales profesionales.",
             'ar': "أنت محلل قانوني كبير يقدم تحليلاً مهنياً للوثائق القانونية. قدم دائماً رؤى شاملة ودقيقة وقابلة للتنفيذ مع الحفاظ على المعايير القانونية المهنية."
         }
-        
+
         system_message = system_messages.get(language, system_messages['en'])
-        
+
         # Try OpenAI request with timeout handling
         response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
@@ -303,12 +304,27 @@ Provide your analysis:
                 }
             ],
             temperature=0.3,
-            max_tokens=4000
+            # max_tokens=4000  # LIMITARE PRINCIPALĂ - controlează lungimea analizei
         )
-        
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": system_message
+                },
+                {
+                    "role": "user", 
+                    "content": prompt
+                }
+            ],
+            temperature=0.3,
+            # max_tokens=None  # FĂRĂ LIMITARE - permite analiză completă
+        )
+
         # Extract and clean the response
         analysis_content = response.choices[0].message.content or ""
-        
+
         # Remove markdown formatting symbols
         analysis_content = analysis_content.replace('**', '')  # Remove bold formatting
         analysis_content = analysis_content.replace('*', '')   # Remove italic formatting
@@ -316,14 +332,14 @@ Provide your analysis:
         analysis_content = analysis_content.replace('#', '')   # Remove h1 headers
         analysis_content = analysis_content.replace('###', '') # Remove h3 headers
         analysis_content = analysis_content.replace('####', '')# Remove h4 headers
-        
+
         # Clean up any double spaces that might result from removing symbols
         import re
         analysis_content = re.sub(r'\s+', ' ', analysis_content)
         analysis_content = re.sub(r'\n\s*\n', '\n\n', analysis_content)
-        
+
         return analysis_content
-        
+
     except Exception as e:
         logging.error(f"Error analyzing document with GPT-4: {str(e)}")
         return f"Analysis Error: Unable to complete document analysis. Error: {str(e)}. Please contact support if this issue persists."
@@ -348,9 +364,9 @@ Document excerpt: {text[:1000]}...
             temperature=0.3,
             max_tokens=200
         )
-        
+
         return response.choices[0].message.content
-        
+
     except Exception as e:
         logging.error(f"Error generating document summary: {str(e)}")
         return "Unable to generate document summary."
@@ -418,18 +434,18 @@ def get_legal_chat_response(message: str, analysis_context: str = '', conversati
 
         IMPORTANT: Răspunsul tău trebuie să demonstreze că este bazat direct pe analiza documentului specific al clientului.
         """
-        
+
         # Build conversation for API
         messages = [{"role": "system", "content": system_prompt}]
-        
+
         # Add conversation history (limited)
         for msg in conversation_history[-4:]:  # Last 4 messages for context
             if 'role' in msg and 'content' in msg:
                 messages.append(msg)
-        
+
         # Add current user message
         messages.append({"role": "user", "content": message})
-        
+
         openai_client = OpenAI(api_key=OPENAI_API_KEY)
         response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
@@ -439,14 +455,14 @@ def get_legal_chat_response(message: str, analysis_context: str = '', conversati
             presence_penalty=0.1,
             frequency_penalty=0.1
         )
-        
+
         chat_response = response.choices[0].message.content.strip()
-        
+
         # Clean markdown symbols from response
         chat_response = clean_markdown_symbols(chat_response)
-        
+
         return chat_response
-        
+
     except Exception as e:
         logging.error(f"Error in legal chat response: {str(e)}")
         if "rate limit" in str(e).lower():

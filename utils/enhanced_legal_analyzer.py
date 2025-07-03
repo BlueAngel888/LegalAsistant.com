@@ -12,7 +12,7 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_lan
     """
     try:
         client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        
+
         # Country-specific legal framework
         legal_frameworks = {
             'RO': 'legislația română (Codul Civil 287/2009, Codul Penal 286/2009)',
@@ -23,23 +23,23 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_lan
             'UK': 'legislația britanică (Common Law)',
             'AE': 'legislația din EAU (UAE Federal Laws)'
         }
-        
+
         country_law = legal_frameworks.get(country_code, legal_frameworks['RO'])
-        
+
         system_prompt = f"""
         Ești un expert juridic cu specializare în {country_law}. 
         Analizează documentul următor oferind o analiză completă și detaliată conform legilor din {country_code}.
-        
+
         Structura obligatorie:
         1. IDENTIFICAREA DOCUMENTULUI
         2. ANALIZA JURIDICĂ DETALIATĂ
         3. VERIFICAREA LEGALITĂȚII
         4. RISCURI ȘI RECOMANDĂRI
         5. ASPECTE FISCALE ȘI CIVILE
-        
+
         Folosește terminologie juridică precisă și oferă sfaturi concrete.
         """
-        
+
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -47,22 +47,22 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_lan
                 {"role": "user", "content": f"Analizează acest document juridic:\n\n{text}"}
             ],
             temperature=0.3,
-            max_tokens=4000
+            # max_tokens=None  # FĂRĂ LIMITARE - permite răspuns complet
         )
-        
+
         return response.choices[0].message.content
-        
+
     except Exception as e:
         logging.error(f"Error in enhanced GPT-4o-mini analysis: {str(e)}")
         return f"Eroare în analiza documentului: {str(e)}"
 
 class EnhancedLegalAnalyzer:
     """Enhanced legal analyzer with country-specific laws and web research capabilities"""
-    
+
     def __init__(self):
         self.openai_client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.model = "gpt-4o-mini"  # Using GPT-4o-mini for efficient legal analysis
-        
+
         # Legal frameworks by country
         self.legal_frameworks = {
             'RO': {
@@ -132,7 +132,7 @@ class EnhancedLegalAnalyzer:
                 'eu_member': False
             }
         }
-    
+
     def get_legal_framework(self, country_code: str) -> Dict:
         """Get legal framework information for a country"""
         return self.legal_frameworks.get(country_code, {
@@ -146,11 +146,11 @@ class EnhancedLegalAnalyzer:
             'currency': 'Local Currency',
             'eu_member': False
         })
-    
+
     def create_enhanced_prompt(self, document_text: str, country_code: str, analysis_language: str) -> str:
         """Create enhanced prompt for legal analysis"""
         framework = self.get_legal_framework(country_code)
-        
+
         prompt = f"""You are an expert legal advisor specializing in {framework['name']} law. 
 
 DOCUMENT TO ANALYZE:
@@ -223,11 +223,11 @@ IMPORTANT FORMATTING REQUIREMENTS:
 LEGAL DISCLAIMER: Add that this analysis is for informational purposes and professional legal counsel should be sought for specific legal action.
 """
         return prompt
-    
+
     def simulate_web_research(self, document_type: str, country_code: str) -> List[Dict]:
         """Simulate web research for similar cases (placeholder for actual web research)"""
         framework = self.get_legal_framework(country_code)
-        
+
         # Simulated research results - in production, this would use actual web scraping
         similar_cases = [
             {
@@ -255,28 +255,28 @@ LEGAL DISCLAIMER: Add that this analysis is for informational purposes and profe
                 ]
             }
         ]
-        
+
         return similar_cases
-    
+
     def analyze_document_enhanced(self, document_text: str, country_code: str, analysis_language: str) -> str:
         """Perform enhanced legal analysis with complete country laws and identical case examples"""
         try:
             # Learn all laws from the selected country
             complete_laws = self.get_complete_legal_database(country_code)
-            
+
             # Extract document type and legal concepts
             document_type = self.extract_document_type(document_text)
             legal_concepts = self.extract_legal_concepts_from_text(document_text)
-            
+
             # Find identical situations with real case examples
             identical_cases = self.find_identical_legal_situations(document_text, country_code, document_type)
-            
+
             # Create comprehensive prompt with all country laws
             prompt = self.create_comprehensive_analysis_prompt(
                 document_text, country_code, analysis_language, 
                 complete_laws, identical_cases, legal_concepts
             )
-            
+
             # Get AI analysis with complete legal knowledge
             response = self.openai_client.chat.completions.create(
                 model="gpt-4",
@@ -290,15 +290,15 @@ LEGAL DISCLAIMER: Add that this analysis is for informational purposes and profe
                         "content": prompt
                     }
                 ],
-                max_tokens=4000,
+                # max_tokens=None,  # FĂRĂ LIMITARE - permite analiză completă  
                 temperature=0.2
             )
-            
+
             analysis = response.choices[0].message.content or ""
-            
+
             # Ensure plain text format (remove markdown symbols)
             analysis = self.convert_to_plain_text(analysis)
-            
+
             # Add identical situations and examples
             framework = self.get_legal_framework(country_code)
             if identical_cases:
@@ -313,7 +313,7 @@ LEGAL DISCLAIMER: Add that this analysis is for informational purposes and profe
                     for application in case['applications']:
                         analysis += f"   - {application}\n"
                     analysis += "\n"
-            
+
             # Add legal framework information
             analysis += f"\nAPPLICABLE LEGAL FRAMEWORK ({framework['name']}):\n\n"
             analysis += f"Primary Laws:\n"
@@ -322,22 +322,22 @@ LEGAL DISCLAIMER: Add that this analysis is for informational purposes and profe
             analysis += f"- Criminal Code: {framework['criminal_code']}\n"
             analysis += f"- Constitution: {framework['constitution']}\n"
             analysis += f"- Court System: {framework['court_system']}\n"
-            
+
             if framework['eu_member']:
                 analysis += f"- EU Law: Applicable as EU member state\n"
                 analysis += f"- European Court of Justice jurisdiction applies\n"
-            
+
             analysis += f"\nLegal Disclaimer: This analysis is provided for informational purposes only. For specific legal action, please consult with a qualified legal professional licensed to practice in {framework['name']}.\n"
-            
+
             # Save for machine learning
             self.save_analysis_for_learning(document_text, analysis, country_code, analysis_language)
-            
+
             return analysis
-            
+
         except Exception as e:
             logging.error(f"Enhanced legal analysis error: {str(e)}")
             return f"Error in legal analysis: {str(e)}. Please contact support for assistance."
-    
+
     def get_complete_legal_database(self, country_code: str) -> Dict:
         """Get complete legal framework database for a country"""
         complete_databases = {
@@ -505,40 +505,40 @@ LEGAL DISCLAIMER: Add that this analysis is for informational purposes and profe
                 }
             }
         }
-        
+
         return complete_databases.get(country_code, {})
-    
+
     def extract_legal_concepts_from_text(self, text: str) -> List[str]:
         """Extract legal concepts from document text"""
         concepts = []
         text_lower = text.lower()
-        
+
         # Contract law concepts
         if any(word in text_lower for word in ['contract', 'agreement', 'obligation', 'payment', 'delivery', 'breach']):
             concepts.append('contract_law')
-        
+
         # Property law concepts  
         if any(word in text_lower for word in ['property', 'ownership', 'real estate', 'land', 'sale', 'purchase']):
             concepts.append('property_law')
-        
+
         # Family law concepts
         if any(word in text_lower for word in ['marriage', 'divorce', 'custody', 'inheritance', 'family']):
             concepts.append('family_law')
-        
+
         # Commercial law concepts
         if any(word in text_lower for word in ['company', 'business', 'commercial', 'corporate', 'partnership']):
             concepts.append('commercial_law')
-        
+
         # Criminal law concepts
         if any(word in text_lower for word in ['crime', 'criminal', 'theft', 'fraud', 'assault', 'penalty']):
             concepts.append('criminal_law')
-        
+
         return concepts
-    
+
     def find_identical_legal_situations(self, document_text: str, country_code: str, document_type: str) -> List[Dict]:
         """Find identical legal situations with real case examples"""
         identical_cases = []
-        
+
         # Database of real case examples by country
         case_database = {
             'RO': [
@@ -684,29 +684,29 @@ LEGAL DISCLAIMER: Add that this analysis is for informational purposes and profe
                 }
             ]
         }
-        
+
         # Find matching cases based on document content and country
         country_cases = case_database.get(country_code, [])
         legal_concepts = self.extract_legal_concepts_from_text(document_text)
-        
+
         for case in country_cases:
             # Check if case matches document concepts
             case_text = f"{case['facts']} {case['legal_basis']}".lower()
             matches = sum(1 for concept in legal_concepts 
                          if concept.replace('_', ' ') in case_text)
-            
+
             if matches > 0 or document_type.lower() in case_text:
                 identical_cases.append(case)
-        
+
         return identical_cases[:3]  # Return top 3 most relevant cases
-    
+
     def create_comprehensive_analysis_prompt(self, document_text: str, country_code: str, 
                                            analysis_language: str, complete_laws: Dict, 
                                            identical_cases: List[Dict], legal_concepts: List[str]) -> str:
         """Create comprehensive analysis prompt with all country laws and case examples"""
-        
+
         framework = self.get_legal_framework(country_code)
-        
+
         prompt = f"""
 As an expert legal analyst with complete access to all {framework['name']} laws and case databases, analyze this document:
 
@@ -718,94 +718,27 @@ COMPLETE LEGAL FRAMEWORK FOR {framework['name'].upper()}:
 
 IDENTICAL LEGAL SITUATIONS FOUND:
 """
-        
+
         for i, case in enumerate(identical_cases, 1):
             prompt += f"""
 Case {i}: {case['title']}
 Facts: {case['facts']}
-Legal Basis: {case['legal_basis']}
-Outcome: {case['outcome']}
-"""
-        
-        prompt += f"""
-
-ANALYSIS REQUIREMENTS:
-Provide analysis in {analysis_language} language, using plain text format (NO markdown symbols like # or *).
-
-1. DOCUMENT CLASSIFICATION
-   - Exact document type and legal category
-   - Applicable legal framework from {framework['name']} law
-   - Jurisdiction and competent courts
-
-2. COMPLETE APPLICABLE LAWS
-   - Cite specific articles/paragraphs from the complete legal database above
-   - Reference exact legal provisions that apply to this situation
-   - Include constitutional provisions if relevant
-
-3. DETAILED LEGAL ANALYSIS
-   - Rights and obligations of all parties
-   - Legal validity and enforceability under {framework['name']} law
-   - Compliance with mandatory legal requirements
-   - Statute of limitations and procedural deadlines
-
-4. RISK ASSESSMENT
-   - Legal consequences for each party
-   - Financial liability exposure
-   - Enforcement options available
-   - Appeal procedures and time limits
-
-5. IDENTICAL SITUATIONS ANALYSIS
-   - How the found identical cases apply to this document
-   - What lessons can be learned from similar outcomes
-   - Specific strategies that worked in identical situations
-   - Common mistakes to avoid based on case precedents
-
-6. LEGAL SOLUTIONS AND PROCEDURES
-   - Step-by-step legal procedures to follow
-   - Required documentation and evidence
-   - Specific forms and filing requirements
-   - Alternative dispute resolution options
-
-7. COSTS AND TIMEFRAMES
-   - Court fees and legal costs in {framework['currency']}
-   - Expected timeframes for legal procedures
-   - Attorney fees and representation costs
-
-Provide concrete, actionable legal advice based on the complete legal framework and identical case examples.
-
-LEGAL DISCLAIMER: This analysis is for informational purposes only. Seek professional legal counsel for specific legal actions.
-"""
-        
-        return prompt
-    
-    def convert_to_plain_text(self, text: str) -> str:
-        """Convert text to plain format without markdown symbols"""
-        # Remove markdown headers
-        text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
-        
-        # Remove bold and italic formatting
-        text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
-        text = re.sub(r'\*(.*?)\*', r'\1', text)
-        text = re.sub(r'__(.*?)__', r'\1', text)
-        text = re.sub(r'_(.*?)_', r'\1', text)
-        
-        # Remove code blocks
-        text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
+.*?```', '', text, flags=re.DOTALL)
         text = re.sub(r'`(.*?)`', r'\1', text)
-        
+
         # Remove bullet points and replace with dashes
         text = re.sub(r'^\s*[-*+]\s+', '- ', text, flags=re.MULTILINE)
-        
+
         # Clean up extra whitespace
         text = re.sub(r'\n\s*\n', '\n\n', text)
         text = text.strip()
-        
+
         return text
-    
+
     def extract_document_type(self, text: str) -> str:
         """Extract document type from text content"""
         text_lower = text.lower()
-        
+
         if any(word in text_lower for word in ['contract', 'agreement', 'accord']):
             return 'contract'
         elif any(word in text_lower for word in ['fine', 'penalty', 'amenda', 'sanction']):
@@ -816,7 +749,7 @@ LEGAL DISCLAIMER: This analysis is for informational purposes only. Seek profess
             return 'commercial_document'
         else:
             return 'legal_document'
-    
+
     def save_analysis_for_learning(self, document_text: str, analysis: str, country_code: str, language: str):
         """Save analysis data for machine learning improvement"""
         try:
@@ -829,10 +762,10 @@ LEGAL DISCLAIMER: This analysis is for informational purposes only. Seek profess
                 'analysis_length': len(analysis),
                 'legal_framework': self.get_legal_framework(country_code)['name']
             }
-            
+
             # In production, this would save to a machine learning database
             logging.info(f"Learning data saved: {learning_data}")
-            
+
         except Exception as e:
             logging.error(f"Error saving learning data: {str(e)}")
 
@@ -841,8 +774,8 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str, analysis_language: 
     """Enhanced legal analysis function"""
     analyzer = EnhancedLegalAnalyzer()
     analysis = analyzer.analyze_document_enhanced(text, country_code, analysis_language)
-    
+
     # Save for learning
     analyzer.save_analysis_for_learning(text, analysis, country_code, analysis_language)
-    
+
     return analysis
