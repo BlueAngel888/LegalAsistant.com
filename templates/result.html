@@ -4,23 +4,8 @@
 
 {% block content %}
 <div class="container analysis-result">
-    <!-- Loading Animation (shown while analysis is in progress) -->
-    <div id="analysis-loading" style="display: none;">
-        <script>
-            document.getElementById('analysis-loading').innerHTML = window.legalLoader.showLoading('Completing comprehensive legal analysis...');
-            window.legalLoader.simulateProgress(5000);
-            setTimeout(() => {
-                window.legalLoader.completeProgress();
-                setTimeout(() => {
-                    window.legalLoader.hideLoading();
-                    document.getElementById('analysis-results').style.display = 'block';
-                }, 1000);
-            }, 4000);
-        </script>
-    </div>
-
-    <!-- Analysis Results (shown after loading completes) -->
-    <div id="analysis-results" style="display:none;">
+    <!-- Analysis Results (displayed immediately) -->
+    <div id="analysis-results">
         <!-- Gamification Achievement Display -->
         {% if analysis_gamification and (analysis_gamification.xp_gained > 0 or analysis_gamification.earned_achievements) %}
         <div class="achievement-notification">
