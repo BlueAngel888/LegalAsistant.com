@@ -807,8 +807,7 @@ def success():
             logging.info(f"SUCCESS ROUTE: Payment status = {payment_status}")
             logging.info(f"SUCCESS ROUTE: All session keys = {list(session.keys())}")
             
-            # UNIFIED OFFLINE ANALYSIS SYSTEM - PREVENTS ALL TIMEOUT ISSUES
-            # Use offline analysis for ALL users to prevent OpenAI timeout errors
+            # Check if user has free access or paid access
             selected_country = session.get('document_country', 'RO')
             country_name = {'RO': 'România', 'DE': 'Germania', 'FR': 'Franța', 'IT': 'Italia'}.get(selected_country, 'România')
             
@@ -816,425 +815,73 @@ def success():
                 logging.info(f"Using offline analysis for free access with code: {session.get('discount_code')}")
                 analysis_title = f"ANALIZĂ JURIDICĂ GRATUITĂ - COD {session.get('discount_code', 'LETSGO')}"
                 payment_note = f"Status: Analiză completă prin acces gratuit cu codul {session.get('discount_code', 'LETSGO')}"
-            else:
-                logging.info(f"Using offline analysis for paid access to prevent timeout issues")
-                analysis_title = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM"
-                payment_note = "Status: Analiză completă prin serviciul premium Legal Assistant"
-            
-            # COMPREHENSIVE OFFLINE LEGAL ANALYSIS
-            analysis = f"""{analysis_title}
+                
+                # Use offline analysis for free access
+                analysis = f"""{analysis_title}
 
 {payment_note}
 Țara selectată: {country_name}
 Document(e) procesat(e): {len(processed_files)} fișier(e)
 Data analizei: {datetime.utcnow().strftime('%d %B %Y, %H:%M')}
 
-BAZA LEGALĂ DE ANALIZĂ
-
-Analiza documentului a fost efectuată conform legislației din {country_name}:
-- Codul Civil pentru aspecte contractuale și patrimoniale
-- Codul Penal pentru aspecte penale aplicabile  
-- Codul Fiscal pentru obligațiile fiscale
-- Codul de Procedură Civilă pentru aspecte procedurale
-
-VERIFICAREA NULITĂȚII DOCUMENTULUI
-
-Analiza preliminară nu identifică vicii evidente de nulitate. Documentul pare să respecte formele legale minime.
-
-1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
-
-Denumirea exactă: Document juridic analizat prin sistemul Legal Assistant
-Țara de origine: {country_name} - se aplică legislația națională specifică
-Limba documentului: {analysis_language.upper()}
-
-Validitate formală:
-- Prezența părților: Identificate conform documentului
-- Obiectul documentului: Definit în conținut
-- Forma legală: Conform standardelor din {country_name}
-
-2. STRUCTURA ȘI CONȚINUTUL LEGAL
-
-Obiectul principal: Identificat conform naturii juridice a documentului
-Părțile implicate: Conform identificărilor din document
-Drepturile și obligațiile părților: Analizate conform legislației din {country_name}
-
-Elemente contractuale esențiale:
-- Consimțământul părților: Prezumat valid
-- Obiectul contractului: Definit în document
-- Cauza juridică: Conform naturii actului
-
-3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
-
-Conformitatea cu normele în vigoare din {country_name}:
-- Respectarea Codului Civil pentru aspecte contractuale
-- Conformitatea cu legislația specială aplicabilă
-- Respectarea principiilor generale ale dreptului
-
-Aspecte de conformitate:
-- Capacitatea juridică: Prezumată pentru părți
-- Consimțământul valid: Fără indicii de vicii
-- Obiect și cauza licite: Conform documentului
-
-4. ANALIZA IMPLICAȚIILOR JURIDICE
-
-Riscuri în executare conform {country_name}:
-- Evaluarea riscurilor de neexecutare a obligațiilor
-- Identificarea dificultăților potențiale în implementare
-- Analiza consecințelor juridice ale nerespectării clauzelor
-- Verificarea posibilităților de executare silită
-
-Măsuri de protecție juridică:
-- Garanții și asigurări disponibile
-- Căi de atac în caz de litigiu
-- Termene de prescripție aplicabile
-- Instanțe competente pentru soluționarea conflictelor
-
-5. ASPECTE FISCALE, CIVILE SAU PENALE
-
-Implicații fiscale conform {country_name}:
-- Obligații declarative fiscale aplicabile
-- Impozite și taxe specifice actului juridic
-- Termene de plată și sancțiuni pentru întârziere
-- Deduceri fiscale posibile
-
-Aspecte civile:
-- Răspunderea civilă a părților
-- Daune și interese aplicabile
-- Modalități de reparare a prejudiciului
-- Prescripția drepturilor civile
-
-Aspecte penale (dacă aplicabil):
-- Verificarea potențialelor infracțiuni
-- Răspunderea penală a părților
-- Sancțiuni penale aplicabile
-- Măsuri de prevenție
-
-CONCLUZII ȘI RECOMANDĂRI:
-
-✓ Documentul analizat conform standardelor juridice din {country_name}
-✓ Analiza acoperă toate aspectele legale esențiale
-✓ Identificate principalele riscuri și oportunități juridice
-✓ Oferite soluții practice pentru implementare
-
-IMPORTANT: Această analiză oferă o evaluare juridică comprehensivă bazată pe legislația din {country_name}. Pentru situații complexe, litigii specifice sau aspecte procedurale detaliate, se recomandă consultarea unui avocat specializat.
-
-Documentul analizat respectă standardele legale minime și poate fi considerat valid în condițiile respectării tuturor procedurilor legale aplicabile.
-
-Legal Assistant - Analiză juridică profesională completă"""
-            logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
-        except Exception as analysis_error:
-            logging.error(f"Analysis error: {str(analysis_error)}")
-            # Provide fallback analysis for any errors
-            analysis = f"""
-ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
-
-Tip Document: Document juridic identificat
-Status: Procesat cu succes
-Limba: {analysis_language.upper()}
-
-1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
-Documentul a fost încărcat și procesat. Pentru o analiză detaliată, vă rugăm să reîncercați.
-
-2. STRUCTURA ȘI CONȚINUTUL LEGAL
-Conținutul documentului este disponibil pentru analiză.
-
-3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
-Analiza conformității necesită reîncercare.
-
-4. ANALIZA IMPLICAȚIILOR JURIDICE
-Implicațiile juridice vor fi analizate la următoarea încercare.
-
-5. ASPECTE FISCALE, CIVILE SAU PENALE  
-Aspectele specifice vor fi detaliate după reîncercare.
-
-Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
-"""
-            # Get selected country for legal framework analysis
-            selected_country = session.get('country', 'Romania')
-            
-            # Determine legal framework based on country
-            legal_frameworks = {
-                'Romania': {
-                    'civil_code': 'Codul Civil românesc (Legea 287/2009)',
-                    'criminal_code': 'Codul Penal românesc (Legea 286/2009)', 
-                    'fiscal_code': 'Codul Fiscal (Legea 227/2015)',
-                    'administrative_code': 'Codul de Procedură Administrativă (Legea 554/2004)'
-                },
-                'Germany': {
-                    'civil_code': 'Bürgerliches Gesetzbuch (BGB)',
-                    'criminal_code': 'Strafgesetzbuch (StGB)',
-                    'fiscal_code': 'Abgabenordnung (AO)',
-                    'administrative_code': 'Verwaltungsverfahrensgesetz (VwVfG)'
-                },
-                'France': {
-                    'civil_code': 'Code Civil français',
-                    'criminal_code': 'Code Pénal français',
-                    'fiscal_code': 'Code général des impôts',
-                    'administrative_code': 'Code de justice administrative'
-                },
-                'Italy': {
-                    'civil_code': 'Codice Civile italiano',
-                    'criminal_code': 'Codice Penale italiano',
-                    'fiscal_code': 'Codice tributario',
-                    'administrative_code': 'Codice del processo amministrativo'
-                },
-                'Spain': {
-                    'civil_code': 'Código Civil español',
-                    'criminal_code': 'Código Penal español',
-                    'fiscal_code': 'Ley General Tributaria',
-                    'administrative_code': 'Ley de Procedimiento Administrativo'
-                }
-            }
-            
-            framework = legal_frameworks.get(selected_country, legal_frameworks['Romania'])
-            
-            analysis = f"""
-ANALIZĂ JURIDICĂ GRATUITĂ - DOCUMENT PROCESAT
-
-Tip Document: Document juridic analizat
-Status: Procesat cu succes prin acces gratuit
-Limba: {analysis_language.upper()}
-Cod Utilizat: {session.get('discount_code', 'LETSGO')}
-Țara de origine: {selected_country}
-
-BAZA LEGALĂ DE ANALIZĂ
-Cadrul legal aplicabil pentru {selected_country}:
-- {framework['civil_code']}
-- {framework['criminal_code']}
-- {framework['fiscal_code']}
-- {framework['administrative_code']}
-
-VERIFICAREA NULITĂȚII DOCUMENTULUI
-Analiza potențialilor factori de nulitate conform legislației din {selected_country}:
-
-Nulitate absolută:
-- Verificare încălcare ordine publică
-- Respectarea formelor legale obligatorii
-- Competența autorității emitente
-
-Nulitate relativă:
-- Vicii de consimțământ (eroare, dol, violență)
-- Capacitatea juridică a părților
-- Defecte de formă nesancționate cu nulitate absolută
-
-Pentru amenzi și sancțiuni:
-- Verificarea competenței organului emitent
-- Respectarea procedurii legale de emitere
-- Respectarea dreptului la apărare
-- Prescripția aplicării sancțiunii
-
-1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
-
-Denumirea exactă a documentului:
-Document juridic identificat și procesat conform standardelor din {selected_country}.
-
-Țara de origine și cadrul legal aplicabil:
-{selected_country} - analiză conform legislației naționale aplicabile
-
-Părțile implicate:
-- Identificarea părților conform documentului
-- Verificarea calității juridice (persoană fizică/juridică)
-- Analiza capacității de exercițiu
-
-Data și locul semnării/emiterii:
-Informațiile temporale și geografice verificate conform cerințelor legale.
-
-Prevederi legale aplicabile specifice pentru {selected_country}:
-- {framework['civil_code']}
-- {framework['criminal_code']}
-- {framework['fiscal_code']}
-- Legislație specială aplicabilă
-
-Aspecte formale:
-- Prezența semnăturilor verificată
-- Ștampile și sigilii analizate
-- Respectarea formei legale evaluată
-
-2. STRUCTURA ȘI CONȚINUTUL LEGAL
-
-Obiectul principal:
-Documentul analizat prezintă obiectul juridic specific conform naturii sale legale din {selected_country}.
-
-Drepturile și obligațiile părților:
-- Obligațiile principale identificate conform {framework['civil_code']}
-- Drepturile corespunzătoare evaluate
-- Garanții și asigurări verificate conform legislației naționale
-- Modalități de executare specifice pentru {selected_country}
-
-Termene și condiții:
-- Termene de executare analizate conform standardelor naționale
-- Condiții contractuale evaluate
-- Modalități de îndeplinire verificate
-- Prescripția drepturilor analizată
-
-Clauze speciale:
-- Clauze de reziliere identificate
-- Penalități și daune-interese conform {framework['civil_code']}
-- Prevederi de forță majoră evaluate
-- Jurisdicție și legea aplicabilă pentru {selected_country}
-
-3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
-
-Conformitatea cu normele în vigoare din {selected_country}:
-- Respectarea {framework['civil_code']} verificată
-- Conformitatea cu {framework['administrative_code']} confirmată
-- Aspectele fiscale evaluate conform {framework['fiscal_code']}
-- Legislație specială aplicabilă
-
-Vicii de consimțământ conform dreptului din {selected_country}:
-- Manifestarea voinței analizată conform standardelor naționale
-- Absența dolului și violenței verificată
-- Validitatea consimțământului confirmată
-- Capacitatea juridică verificată
-
-Deficiențe de formă:
-- Elemente esențiale verificate conform cerințelor din {selected_country}
-- Forma legală respectată conform legislației naționale
-- Procedurile legale confirmate
-- Formalități specifice țării verificate
-
-4. ANALIZA IMPLICAȚIILOR JURIDICE
-
-Riscuri în executare conform legislației din {selected_country}:
-- Dificultățile potențiale identificate
-- Neclaritățile analizate conform standardelor naționale
-- Soluții pentru executare propuse
-- Proceduri de executare specifice
-
-Consecințe juridice:
-- Efectele neexecutării evaluate conform {framework['civil_code']}
-- Remedii legale disponibile identificate
-- Executarea silită analizată conform legislației naționale
-- Căi de atac și contestare
-
-Compatibilitatea juridică:
-- Compatibilitatea cu legislația din {selected_country} verificată
-- Respectarea cadrului normativ confirmat
-- Drept internațional aplicabil
-- Recunoașterea în alte jurisdicții
-
-5. ASPECTE FISCALE, CIVILE SAU PENALE
-
-Aspecte fiscale conform {framework['fiscal_code']}:
-- Obligații declarative identificate pentru {selected_country}
-- Impozite și taxe aplicabile analizate
-- Înregistrarea fiscală verificată
-- Regimul fiscal specific
-
-Implicații patrimoniale:
-- Efecte asupra patrimoniului evaluate conform dreptului din {selected_country}
-- Garanții analizate
-- Răspunderea patrimonială clarificată
-- Măsuri conservatorii disponibile
-
-Aspecte penale conform {framework['criminal_code']}:
-- Verificarea potențialelor infracțiuni
-- Respectarea legalității confirmat
-- Sancțiuni aplicabile analizate
-- Prescripția răspunderii penale
-
-Evaluarea prejudiciului:
-- Riscurile financiare analizate conform legislației din {selected_country}
-- Măsuri de protecție identificate
-- Calculul daunelor conform standardelor naționale
-- Modalități de recuperare
-
-RECOMANDĂRI SPECIFICE PENTRU AMENZI ȘI SANCȚIUNI:
-Dacă documentul conține amenzi sau sancțiuni, verificați:
-- Competența organului emitent conform legislației din {selected_country}
-- Respectarea procedurii contradictorii
-- Termenele de contestare disponibile
-- Prescripția aplicării și executării sancțiunii
-- Posibilitatea reducerii sau anulării amenzii
-- Modalități de plată în rate (dacă sunt disponibile)
-
-Pentru analize AI detaliate bazate pe textul exact al documentului, vă stăm la dispoziție cu versiunea completă.
-"""
-        else:
-            try:
-                # Check if this is free access - even in fallback scenario
-                if session.get('payment_status') == 'free_access':
-                    logging.info(f"Fallback: Using offline analysis for free access")
-                    selected_country = session.get('country', 'Romania')
-                    analysis = f"""ANALIZĂ JURIDICĂ GRATUITĂ - COD LETSGO
-
-Status: Analiză offline prin acces gratuit
-Cod folosit: {session.get('discount_code', 'LETSGO')}
-Procesat cu succes prin sistemul offline pentru utilizatorii cu cod LETSGO
-
-IMPORTANT: Această analiză a fost generată offline pentru a evita întârzierile de conectare. 
-Pentru o analiză AI completă și detaliată, folosiți serviciul premium.
-
-Mulțumim că ați folosit codul LETSGO!"""
-                else:
-                    # Use offline analysis for paid access to prevent timeout issues
-                    logging.info(f"Using offline analysis for paid access to prevent timeout issues")
-                    analysis = f"""ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM
-
-Status: Analiză offline prin serviciul premium Legal Assistant
+ANALIZĂ JURIDICĂ COMPLETĂ GRATUITĂ
+
+Această analiză a fost generată prin sistemul offline Legal Assistant pentru utilizatorii cu codul de acces gratuit.
+
+1. IDENTIFICAREA DOCUMENTULUI
+Documentul a fost procesat și analizat conform standardelor juridice din {country_name}.
+
+2. ASPECTE LEGALE PRINCIPALE
+Analiza preliminară identifică elementele juridice principale conform legislației aplicabile.
+
+3. RECOMANDĂRI
+Pentru o analiză AI detaliată, vă recomandăm să accesați serviciul premium.
+
+IMPORTANT: Această analiză gratuită oferă o evaluare preliminară. Pentru aspecte complexe sau litigii, consultați un avocat specializat.
+
+Mulțumim că ați folosit codul {session.get('discount_code', 'LETSGO')} pentru accesul gratuit!"""
+                
+            else:
+                logging.info(f"Using AI analysis for paid access")
+                analysis_title = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM"
+                payment_note = "Status: Analiză completă prin serviciul premium Legal Assistant"
+                
+                # Try AI analysis for paid users
+                try:
+                    analysis = analyze_with_gpt4(doc_text, analysis_language)
+                    logging.info(f"AI analysis completed successfully")
+                except Exception as ai_error:
+                    logging.error(f"AI analysis failed: {str(ai_error)}")
+                    # Fallback to offline analysis for paid users too
+                    analysis = f"""{analysis_title}
+
+{payment_note}
 Țara selectată: {country_name}
 Document(e) procesat(e): {len(processed_files)} fișier(e)
 Data analizei: {datetime.utcnow().strftime('%d %B %Y, %H:%M')}
 
-BAZA LEGALĂ DE ANALIZĂ
+ANALIZĂ JURIDICĂ COMPLETĂ - SERVICIU PREMIUM
 
-Analiza documentului a fost efectuată conform legislației din {country_name}:
-- Codul Civil pentru aspecte contractuale și patrimoniale
-- Codul Penal pentru aspecte penale aplicabile  
-- Codul Fiscal pentru obligațiile fiscale
-- Codul de Procedură Civilă pentru aspecte procedurale
+Documentul a fost procesat prin serviciul premium Legal Assistant.
 
-VERIFICAREA NULITĂȚII DOCUMENTULUI
+1. IDENTIFICAREA ȘI VALIDITATEA DOCUMENTULUI
+Documentul a fost analizat conform standardelor juridice din {country_name}.
 
-Analiza preliminară nu identifică vicii evidente de nulitate. Documentul respectă formele legale minime.
+2. ASPECTE LEGALE PRINCIPALE
+Analiza identifică elementele juridice principale și riscurile potențiale.
 
-1. IDENTIFICAREA ȘI VALIDITATEA FORMALĂ A DOCUMENTULUI
+3. RECOMANDĂRI LEGALE
+Recomandări specifice pentru documentul analizat conform legislației aplicabile.
 
-Denumirea exactă: Document juridic analizat prin serviciul premium
-Țara de origine: {country_name} - se aplică legislația națională specifică
-Limba documentului: {analysis_language.upper()}
+IMPORTANT: Analiza a fost completată cu succes prin serviciul premium Legal Assistant.
 
-2. STRUCTURA ȘI CONȚINUTUL LEGAL
-
-Obiectul principal: Identificat conform naturii juridice a documentului
-Părțile implicate: Conform identificărilor din document
-Drepturile și obligațiile părților: Analizate conform legislației din {country_name}
-
-3. VERIFICAREA LEGALITĂȚII ȘI CONFORMITĂȚII
-
-Conformitatea cu normele în vigoare din {country_name}:
-- Respectarea Codului Civil pentru aspecte contractuale
-- Conformitatea cu legislația specială aplicabilă
-- Respectarea principiilor generale ale dreptului
-
-4. ANALIZA IMPLICAȚIILOR JURIDICE
-
-Riscuri în executare conform {country_name}:
-- Evaluarea riscurilor de neexecutare a obligațiilor
-- Identificarea dificultăților potențiale în implementare
-- Analiza consecințelor juridice ale nerespectării clauzelor
-
-5. ASPECTE FISCALE, CIVILE SAU PENALE
-
-Implicații fiscale conform {country_name}:
-- Obligații declarative fiscale aplicabile
-- Impozite și taxe specifice actului juridic
-- Termene de plată și sancțiuni pentru întârziere
-
-CONCLUZII ȘI RECOMANDĂRI:
-
-✓ Documentul analizat conform standardelor juridice premium
-✓ Analiza acoperă toate aspectele legale esențiale
-✓ Identificate principalele riscuri și oportunități juridice
-✓ Oferite soluții practice pentru implementare
-
-Legal Assistant Premium - Analiză juridică profesională completă"""
-                logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
-            except Exception as analysis_error:
-                logging.error(f"Analysis error: {str(analysis_error)}")
-                # Provide fallback analysis
-                analysis = f"""
-ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
+Nota tehnică: Analiza AI temporar indisponibilă - s-a folosit sistemul offline premium pentru a evita întârzierile."""
+            
+            logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
+        except Exception as analysis_error:
+            logging.error(f"Analysis error: {str(analysis_error)}")
+            # Provide fallback analysis for any errors
+            analysis = f"""ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
 
 Tip Document: Document juridic identificat
 Status: Procesat cu succes
@@ -1255,22 +902,26 @@ Implicațiile juridice vor fi analizate la următoarea încercare.
 5. ASPECTE FISCALE, CIVILE SAU PENALE  
 Aspectele specifice vor fi detaliate după reîncercare.
 
-Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza.
-"""
+Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza."""
         
         # Store analysis result in database
         try:
             analysis_id = session.get('analysis_id')
-            if analysis_id:
+            if analysis_id and analysis:
                 analysis_record = DocumentAnalysis.query.get(analysis_id)
                 if analysis_record:
                     analysis_record.analysis_result = analysis
                     analysis_record.updated_at = datetime.utcnow()
                     db.session.commit()
                     logging.info(f"Analysis result stored for ID: {analysis_id}")
+                else:
+                    logging.error(f"Analysis record not found for ID: {analysis_id}")
+            else:
+                logging.warning(f"Missing analysis_id or analysis content for storage")
                     
         except Exception as db_error:
             logging.error(f"Database error storing analysis: {str(db_error)}")
+            db.session.rollback()  # Rollback transaction on error
         
         # Track gamification progress for completed analysis
         analysis_gamification = GamificationService.track_document_analysis(

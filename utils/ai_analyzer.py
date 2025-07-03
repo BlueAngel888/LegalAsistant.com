@@ -7,8 +7,8 @@ from config import OPENAI_API_KEY
 # Initialize OpenAI client with timeout settings
 openai_client = OpenAI(
     api_key=OPENAI_API_KEY,
-    timeout=30.0,  # 30 second timeout
-    max_retries=2   # Retry failed requests twice
+    timeout=120.0,  # 120 second timeout for large documents
+    max_retries=3   # Retry failed requests 3 times
 )
 
 def clean_markdown_symbols(text: str) -> str:
