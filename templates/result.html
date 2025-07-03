@@ -1,8 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Analysis Results - Legal Assistant{% endblock %}
+{% block title %}Legal Analysis Result{% endblock %}
 
 {% block content %}
+<div class="container analysis-result">
+    <!-- Loading Animation (shown while analysis is in progress) -->
+    <div id="analysis-loading" style="display: none;">
+        <script>
+            document.getElementById('analysis-loading').innerHTML = window.legalLoader.showLoading('Completing comprehensive legal analysis...');
+            window.legalLoader.simulateProgress(5000);
+            setTimeout(() => {
+                window.legalLoader.completeProgress();
+                setTimeout(() => {
+                    window.legalLoader.hideLoading();
+                    document.getElementById('analysis-results').style.display = 'block';
+                }, 1000);
+            }, 4000);
+        </script>
+    </div>
+
+    <!-- Analysis Results (shown after loading completes) -->
+    <div id="analysis-results" style="display:none;">
+        <!-- Gamification Achievement Display -->
+        {% if analysis_gamification and (analysis_gamification.xp_gained > 0 or analysis_gamification.earned_achievements) %}
+        <div class="achievement-notification">
+            <div class="achievement-content">
+                <div class="achievement-icon">🏆</div>
+                <div class="achievement-details">
+                    <h3>{{ t.get('analysis_complete', 'Analysis Complete!') }}</h3>
+                    <p>{{ t.get('xp_gained', 'XP Gained:') }} +{{ analysis_gamification.xp_gained }}</p>
+                    {% if analysis_gamification.level_up %}
+                    <p class="level-up">🎉 {{ t.get('level_up', 'Level Up!') }} {{ t.get('new_level', 'New Level:') }} {{ analysis_gamification.new_level }}</p>
+                    {% endif %}
+
+                    {% if analysis_gamification.earned_achievements %}
+                    <div class="new-achievements">
+                        <h4>{{ t.get('new_achievements', 'New Achievements:') }}</h4>
+                        {% for achievement in analysis_gamification.earned_achievements %}
+                        <div class="achievement-item">
+                            <span class="achievement-emoji">{{ achievement.icon }}</span>
+                            <span class="achievement-name">{{ achievement.name }}</span>
+                            <span class="achievement-rarity rarity-{{ achievement.rarity }}">{{ achievement.rarity.title() }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
 <section class="py-5">
     <div class="container">
         <!-- Success Header -->
@@ -217,6 +264,7 @@
         </div>
     </div>
 </section>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -229,6 +277,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize integrated chat functionality
     initializeIntegratedChat(contextText);
+
+    // Simulate the loading animation and then show content
+    document.getElementById('analysis-loading').style.display = 'block';
 });
 
 function initializeIntegratedChat(analysisContext) {
@@ -805,6 +856,7 @@ const analysisStyles = `
     
     .intro-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        ```
         border: 1px solid #dee2e6;
         border-radius: 12px;
         padding: 1.5rem;

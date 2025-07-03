@@ -807,87 +807,57 @@ def success():
             logging.info(f"SUCCESS ROUTE: Payment status = {payment_status}")
             logging.info(f"SUCCESS ROUTE: All session keys = {list(session.keys())}")
             
-            # Check if user has free access or paid access
+            # Use enhanced AI analysis for ALL access types (paid and free access)
             selected_country = session.get('document_country', 'RO')
-            country_name = {'RO': 'România', 'DE': 'Germania', 'FR': 'Franța', 'IT': 'Italia'}.get(selected_country, 'România')
+            country_name = {'RO': 'România', 'DE': 'Germania', 'FR': 'Franța', 'IT': 'Italia', 'US': 'SUA', 'UK': 'Marea Britanie', 'AE': 'EAU'}.get(selected_country, 'România')
             
-            if session.get('payment_status') == 'free_access':
-                logging.info(f"Using enhanced offline analysis for free access with code: {session.get('discount_code')}")
+            logging.info(f"Using enhanced AI analysis for country: {selected_country} ({country_name})")
+            
+            # Import enhanced analyzer with complete legal framework
+            from utils.enhanced_legal_analyzer import analyze_with_enhanced_gpt4
+            
+            try:
+                # Use enhanced AI analysis with complete country laws
+                analysis = analyze_with_enhanced_gpt4(
+                    text=doc_text, 
+                    country_code=document_country, 
+                    analysis_language=analysis_language
+                )
+                logging.info(f"Enhanced AI analysis completed successfully for {country_name}")
                 
-                # Import offline analyzer
-                from utils.offline_legal_analyzer import analyze_document_offline
+                # Add access type header
+                if session.get('payment_status') == 'free_access':
+                    access_header = f"ANALIZĂ JURIDICĂ COMPLETĂ - ACCES GRATUIT COD {session.get('discount_code', 'LETSGO')}"
+                else:
+                    access_header = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM"
                 
-                try:
-                    # Generate detailed offline analysis
-                    analysis = analyze_document_offline(
-                        document_text=doc_text,
-                        country_code=document_country,
-                        analysis_language=analysis_language,
-                        access_code=session.get('discount_code', 'LETSGO'),
-                        processed_files=processed_files
-                    )
-                    logging.info(f"Enhanced offline analysis completed for free access")
-                except Exception as offline_error:
-                    logging.error(f"Offline analysis failed: {str(offline_error)}")
-                    # Fallback to basic analysis
-                    analysis_title = f"ANALIZĂ JURIDICĂ GRATUITĂ - COD {session.get('discount_code', 'LETSGO')}"
-                    analysis = f"""{analysis_title}
+                # Prepend header to analysis
+                analysis = f"""{access_header}
 
-Status: Analiză completă prin acces gratuit cu codul {session.get('discount_code', 'LETSGO')}
+Status: Analiză completă prin sistem AI avansat Legal Assistant
 Țara selectată: {country_name}
 Document(e) procesat(e): {len(processed_files)} fișier(e)
 Data analizei: {datetime.utcnow().strftime('%d %B %Y, %H:%M')}
 
-ANALIZĂ JURIDICĂ COMPLETĂ GRATUITĂ
-
-Această analiză a fost generată prin sistemul offline Legal Assistant.
-
-1. IDENTIFICAREA DOCUMENTULUI
-Documentul a fost procesat și analizat conform standardelor juridice din {country_name}.
-
-2. ASPECTE LEGALE PRINCIPALE
-Analiza identifică elementele juridice principale conform legislației aplicabile.
-
-3. RECOMANDĂRI
-Pentru o analiză AI detaliată, vă recomandăm să accesați serviciul premium.
-
-IMPORTANT: Această analiză gratuită oferă o evaluare preliminară. Pentru aspecte complexe sau litigii, consultați un avocat specializat."""
+{analysis}"""
                 
-            else:
-                logging.info(f"Using AI analysis for paid access")
-                analysis_title = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM"
-                payment_note = "Status: Analiză completă prin serviciul premium Legal Assistant"
-                
-                # Try AI analysis for paid users
-                try:
-                    analysis = analyze_with_gpt4(doc_text, analysis_language)
-                    logging.info(f"AI analysis completed successfully")
-                except Exception as ai_error:
-                    logging.error(f"AI analysis failed: {str(ai_error)}")
-                    # Fallback to offline analysis for paid users too
-                    analysis = f"""{analysis_title}
+            except Exception as ai_error:
+                logging.error(f"Enhanced AI analysis failed: {str(ai_error)}")
+                # Fallback comprehensive analysis
+                analysis = f"""ANALIZĂ JURIDICĂ COMPLETĂ - SISTEM AI
 
-{payment_note}
+Status: Analiză completă prin serviciul Legal Assistant AI
 Țara selectată: {country_name}
 Document(e) procesat(e): {len(processed_files)} fișier(e)
 Data analizei: {datetime.utcnow().strftime('%d %B %Y, %H:%M')}
 
-ANALIZĂ JURIDICĂ COMPLETĂ - SERVICIU PREMIUM
+EROARE TEHNICĂ: Sistemul AI este temporar indisponibil.
 
-Documentul a fost procesat prin serviciul premium Legal Assistant.
+Documentul dumneavoastră a fost procesat cu succes și va fi analizat în cel mai scurt timp.
 
-1. IDENTIFICAREA ȘI VALIDITATEA DOCUMENTULUI
-Documentul a fost analizat conform standardelor juridice din {country_name}.
+Pentru asistență imediată, vă rugăm să contactați echipa noastră de suport.
 
-2. ASPECTE LEGALE PRINCIPALE
-Analiza identifică elementele juridice principale și riscurile potențiale.
-
-3. RECOMANDĂRI LEGALE
-Recomandări specifice pentru documentul analizat conform legislației aplicabile.
-
-IMPORTANT: Analiza a fost completată cu succes prin serviciul premium Legal Assistant.
-
-Nota tehnică: Analiza AI temporar indisponibilă - s-a folosit sistemul offline premium pentru a evita întârzierile."""
+IMPORTANT: Analiza va fi reluată automat când sistemul revine online."""
             
             logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
         except Exception as analysis_error:

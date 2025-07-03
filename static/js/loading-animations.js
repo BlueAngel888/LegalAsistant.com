@@ -1,305 +1,292 @@
-// Legal-themed Loading Animation System
 
-class LegalLoadingManager {
+<old_str>// Loading animations and progress tracking
+class LegalLoadingAnimator {
     constructor() {
-        this.currentLoader = null;
-        this.progressTimer = null;
-        this.statusTimer = null;
-        this.init();
+        this.currentStep = 0;
+        this.progress = 0;
+        this.steps = [
+            { icon: '📄', label: 'Document Upload' },
+            { icon: '🔍', label: 'Text Analysis' },
+            { icon: '⚖️', label: 'Legal Review' },
+            { icon: '✅', label: 'Complete' }
+        ];
     }
 
-    init() {
-        // Create loading overlay if it doesn't exist
-        if (!document.getElementById('loading-overlay')) {
-            this.createLoadingOverlay();
-        }
-    }
-
-    createLoadingOverlay() {
-        const overlay = document.createElement('div');
-        overlay.id = 'loading-overlay';
-        overlay.className = 'loading-overlay';
-        overlay.innerHTML = `
+    showLoading(message = 'Analyzing document...') {
+        const loadingHtml = `
             <div class="loading-container">
-                <div id="loading-animation-container">
-                    <!-- Animation will be inserted here -->
+                <div class="scales-container">
+                    <div class="scales-base"></div>
+                    <div class="scales-arm">
+                        <div class="scales-pan left"></div>
+                        <div class="scales-pan right"></div>
+                    </div>
                 </div>
-                <div class="loading-text" id="loading-text">Processing Document...</div>
-                <div class="loading-subtext" id="loading-subtext">Please wait while we analyze your legal document</div>
-                <div class="progress-steps">
-                    <div class="progress-step" id="step-upload">
-                        <span class="step-label">Upload</span>
-                    </div>
-                    <div class="progress-step" id="step-process">
-                        <span class="step-label">Process</span>
-                    </div>
-                    <div class="progress-step" id="step-analyze">
-                        <span class="step-label">Analyze</span>
-                    </div>
+                <div class="loading-text">${message}</div>
+                <div class="loading-subtext">Please wait while we analyze your legal document...</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">0% Complete</div>
+                <div class="analysis-steps">
+                    ${this.steps.map((step, index) => `
+                        <div class="step ${index === 0 ? 'active' : ''}" data-step="${index}">
+                            <div class="step-icon">${step.icon}</div>
+                            <div class="step-label">${step.label}</div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
-        document.body.appendChild(overlay);
-    }
-
-    showLoader(type = 'document', options = {}) {
-        const overlay = document.getElementById('loading-overlay');
-        const animationContainer = document.getElementById('loading-animation-container');
-        const textElement = document.getElementById('loading-text');
-        const subtextElement = document.getElementById('loading-subtext');
-
-        // Clear any existing timers
-        this.clearTimers();
-
-        // Set animation type
-        animationContainer.innerHTML = this.getAnimationHTML(type);
-
-        // Set text content
-        textElement.textContent = options.title || this.getDefaultTitle(type);
-        subtextElement.textContent = options.subtitle || this.getDefaultSubtitle(type);
-
-        // Show overlay
-        overlay.classList.add('active');
-
-        // Start progress animation
-        this.startProgressAnimation(options.duration || 8000);
-
-        // Start status updates
-        this.startStatusUpdates();
-
-        this.currentLoader = type;
-    }
-
-    hideLoader() {
-        const overlay = document.getElementById('loading-overlay');
-        overlay.classList.remove('active');
-        this.clearTimers();
-        this.currentLoader = null;
-    }
-
-    getAnimationHTML(type) {
-        switch (type) {
-            case 'scale':
-                return `
-                    <div class="legal-scale">
-                        <div class="scale-base"></div>
-                        <div class="scale-beam">
-                            <div class="scale-chain left"></div>
-                            <div class="scale-chain right"></div>
-                            <div class="scale-pan left"></div>
-                            <div class="scale-pan right"></div>
-                        </div>
-                    </div>
-                `;
-            case 'gavel':
-                return `
-                    <div class="gavel-animation">
-                        <div class="gavel">
-                            <div class="gavel-handle"></div>
-                        </div>
-                        <div class="gavel-block"></div>
-                        <div class="gavel-impact"></div>
-                    </div>
-                `;
-            case 'document':
-            default:
-                return `
-                    <div class="document-animation">
-                        <div class="document-stack">
-                            <div class="document-page">
-                                <div class="document-lines"></div>
-                            </div>
-                            <div class="document-page">
-                                <div class="document-lines"></div>
-                            </div>
-                            <div class="document-page">
-                                <div class="document-lines"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-        }
-    }
-
-    getDefaultTitle(type) {
-        switch (type) {
-            case 'scale':
-                return 'Weighing Legal Evidence...';
-            case 'gavel':
-                return 'Rendering Judgment...';
-            case 'document':
-            default:
-                return 'Processing Document...';
-        }
-    }
-
-    getDefaultSubtitle(type) {
-        switch (type) {
-            case 'scale':
-                return 'Analyzing legal implications and balancing arguments';
-            case 'gavel':
-                return 'Finalizing legal analysis and recommendations';
-            case 'document':
-            default:
-                return 'Please wait while we analyze your legal document';
-        }
-    }
-
-    startProgressAnimation(duration) {
-        // New progress animation is handled by startStatusUpdates()
-        // No longer using the old progress bar
-    }
-
-    startStatusUpdates() {
-        const progressSteps = [
-            document.getElementById('step-upload'),
-            document.getElementById('step-process'),
-            document.getElementById('step-analyze')
-        ];
-
-        let currentStep = 0;
         
-        // Activate first step immediately
-        progressSteps[0].classList.add('active');
+        return loadingHtml;
+    }
 
-        this.statusTimer = setInterval(() => {
-            if (currentStep < progressSteps.length - 1) {
-                // Complete current step
-                progressSteps[currentStep].classList.remove('active');
-                progressSteps[currentStep].classList.add('completed');
-                
-                // Move to next step
-                currentStep++;
-                progressSteps[currentStep].classList.add('active');
+    updateProgress(percentage, stepIndex = null) {
+        const progressBar = document.querySelector('.progress-bar');
+        const progressText = document.querySelector('.progress-text');
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = Math.round(percentage) + '% Complete';
+        }
+
+        if (stepIndex !== null) {
+            this.updateStep(stepIndex);
+        }
+    }
+
+    updateStep(stepIndex) {
+        const steps = document.querySelectorAll('.step');
+        
+        steps.forEach((step, index) => {
+            step.classList.remove('active', 'completed');
+            
+            if (index < stepIndex) {
+                step.classList.add('completed');
+            } else if (index === stepIndex) {
+                step.classList.add('active');
             }
-        }, 3000); // 3 seconds per step
+        });
     }
 
-    clearTimers() {
-        if (this.progressTimer) {
-            clearInterval(this.progressTimer);
-            this.progressTimer = null;
+    simulateProgress(duration = 30000) {
+        let startTime = Date.now();
+        let currentProgress = 0;
+        
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progressPercentage = Math.min((elapsed / duration) * 100, 95);
+            
+            // Update step based on progress
+            let stepIndex = 0;
+            if (progressPercentage > 25) stepIndex = 1;
+            if (progressPercentage > 50) stepIndex = 2;
+            if (progressPercentage > 80) stepIndex = 3;
+            
+            this.updateProgress(progressPercentage, stepIndex);
+            
+            if (progressPercentage >= 95) {
+                clearInterval(interval);
+            }
+        }, 500);
+        
+        return interval;
+    }
+
+    hideLoading() {
+        const loadingContainer = document.querySelector('.loading-container');
+        if (loadingContainer) {
+            loadingContainer.style.opacity = '0';
+            setTimeout(() => {
+                if (loadingContainer.parentNode) {
+                    loadingContainer.parentNode.removeChild(loadingContainer);
+                }
+            }, 300);
         }
-        if (this.statusTimer) {
-            clearInterval(this.statusTimer);
-            this.statusTimer = null;
-        }
-    }
-
-    // Predefined loading scenarios
-    showDocumentUpload() {
-        this.showLoader('document', {
-            title: 'Uploading Document...',
-            subtitle: 'Securely processing your legal files',
-            duration: 3000
-        });
-    }
-
-    showDocumentAnalysis() {
-        this.showLoader('scale', {
-            title: 'Analyzing Legal Document...',
-            subtitle: 'AI is reviewing content and legal implications',
-            duration: 8000
-        });
-    }
-
-    showPaymentProcessing() {
-        this.showLoader('gavel', {
-            title: 'Processing Payment...',
-            subtitle: 'Securing your transaction and preparing analysis',
-            duration: 5000
-        });
-    }
-
-    showContractGeneration() {
-        this.showLoader('document', {
-            title: 'Generating Contract...',
-            subtitle: 'Creating legal document based on your specifications',
-            duration: 6000
-        });
-    }
-
-    showLegalResearch() {
-        this.showLoader('scale', {
-            title: 'Researching Legal Framework...',
-            subtitle: 'Analyzing applicable laws and regulations',
-            duration: 7000
-        });
     }
 }
 
 // Global instance
-const legalLoader = new LegalLoadingManager();
+window.legalLoader = new LegalLoadingAnimator();</old_str>
+<new_str>// Enhanced Loading animations with detailed legal analysis steps
+class LegalLoadingAnimator {
+    constructor() {
+        this.currentStep = 0;
+        this.progress = 0;
+        this.steps = [
+            { icon: '📄', label: 'Document Processing' },
+            { icon: '🔍', label: 'Text Extraction' },
+            { icon: '🌍', label: 'Country Laws' },
+            { icon: '⚖️', label: 'Legal Analysis' },
+            { icon: '🔬', label: 'Nullity Check' },
+            { icon: '✅', label: 'Complete Analysis' }
+        ];
+        this.currentInterval = null;
+    }
 
-// Integration with existing form submissions
-document.addEventListener('DOMContentLoaded', function() {
-    // Override existing upload functionality
-    const uploadForm = document.getElementById('upload-form');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-            // Don't prevent default, just show loader
-            legalLoader.showDocumentUpload();
+    showLoading(message = 'Analyzing legal document with AI...') {
+        const loadingHtml = `
+            <div class="loading-container">
+                <div class="scales-container">
+                    <div class="scales-base"></div>
+                    <div class="scales-fulcrum"></div>
+                    <div class="scales-arm">
+                        <div class="scales-chain left"></div>
+                        <div class="scales-chain right"></div>
+                        <div class="scales-pan left">
+                            <div class="scales-evidence"></div>
+                        </div>
+                        <div class="scales-pan right">
+                            <div class="scales-evidence"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loading-text">${message}</div>
+                <div class="loading-subtext">Analyzing document according to country-specific laws...<br>Checking for legal nullity and fraudulent clauses...</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">0% Complete</div>
+                <div class="analysis-steps">
+                    ${this.steps.map((step, index) => `
+                        <div class="step ${index === 0 ? 'active' : ''}" data-step="${index}">
+                            <div class="step-icon">${step.icon}</div>
+                            <div class="step-label">${step.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="legal-status">
+                    <strong>Status:</strong> <span id="current-status">Initializing legal analysis...</span>
+                </div>
+            </div>
+        `;
+        
+        return loadingHtml;
+    }
+
+    updateProgress(percentage, stepIndex = null, statusMessage = null) {
+        const progressBar = document.querySelector('.progress-bar');
+        const progressText = document.querySelector('.progress-text');
+        const statusElement = document.getElementById('current-status');
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = percentage + '%';
+            progressText.textContent = Math.round(percentage) + '% Complete';
+        }
+
+        if (stepIndex !== null) {
+            this.updateStep(stepIndex);
+        }
+
+        if (statusMessage && statusElement) {
+            statusElement.textContent = statusMessage;
+        }
+    }
+
+    updateStep(stepIndex) {
+        const steps = document.querySelectorAll('.step');
+        
+        steps.forEach((step, index) => {
+            step.classList.remove('active', 'completed');
+            
+            if (index < stepIndex) {
+                step.classList.add('completed');
+            } else if (index === stepIndex) {
+                step.classList.add('active');
+            }
         });
     }
 
-    // Override checkout form
-    const checkoutForm = document.querySelector('form[action*="checkout"]');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            legalLoader.showPaymentProcessing();
+    simulateProgress(duration = 45000) {
+        if (this.currentInterval) {
+            clearInterval(this.currentInterval);
+        }
+
+        let startTime = Date.now();
+        const statusMessages = [
+            'Extracting text from documents...',
+            'Identifying document type and parties...',
+            'Loading country-specific legal framework...',
+            'Performing comprehensive legal analysis...',
+            'Checking for legal nullity and procedural defects...',
+            'Finalizing detailed legal assessment...'
+        ];
+        
+        this.currentInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progressPercentage = Math.min((elapsed / duration) * 100, 95);
+            
+            // Update step and status based on progress
+            let stepIndex = 0;
+            let statusMessage = statusMessages[0];
+            
+            if (progressPercentage > 15) {
+                stepIndex = 1;
+                statusMessage = statusMessages[1];
+            }
+            if (progressPercentage > 30) {
+                stepIndex = 2;
+                statusMessage = statusMessages[2];
+            }
+            if (progressPercentage > 50) {
+                stepIndex = 3;
+                statusMessage = statusMessages[3];
+            }
+            if (progressPercentage > 75) {
+                stepIndex = 4;
+                statusMessage = statusMessages[4];
+            }
+            if (progressPercentage > 90) {
+                stepIndex = 5;
+                statusMessage = statusMessages[5];
+            }
+            
+            this.updateProgress(progressPercentage, stepIndex, statusMessage);
+            
+            if (progressPercentage >= 95) {
+                clearInterval(this.currentInterval);
+                this.currentInterval = null;
+            }
+        }, 800);
+        
+        return this.currentInterval;
+    }
+
+    completeProgress() {
+        if (this.currentInterval) {
+            clearInterval(this.currentInterval);
+            this.currentInterval = null;
+        }
+        
+        this.updateProgress(100, 5, 'Legal analysis completed successfully!');
+        
+        // Complete all steps
+        const steps = document.querySelectorAll('.step');
+        steps.forEach(step => {
+            step.classList.remove('active');
+            step.classList.add('completed');
         });
     }
 
-    // Override free access form
-    const freeAccessForm = document.querySelector('form[action*="free-access"]');
-    if (freeAccessForm) {
-        freeAccessForm.addEventListener('submit', function(e) {
-            legalLoader.showDocumentAnalysis();
-        });
+    hideLoading() {
+        if (this.currentInterval) {
+            clearInterval(this.currentInterval);
+            this.currentInterval = null;
+        }
+        
+        const loadingContainer = document.querySelector('.loading-container');
+        if (loadingContainer) {
+            loadingContainer.style.opacity = '0';
+            loadingContainer.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                if (loadingContainer.parentNode) {
+                    loadingContainer.parentNode.removeChild(loadingContainer);
+                }
+            }, 400);
+        }
     }
+}
 
-    // Legal services forms
-    const contractForm = document.querySelector('form[action*="generate-contract"]');
-    if (contractForm) {
-        contractForm.addEventListener('submit', function(e) {
-            legalLoader.showContractGeneration();
-        });
-    }
-
-    const legalRequestForm = document.querySelector('form[action*="generate-legal-request"]');
-    if (legalRequestForm) {
-        legalRequestForm.addEventListener('submit', function(e) {
-            legalLoader.showLegalResearch();
-        });
-    }
-
-    const penaltyForm = document.querySelector('form[action*="analyze-penalty"]');
-    if (penaltyForm) {
-        penaltyForm.addEventListener('submit', function(e) {
-            legalLoader.showDocumentAnalysis();
-        });
-    }
-
-    const realEstateForm = document.querySelector('form[action*="verify-real-estate"]');
-    if (realEstateForm) {
-        realEstateForm.addEventListener('submit', function(e) {
-            legalLoader.showLegalResearch();
-        });
-    }
-
-    // Hide loader when page fully loads (for redirects)
-    window.addEventListener('load', function() {
-        // Small delay to ensure smooth transition
-        setTimeout(() => {
-            legalLoader.hideLoader();
-        }, 500);
-    });
-
-    // Hide loader if user navigates away
-    window.addEventListener('beforeunload', function() {
-        legalLoader.hideLoader();
-    });
-});
-
-// Export for external use
-window.legalLoader = legalLoader;
+// Global instance
+window.legalLoader = new LegalLoadingAnimator();</new_str>

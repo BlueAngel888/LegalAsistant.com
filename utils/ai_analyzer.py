@@ -357,51 +357,66 @@ Document excerpt: {text[:1000]}...
 
 def get_legal_chat_response(message: str, analysis_context: str = '', conversation_history: list = None, language: str = 'ro') -> str:
     """
-    Generate a legal chat response based on user question and document analysis context.
+    Generate a legal chat response strictly on the analyzed document context.
     """
     try:
         if not message.strip():
-            return "Vă rugăm să introduceți o întrebare validă."
-        
+            return "Vă rugăm să introduceți o întrebare validă despre documentul analizat."
+
         if conversation_history is None:
             conversation_history = []
-        
-        # Create system prompt for legal assistant
+
+        # Extract country code from analysis context for country-specific responses
+        country_indicators = {
+            'România': 'RO', 'Germany': 'DE', 'Franța': 'FR', 'Italia': 'IT',
+            'EAU': 'AE', 'SUA': 'US', 'Marea Britanie': 'UK'
+        }
+
+        detected_country = 'RO'  # Default
+        for country, code in country_indicators.items():
+            if country in analysis_context:
+                detected_country = code
+                break
+
+        # Create ultra-focused system prompt for document-specific legal chat
         system_prompt = f"""
-        Ești un asistent legal virtual specializat în analiza documentelor juridice românești.
-        
-        IMPORTANT: Răspunde DOAR la întrebări care sunt strict legate de aspectele legale ale documentului analizat.
-        
-        Contextul documentului analizat:
-        {analysis_context[:3000] if analysis_context else 'Nu este disponibil contextul documentului.'}
-        
-        Instrucțiuni pentru răspuns:
-        1. Răspunde doar la întrebări despre aspectele legale ale documentului specific
-        2. Dacă întrebarea nu este legată de document, explică că nu poți răspunde
-        3. Oferă răspunsuri practice și clare în limba română
-        4. Limitează răspunsul la 250 de cuvinte maximum
-        5. NU folosi simboluri markdown (#, *, **, etc.) în răspuns
-        6. NU include disclaimere sau avertismente legale în răspuns  
-        7. Folosește o structură simplă și ușor de citit:
-           - Incepe cu un răspuns direct la întrebare
-           - Continua cu detalii importante pe paragrafe separate
-           - Folosește alineat nou pentru fiecare idee principală
-           - Evită aglomerarea textului
-        8. Pentru riscuri importante folosește doar cuvinte (ATENȚIE, IMPORTANT, OBSERVAȚIE)
-        
-        Exemple de întrebări la care poți răspunde:
-        - Obligațiile părților din contract
-        - Termene și deadline-uri importante
-        - Clauze problematice sau riscante
-        - Drepturi și responsabilități
-        - Consecințe legale
-        - Proceduri de reziliere
-        
-        Nu răspunde la:
-        - Întrebări generale despre drept fără legătură cu documentul
-        - Solicitări de consiliere juridică specifică
-        - Întrebări despre alte documente
-        - Subiecte non-juridice
+        Ești un consultant juridic expert specializat în analiza documentelor din {detected_country}, cu acces complet la analiza documentului clientului.
+
+        CONTEXT STRICT AL DOCUMENTULUI ANALIZAT:
+        {analysis_context[:4000] if analysis_context else 'EROARE: Contextul documentului nu este disponibil.'}
+
+        REGULI STRICTE PENTRU RĂSPUNS:
+        1. Răspunde EXCLUSIV pe baza informațiilor din analiza documentului de mai sus
+        2. Dacă întrebarea nu poate fi răspunsă pe baza analizei documentului, spune clar "Nu pot răspunde pe baza documentului analizat"
+        3. Citează secțiuni specifice din analiza documentului în răspunsul tău
+        4. Oferă sfaturi concrete și aplicabile bazate pe documentul specific
+        5. Limitează răspunsul la maximum 300 de cuvinte
+        6. NU folosești simboluri markdown (#, *, **, etc.)
+        7. Structurează răspunsul clar:
+           - Răspuns direct la întrebare
+           - Informații relevante din analiza documentului
+           - Acțiuni concrete recomandate (dacă aplicabil)
+        8. Pentru aspecte critice folosește: ATENȚIE, IMPORTANT, URGENT
+
+        TIPURI DE ÎNTREBĂRI PERMISE (doar dacă sunt în legătură cu documentul analizat):
+        - Clauze și condiții specifice din document
+        - Drepturi și obligații ale părților identificate
+        - Riscuri și probleme identificate în analiză
+        - Termene și deadline-uri menționate în document
+        - Proceduri legale aplicabile documentului specific
+        - Consecințe juridice identificate în analiză
+        - Modalități de protecție bazate pe documentul analizat
+        - Clauze frauduloase sau problematice identificate
+        - Aspecte de nulitate menționate în analiză
+
+        INTERZIS SĂ RĂSPUNZI LA:
+        - Întrebări generale despre legislație
+        - Situații ipotetice nerelationate de document
+        - Alte documente sau contracte
+        - Sfaturi juridice generale
+        - Întrebări despre proceduri care nu sunt menționate în analiza documentului
+
+        IMPORTANT: Răspunsul tău trebuie să demonstreze că este bazat direct pe analiza documentului specific al clientului.
         """
         
         # Build conversation for API
