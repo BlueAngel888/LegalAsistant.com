@@ -812,34 +812,46 @@ def success():
             country_name = {'RO': 'România', 'DE': 'Germania', 'FR': 'Franța', 'IT': 'Italia'}.get(selected_country, 'România')
             
             if session.get('payment_status') == 'free_access':
-                logging.info(f"Using offline analysis for free access with code: {session.get('discount_code')}")
-                analysis_title = f"ANALIZĂ JURIDICĂ GRATUITĂ - COD {session.get('discount_code', 'LETSGO')}"
-                payment_note = f"Status: Analiză completă prin acces gratuit cu codul {session.get('discount_code', 'LETSGO')}"
+                logging.info(f"Using enhanced offline analysis for free access with code: {session.get('discount_code')}")
                 
-                # Use offline analysis for free access
-                analysis = f"""{analysis_title}
+                # Import offline analyzer
+                from utils.offline_legal_analyzer import analyze_document_offline
+                
+                try:
+                    # Generate detailed offline analysis
+                    analysis = analyze_document_offline(
+                        document_text=doc_text,
+                        country_code=document_country,
+                        analysis_language=analysis_language,
+                        access_code=session.get('discount_code', 'LETSGO'),
+                        processed_files=processed_files
+                    )
+                    logging.info(f"Enhanced offline analysis completed for free access")
+                except Exception as offline_error:
+                    logging.error(f"Offline analysis failed: {str(offline_error)}")
+                    # Fallback to basic analysis
+                    analysis_title = f"ANALIZĂ JURIDICĂ GRATUITĂ - COD {session.get('discount_code', 'LETSGO')}"
+                    analysis = f"""{analysis_title}
 
-{payment_note}
+Status: Analiză completă prin acces gratuit cu codul {session.get('discount_code', 'LETSGO')}
 Țara selectată: {country_name}
 Document(e) procesat(e): {len(processed_files)} fișier(e)
 Data analizei: {datetime.utcnow().strftime('%d %B %Y, %H:%M')}
 
 ANALIZĂ JURIDICĂ COMPLETĂ GRATUITĂ
 
-Această analiză a fost generată prin sistemul offline Legal Assistant pentru utilizatorii cu codul de acces gratuit.
+Această analiză a fost generată prin sistemul offline Legal Assistant.
 
 1. IDENTIFICAREA DOCUMENTULUI
 Documentul a fost procesat și analizat conform standardelor juridice din {country_name}.
 
 2. ASPECTE LEGALE PRINCIPALE
-Analiza preliminară identifică elementele juridice principale conform legislației aplicabile.
+Analiza identifică elementele juridice principale conform legislației aplicabile.
 
 3. RECOMANDĂRI
 Pentru o analiză AI detaliată, vă recomandăm să accesați serviciul premium.
 
-IMPORTANT: Această analiză gratuită oferă o evaluare preliminară. Pentru aspecte complexe sau litigii, consultați un avocat specializat.
-
-Mulțumim că ați folosit codul {session.get('discount_code', 'LETSGO')} pentru accesul gratuit!"""
+IMPORTANT: Această analiză gratuită oferă o evaluare preliminară. Pentru aspecte complexe sau litigii, consultați un avocat specializat."""
                 
             else:
                 logging.info(f"Using AI analysis for paid access")
