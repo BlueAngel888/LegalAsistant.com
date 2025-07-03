@@ -71,7 +71,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Country:</strong> {{ country_name }}</p>
-                                        <p><strong>Language:</strong> {{ analysis_language.upper() }}</p>
+                                        <p><strong>Language:</strong> {{ session.get('analysis_language', 'RO').upper() }}</p>
                                         <p class="mb-0"><strong>Analysis Type:</strong> 
                                             {% if payment_status == 'free_access' %}
                                                 <span class="badge bg-success">Free Access ({{ discount_code }})</span>

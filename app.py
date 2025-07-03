@@ -847,7 +847,7 @@ Analiza preliminară nu identifică vicii evidente de nulitate. Documentul respe
 
 Denumirea exactă: Document juridic analizat prin Legal Assistant
 Țara de origine: {country_name} - se aplică legislația națională specifică
-Limba documentului: {analysis_language.upper()}
+Limba documentului: {session.get('analysis_language', 'RO').upper()}
 Părțile identificate: Conform datelor din document
 Natura juridică: Document cu caracter legal verificabil
 
@@ -927,6 +927,8 @@ IMPORTANT: Analiza va fi reluată automat când sistemul revine online."""
             logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
         except Exception as analysis_error:
             logging.error(f"Analysis error: {str(analysis_error)}")
+            # Get analysis language from session for fallback
+            analysis_language = session.get('analysis_language', 'ro')
             # Provide fallback analysis for any errors
             analysis = f"""ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
 
