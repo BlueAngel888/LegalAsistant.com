@@ -282,7 +282,7 @@ Document excerpt: {text[:1000]}...
             max_tokens=200
         )
 
-        return response.choices[0].message.content
+        return response.choices[0].message.content or ""
 
     except Exception as e:
         logging.error(f"Error generating document summary: {str(e)}")
@@ -290,7 +290,7 @@ Document excerpt: {text[:1000]}...
 
 def get_legal_chat_response(message: str, analysis_context: str = '', conversation_history: list = None, language: str = 'ro') -> str:
     """
-    Generate a legal chat response strictly on the analyzed document context.
+    Generate a legal chat response strictly on the analyzed document context using GPT-4o-mini.
     """
     try:
         if not message.strip():
@@ -299,81 +299,92 @@ def get_legal_chat_response(message: str, analysis_context: str = '', conversati
         if conversation_history is None:
             conversation_history = []
 
-        # Extract country code from analysis context for country-specific responses
+        # Extract country code and legal framework from analysis context
         country_indicators = {
-            'România': 'RO', 'Germany': 'DE', 'Franța': 'FR', 'Italia': 'IT',
-            'EAU': 'AE', 'SUA': 'US', 'Marea Britanie': 'UK'
+            'România': ('RO', 'Codul Civil 287/2009, Codul Penal 286/2009, Codul Fiscal, Codul de Procedură Civilă'),
+            'Germany': ('DE', 'BGB (Bürgerliches Gesetzbuch), HGB (Handelsgesetzbuch), StGB (Strafgesetzbuch)'),
+            'Germania': ('DE', 'BGB (Bürgerliches Gesetzbuch), HGB (Handelsgesetzbuch), StGB (Strafgesetzbuch)'),
+            'Franța': ('FR', 'Code Civil Français, Code de Commerce, Code Pénal'),
+            'Italia': ('IT', 'Codice Civile Italiano, Codice Penale, Codice di Commercio'),
+            'EAU': ('AE', 'UAE Civil Code (Federal Law No. 5/1985), UAE Commercial Code, UAE Penal Code'),
+            'China': ('CN', '中华人民共和国民法典, 合同法, 刑法'),
+            'Japonia': ('JP', '日本民法, 商法, 刑法')
         }
 
         detected_country = 'RO'  # Default
-        for country, code in country_indicators.items():
+        legal_framework = 'Codul Civil 287/2009, Codul Penal 286/2009'
+        
+        for country, (code, framework) in country_indicators.items():
             if country in analysis_context:
                 detected_country = code
+                legal_framework = framework
                 break
 
-        # Create ultra-focused system prompt for document-specific legal chat
+        # Create strict system prompt focused on document-specific legal responses
         system_prompt = f"""
-        Ești un consultant juridic expert specializat în analiza documentelor din {detected_country}, cu acces complet la analiza documentului clientului.
+Ești un expert juridic specializat EXCLUSIV în legislația din {detected_country}.
 
-        CONTEXT STRICT AL DOCUMENTULUI ANALIZAT:
-        {analysis_context[:4000] if analysis_context else 'EROARE: Contextul documentului nu este disponibil.'}
+CADRUL LEGAL APLICABIL: {legal_framework}
 
-        REGULI STRICTE PENTRU RĂSPUNS:
-        1. Răspunde EXCLUSIV pe baza informațiilor din analiza documentului de mai sus
-        2. Dacă întrebarea nu poate fi răspunsă pe baza analizei documentului, spune clar "Nu pot răspunde pe baza documentului analizat"
-        3. Citează secțiuni specifice din analiza documentului în răspunsul tău
-        4. Oferă sfaturi concrete și aplicabile bazate pe documentul specific
-        5. Limitează răspunsul la maximum 300 de cuvinte
-        6. NU folosești simboluri markdown (#, *, **, etc.)
-        7. Structurează răspunsul clar:
-           - Răspuns direct la întrebare
-           - Informații relevante din analiza documentului
-           - Acțiuni concrete recomandate (dacă aplicabil)
-        8. Pentru aspecte critice folosește: ATENȚIE, IMPORTANT, URGENT
+DOCUMENTUL ANALIZAT:
+{analysis_context[:3500] if analysis_context else 'EROARE: Contextul documentului nu este disponibil.'}
 
-        TIPURI DE ÎNTREBĂRI PERMISE (doar dacă sunt în legătură cu documentul analizat):
-        - Clauze și condiții specifice din document
-        - Drepturi și obligații ale părților identificate
-        - Riscuri și probleme identificate în analiză
-        - Termene și deadline-uri menționate în document
-        - Proceduri legale aplicabile documentului specific
-        - Consecințe juridice identificate în analiză
-        - Modalități de protecție bazate pe documentul analizat
-        - Clauze frauduloase sau problematice identificate
-        - Aspecte de nulitate menționate în analiză
+REGULI ABSOLUTE:
+1. Răspunde DOAR pe baza:
+   - Informațiilor din documentul analizat de mai sus
+   - Legislației specifice țării {detected_country}: {legal_framework}
+   
+2. NU răspunde la întrebări despre:
+   - Alte documente
+   - Legislația altor țări  
+   - Situații ipotetice
+   - Aspecte care nu apar în documentul analizat
 
-        INTERZIS SĂ RĂSPUNZI LA:
-        - Întrebări generale despre legislație
-        - Situații ipotetice nerelationate de document
-        - Alte documente sau contracte
-        - Sfaturi juridice generale
-        - Întrebări despre proceduri care nu sunt menționate în analiza documentului
+3. Pentru FIECARE răspuns:
+   - Citează articolul de lege specific din {legal_framework}
+   - Menționează secțiunea exactă din document
+   - Maximum 250 cuvinte
+   - Fără simboluri markdown
 
-        IMPORTANT: Răspunsul tău trebuie să demonstreze că este bazat direct pe analiza documentului specific al clientului.
-        """
+4. Structura răspunsului:
+   RĂSPUNS: [răspuns direct]
+   BAZĂ LEGALĂ: [Art. X din legea Y]
+   DIN DOCUMENT: [referință la secțiunea documentului]
+   RECOMANDARE: [acțiune concretă]
+
+5. Dacă întrebarea NU se referă la documentul analizat, răspunde DOAR:
+   "Pot răspunde doar despre documentul analizat. Întrebarea dvs. nu se referă la acest document."
+
+EXEMPLU RĂSPUNS CORECT:
+RĂSPUNS: Termenul de contestare este de 15 zile.
+BAZĂ LEGALĂ: Art. 260 din Codul de Procedură Civilă {detected_country}
+DIN DOCUMENT: Conform secțiunii 3 din analiza documentului
+RECOMANDARE: Depuneți contestația până la data de [dată]
+"""
 
         # Build conversation for API
         messages = [{"role": "system", "content": system_prompt}]
 
-        # Add conversation history (limited)
-        for msg in conversation_history[-4:]:  # Last 4 messages for context
+        # Add limited conversation history
+        for msg in conversation_history[-3:]:  # Last 3 messages for context
             if 'role' in msg and 'content' in msg:
                 messages.append(msg)
 
         # Add current user message
         messages.append({"role": "user", "content": message})
 
-        openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        # Use GPT-4o-mini specifically for chat responses
         response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=messages,
-            max_tokens=500,
-            temperature=0.3,
-            presence_penalty=0.1,
-            frequency_penalty=0.1
+            max_tokens=400,
+            temperature=0.2,  # Lower temperature for more focused responses
+            presence_penalty=0.2,
+            frequency_penalty=0.2
         )
 
-        chat_response = response.choices[0].message.content.strip()
+        chat_response = response.choices[0].message.content or ""
+        chat_response = chat_response.strip()
 
         # Clean markdown symbols from response
         chat_response = clean_markdown_symbols(chat_response)
