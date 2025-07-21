@@ -779,3 +779,140 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str, analysis_language: 
     analyzer.save_analysis_for_learning(text, analysis, country_code, analysis_language)
 
     return analysis
+
+
+def analyze_real_estate_contract(text: str, country_code: str = 'RO', analysis_language: str = 'ro') -> str:
+    """
+    Specialized analysis for real estate contracts using LegalAnalyserGPT format
+    """
+    try:
+        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        # Country-specific legal frameworks for real estate
+        real_estate_frameworks = {
+            'RO': {
+                'civil_code': 'Codul Civil 287/2009',
+                'cadastral': 'Legea cadastrului și a publicității imobiliare nr. 7/1996',
+                'notarial': 'Legea notarilor publici nr. 36/1995',
+                'fiscal': 'Codul Fiscal (Legea nr. 227/2015)',
+                'construction': 'Legea nr. 50/1991 privind autorizarea construcțiilor'
+            },
+            'DE': {
+                'civil_code': 'BGB (Bürgerliches Gesetzbuch)',
+                'land_registry': 'Grundbuchordnung (GBO)',
+                'notarial': 'Beurkundungsgesetz (BeurkG)',
+                'tax_law': 'Grunderwerbsteuergesetz (GrEStG)'
+            },
+            'FR': {
+                'civil_code': 'Code Civil Français',
+                'property_code': 'Code de la propriété',
+                'urban_code': 'Code de l\'urbanisme',
+                'tax_code': 'Code général des impôts'
+            },
+            'IT': {
+                'civil_code': 'Codice Civile Italiano',
+                'registry': 'Conservatoria dei Registri Immobiliari',
+                'tax_code': 'Testo Unico Imposte sui Redditi'
+            }
+        }
+        
+        framework = real_estate_frameworks.get(country_code, real_estate_frameworks['RO'])
+        
+        # Create the detailed prompt for real estate analysis
+        system_prompt = f"""
+Ești LegalAnalyserGPT, un asistent juridic avansat, expert în contracte de vânzare-cumpărare imobiliară pentru {country_code}.
+
+Legislația aplicabilă:
+{json.dumps(framework, indent=2, ensure_ascii=False)}
+
+Instrucțiuni esențiale:
+1. Citește documentul primit cu atenție maximă
+2. Completează TOATE secțiunile analizei cu date EXTRASE din document, CITATE exact
+3. Dacă un câmp nu apare în document, scrie explicit `N/A`
+4. Folosește ghilimele pentru citare directă
+5. Respectă legislația țării: citează articole, legi, norme locale
+6. Identifică și semnalează orice clauză abuzivă sau ilegală
+7. Nu lăsa spații goale în analiză
+
+Structura obligatorie de analiză:
+
+0. METADATE DOCUMENT
+   • Denumire contract: (citat exact sau `N/A`)
+   • Țara / jurisdicția: (citat exact sau dedusă)
+   • Data semnării: (citat exact sau `N/A`)
+   • Părți contractante: (nume complet, CNP/CUI, adresă, reprezentant)
+   • Imobil vândut: (tip, adresă, suprafață, CF, nr. cadastral)
+   • Preț total și modalitate plată: (citat exact)
+   • Avans / ipotecă / garanții: (citat sau `N/A`)
+   • Alte detalii esențiale: (termene, penalități, predare)
+
+1. BAZĂ LEGALĂ DETALIATĂ
+   • Articole și legi citate în document
+   • Reglementări relevante conform {framework}
+   • Norme notariale și cadastrale aplicabile
+   • Jurisprudență menționată
+
+2. VERIFICAREA NULITĂȚII ȘI VALIDITĂȚII
+   • Respectă cerințele de formă și fond?
+   • Autentificare notarială prezentă?
+   • Consimțământ valid al părților?
+   • Titlu de proprietate menționat?
+   • Motive de nulitate identificate
+
+3. CLAUZE SPECIALE, ABUZIVE SAU DE RISC
+   • Clauze dezechilibrate (citate integral)
+   • Termeni de plată riscanți
+   • Penalități disproporționate
+   • Limitări de garanție
+   • Lipsă termene predare
+
+4. IMPLICAȚII FISCALE, CADASTRALE ȘI ADMINISTRATIVE
+   • Taxe aplicabile (TVA, transfer, timbru, notar)
+   • Obligații înregistrare (carte funciară, ANAF)
+   • Termene legale de respectat
+
+5. CONCLUZII, RISCURI ȘI RECOMANDĂRI PRACTICE
+   • Rezumat riscuri principale
+   • Recomandări concrete
+   • Lipsuri identificate în document
+   • Necesitate consultare specialist
+
+6. DISCLAIMER
+   *Analiză informativă. Pentru decizii legale consultați avocat/notar local.*
+
+NU folosi simboluri markdown (*, #, ##, ###)!
+"""
+
+        user_prompt = f"""
+Analizează următorul contract imobiliar:
+
+<<START DOC>>
+{text}
+<<END DOC>>
+
+Oferă analiza completă în formatul cerut, cu toate secțiunile completate.
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.2,
+            max_tokens=None  # Allow complete analysis
+        )
+        
+        analysis = response.choices[0].message.content or ""
+        
+        # Clean markdown symbols
+        analysis = re.sub(r'\*+', '', analysis)
+        analysis = re.sub(r'#+', '', analysis)
+        analysis = re.sub(r'\s+', ' ', analysis)
+        analysis = re.sub(r'\n\s*\n', '\n\n', analysis)
+        
+        return analysis
+        
+    except Exception as e:
+        logging.error(f"Error in real estate contract analysis: {str(e)}")
+        return f"Eroare la analiza contractului imobiliar: {str(e)}"

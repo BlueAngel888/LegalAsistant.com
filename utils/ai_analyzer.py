@@ -33,6 +33,37 @@ def clean_markdown_symbols(text: str) -> str:
 
     return cleaned_text.strip()
 
+def detect_real_estate_contract(text: str) -> bool:
+    """
+    Detect if the document is a real estate contract
+    """
+    real_estate_keywords = [
+        # Romanian
+        'vânzare-cumpărare', 'vanzare-cumparare', 'contract de vânzare', 'imobil',
+        'apartament', 'casă', 'teren', 'intravilan', 'extravilan', 'construcție',
+        'carte funciară', 'cadastral', 'suprafață', 'proprietate imobiliară',
+        'preț de vânzare', 'avans', 'rate', 'ipotecă', 'notar public',
+        # German
+        'kaufvertrag', 'immobilie', 'grundstück', 'wohnung', 'haus',
+        'grundbuch', 'kataster', 'kaufpreis', 'notar',
+        # French
+        'vente immobilière', 'bien immobilier', 'appartement', 'maison',
+        'terrain', 'cadastre', 'prix de vente', 'notaire',
+        # Italian
+        'compravendita', 'immobile', 'appartamento', 'casa', 'terreno',
+        'catasto', 'prezzo di vendita', 'notaio',
+        # English
+        'real estate', 'property', 'land', 'house', 'apartment', 'building',
+        'deed', 'cadastral', 'purchase price', 'mortgage', 'notary'
+    ]
+    
+    text_lower = text.lower()
+    keyword_count = sum(1 for keyword in real_estate_keywords if keyword in text_lower)
+    
+    # If 3 or more real estate keywords are found, it's likely a real estate contract
+    return keyword_count >= 3
+
+
 def analyze_with_gpt4(text: str, language: str = 'en') -> str:
     """
     Analyze legal document text using GPT-4 and provide comprehensive legal insights.
@@ -184,6 +215,22 @@ Por favor, estructura tu respuesta en un formato claro y profesional adecuado pa
 يرجى تنظيم إجابتك في تنسيق واضح ومهني مناسب للمهنيين القانونيين. استخدم النقاط والعناوين الواضحة للقراءة السهلة.
 """
         }
+
+        # Check if this is a real estate contract before proceeding
+        if detect_real_estate_contract(text):
+            logging.info("Real estate contract detected - using specialized LegalAnalyserGPT format")
+            # Extract country code if present
+            country_code = 'RO'  # Default
+            if 'countryHint:' in text:
+                lines = text.split('\n')
+                for line in lines:
+                    if line.startswith('countryHint:'):
+                        country_code = line.replace('countryHint:', '').strip()
+                        text = text.replace(line + '\n', '')
+                        break
+            
+            from utils.enhanced_legal_analyzer import analyze_real_estate_contract
+            return analyze_real_estate_contract(text, country_code, language)
 
         base_prompt = language_prompts.get(language, language_prompts['en'])
         prompt = f"""{base_prompt}
