@@ -156,6 +156,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 - July 10, 2025. ENHANCED: Multi-jurisdictional support for EU member states, UAE, China, and Japan with specific legal framework references
 - July 21, 2025. ENHANCED: Legal chat system now uses GPT-4o-mini with strict document-focused responses based on country-specific laws
 - July 21, 2025. IMPLEMENTED: Specialized LegalAnalyserGPT format for real estate contracts with automatic detection and comprehensive 7-section analysis including metadata, legal basis, validity verification, abusive clauses, fiscal implications, practical recommendations and disclaimer
+- July 21, 2025. IMPROVED: Enhanced real estate contract analysis prompt to provide clearer, more user-friendly explanations without "N/A", including practical explanations for non-specialists and risk warnings
 
 ## User Preferences
 
