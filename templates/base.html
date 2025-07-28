@@ -97,6 +97,24 @@
                     <small class="text-muted">Information provided is for informational purposes only and does not constitute legal advice.</small>
                 </div>
                 <div class="col-md-4 text-center">
+                    <div class="mb-3">
+                        <p class="mb-1">
+                            <i class="fas fa-shield-alt me-2"></i>Secure & Confidential
+                        </p>
+                        <small class="text-muted">Your documents are processed securely</small>
+                    </div>
+                    <div class="footer-links">
+                        <a href="{{ url_for('terms') }}" class="text-light text-decoration-none">
+                            <i class="fas fa-file-contract me-1"></i>Terms & Conditions
+                        </a>
+                        <br>
+                        <small class="text-muted mt-2 d-block">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Always consult a qualified attorney for legal matters
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
                     <!-- GDPR Compliance Badge -->
                     <div class="mb-3">
                         <svg width="80" height="50" viewBox="0 0 80 50" class="mb-2">
@@ -113,24 +131,6 @@
                         <i class="fas fa-trash-alt me-1"></i>Documents auto-deleted after analysis
                     </p>
                     <p class="mb-0 small text-muted">EU Privacy Regulation Compliant</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="mb-3">
-                        <p class="mb-1">
-                            <i class="fas fa-shield-alt me-2"></i>Secure & Confidential
-                        </p>
-                        <small class="text-muted">Your documents are processed securely</small>
-                    </div>
-                    <div class="footer-links">
-                        <a href="{{ url_for('terms') }}" class="text-light text-decoration-none me-3">
-                            <i class="fas fa-file-contract me-1"></i>Terms & Conditions
-                        </a>
-                        <br>
-                        <small class="text-muted mt-2 d-block">
-                            <i class="fas fa-exclamation-triangle me-1"></i>
-                            Always consult a qualified attorney for legal matters
-                        </small>
-                    </div>
                 </div>
             </div>
             <hr class="border-secondary my-3">
