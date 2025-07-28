@@ -1288,7 +1288,6 @@ function initializeFormValidation() {
             if (select) {
                 select.addEventListener('change', function() {
                     console.log('Dropdown changed:', this.id, 'value:', this.value);
-                    validateLegalOption(this);
                     updateSubmitButtonState();
                     if (this.id.includes('country')) {
                         showCountryInfo(this.value);

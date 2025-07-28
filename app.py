@@ -552,9 +552,19 @@ def free_access():
     try:
         free_code = request.form.get('free_code', '').strip().upper()
         
-        # Verify free access code from session
-        if session.get('free_access') and session.get('discount_code') == free_code:
+        # Check if code is valid
+        discount_info = validate_discount_code(free_code)
+        
+        # Verify free access code - either from session or freshly validated
+        if (discount_info and discount_info['free_access']) or \
+           (session.get('free_access') and session.get('discount_code') == free_code):
             logging.info(f"Free access granted with code: {free_code}")
+            
+            # Update session with discount info
+            if discount_info:
+                session['discount_code'] = free_code
+                session['discount_percent'] = discount_info['discount_percent']
+                session['free_access'] = discount_info['free_access']
             
             # Mark as free access in session
             session['payment_status'] = 'free_access'
