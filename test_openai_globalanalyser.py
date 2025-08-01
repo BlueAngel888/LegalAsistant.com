@@ -1,87 +1,125 @@
 #!/usr/bin/env python3
 """
-Test script to verify OpenAI GlobalLegalAnalyserGPT format implementation
+Test rapid pentru OpenAI GlobalLegalAnalyserGPT
 """
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath('.'))
+import time
+from openai import OpenAI
+from config import OPENAI_API_KEY
 
-from utils.ai_analyzer import analyze_with_gpt4
+def test_globalanalyser():
+    print("🔍 TEST OPENAI GLOBALANALYSER\n")
+    
+    # Initialize client
+    client = OpenAI(api_key=OPENAI_API_KEY, timeout=60.0)
+    
+    # Simple test document
+    test_doc = """countryHint: RO
 
-def test_global_legal_analyser():
-    """Test the new GlobalLegalAnalyserGPT format"""
+CONTRACT DE VÂNZARE-CUMPĂRARE
+
+Între:
+1. VÂNZĂTOR: Ion Popescu, CNP 1234567890123
+2. CUMPĂRĂTOR: Maria Ionescu, CNP 2345678901234
+
+Obiect: Apartament 2 camere, situat în București, Sector 3
+Preț: 85.000 EUR
+Termen plată: 30 zile
+"""
     
-    # Sample legal document text
-    test_document = """
-    countryHint: RO
-    
-    CONTRACT DE VÂNZARE-CUMPĂRARE
-    
-    Încheiat astăzi, 10.07.2025, între:
-    1. VÂNZĂTOR: Popescu Ion, CNP 1234567890123, domiciliat în București, str. Victoriei nr. 10
-    2. CUMPĂRĂTOR: Ionescu Maria, CNP 9876543210987, domiciliată în Cluj-Napoca, str. Eroilor nr. 5
-    
-    Părțile au convenit următoarele:
-    
-    Art. 1. Obiectul contractului
-    Vânzătorul vinde și cumpărătorul cumpără apartamentul situat în București, str. Mihai Eminescu nr. 15, 
-    bloc A, scara B, etaj 3, ap. 12, compus din 3 camere, în suprafață utilă de 75 mp.
-    
-    Art. 2. Prețul
-    Prețul de vânzare este de 100.000 EUR (una sută mii euro), achitat integral la data semnării prezentului contract.
-    
-    Art. 3. Garanții
-    Vânzătorul garantează că imobilul nu este grevat de sarcini și nu face obiectul unor litigii.
-    
-    Art. 4. Predarea bunului
-    Predarea efectivă a apartamentului se va face în termen de 30 de zile de la data semnării contractului.
-    
-    Prezentul contract s-a încheiat în 3 exemplare originale.
-    
-    VÂNZĂTOR                    CUMPĂRĂTOR
-    Popescu Ion                 Ionescu Maria
-    """
-    
-    print("🔍 Testing GlobalLegalAnalyserGPT format...")
-    print("=" * 80)
+    # Test with simplified prompt
+    print("1. Test cu prompt simplificat...")
+    start = time.time()
     
     try:
-        # Call the analyze function with Romanian language
-        analysis = analyze_with_gpt4(test_document, 'ro')
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Ești GlobalLegalAnalyserGPT. Analizează documentul juridic în format structurat."
+                },
+                {
+                    "role": "user",
+                    "content": f"Analizează acest contract de vânzare-cumpărare din România:\n\n{test_doc}\n\nOferă o analiză SCURTĂ în 5 secțiuni principale."
+                }
+            ],
+            max_tokens=1000,  # Limit response length
+            temperature=0.3
+        )
         
-        print("\n✅ ANALYSIS RESULT:")
-        print("-" * 80)
-        print(analysis[:2000])  # Print first 2000 characters
-        print("\n..." if len(analysis) > 2000 else "")
-        print("-" * 80)
-        
-        # Check if analysis contains expected sections
-        expected_sections = [
-            "METADATE DOCUMENT",
-            "BAZĂ LEGALĂ",
-            "VERIFICAREA NULITĂŢII",
-            "CĂI DE ATAC",
-            "CLAUZE",
-            "IMPLICAŢII",
-            "RECOMANDĂRI",
-            "CONCLUZIE"
-        ]
-        
-        print("\n📋 Checking for expected sections:")
-        for section in expected_sections:
-            if section in analysis.upper():
-                print(f"  ✅ Found: {section}")
-            else:
-                print(f"  ❌ Missing: {section}")
-        
-        print("\n✅ Test completed successfully!")
+        elapsed = time.time() - start
+        print(f"   ✅ Succes în {elapsed:.2f} secunde")
+        print(f"   Tokens folosiți: {response.usage.total_tokens}")
+        print("\n   Răspuns (primele 200 caractere):")
+        print(f"   {response.choices[0].message.content[:200]}...")
         
     except Exception as e:
-        print(f"\n❌ ERROR: {str(e)}")
-        print(f"Error type: {type(e).__name__}")
-        import traceback
-        traceback.print_exc()
+        elapsed = time.time() - start
+        print(f"   ❌ Eroare după {elapsed:.2f} secunde: {str(e)}")
+    
+    # Test with full GlobalLegalAnalyserGPT prompt
+    print("\n\n2. Test cu prompt complet GlobalLegalAnalyserGPT...")
+    start = time.time()
+    
+    full_prompt = """Ești **GlobalLegalAnalyserGPT**, un asistent juridic avansat. 
+Analizează documentul folosind structura exactă de mai jos, fără a folosi "N/A":
+
+**ANALIZĂ JURIDICĂ COMPLETĂ**
+
+**1. METADATA DOCUMENTULUI**
+• Tip document: [identifică tipul]
+• Jurisdicție: România
+• Data analizei: [data curentă]
+• Părți implicate: [listează părțile]
+
+**2. BAZA LEGALĂ ȘI VALIDITATEA**
+• Cadru legal: [menționează legile aplicabile]
+• Elemente esențiale: [verifică elementele]
+• Validitate formală: [evaluează validitatea]
+
+**3. VERIFICAREA LEGALITĂȚII**
+• Conformitate legală: [analizează conformitatea]
+• Clauze standard: [verifică prezența]
+• Deficiențe formale: [identifică problemele]
+
+**4. IMPLICAȚII JURIDICE**
+• Drepturi și obligații: [detaliază pentru fiecare parte]
+• Riscuri juridice: [identifică riscurile]
+• Remedii legale: [sugerează soluții]
+
+**5. ASPECTE FISCALE ȘI CIVILE**
+• Obligații fiscale: [specifică taxele]
+• Implicații civile: [analizează aspectele]
+• Recomandări practice: [oferă sfaturi concrete]
+
+Document de analizat:
+""" + test_doc
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Ești un expert juridic care analizează documente legale pentru România."
+                },
+                {
+                    "role": "user",
+                    "content": full_prompt
+                }
+            ],
+            max_tokens=2000,  # Reasonable limit
+            temperature=0.3
+        )
+        
+        elapsed = time.time() - start
+        print(f"   ✅ Succes în {elapsed:.2f} secunde")
+        print(f"   Tokens folosiți: {response.usage.total_tokens}")
+        
+    except Exception as e:
+        elapsed = time.time() - start
+        print(f"   ❌ Eroare după {elapsed:.2f} secunde: {str(e)}")
 
 if __name__ == "__main__":
-    test_global_legal_analyser()
+    test_globalanalyser()

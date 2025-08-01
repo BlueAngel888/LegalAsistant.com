@@ -7,8 +7,8 @@ from config import OPENAI_API_KEY
 # Initialize OpenAI client with timeout settings
 openai_client = OpenAI(
     api_key=OPENAI_API_KEY,
-    timeout=120.0,  # 120 second timeout for large documents
-    max_retries=3   # Retry failed requests 3 times
+    timeout=180.0,  # 180 second timeout for large documents
+    max_retries=2   # Retry failed requests 2 times
 )
 
 def clean_markdown_symbols(text: str) -> str:
@@ -255,21 +255,6 @@ Provide your analysis:
         system_message = system_messages.get(language, system_messages['en'])
 
         # Try OpenAI request with timeout handling
-        response = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system", 
-                    "content": system_message
-                },
-                {
-                    "role": "user", 
-                    "content": prompt
-                }
-            ],
-            temperature=0.3,
-            # max_tokens=4000  # LIMITARE PRINCIPALĂ - controlează lungimea analizei
-        )
         response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[

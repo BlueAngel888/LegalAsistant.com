@@ -818,77 +818,27 @@ def analyze_real_estate_contract(text: str, country_code: str = 'RO', analysis_l
         
         framework = real_estate_frameworks.get(country_code, real_estate_frameworks['RO'])
         
-        # Create the detailed prompt for real estate analysis
-        system_prompt = f"""
-Ești LegalAnalyserGPT, expert în contracte de vânzare-cumpărare imobiliară pentru {country_code}. Misiunea ta este să oferi o analiză profesională, completă și UȘOR DE ÎNȚELES pentru orice utilizator (chiar și fără studii juridice).
+        # Create optimized prompt for real estate analysis
+        system_prompt = f"""Ești LegalAnalyserGPT, expert în contracte imobiliare pentru {country_code}.
 
-Legislația aplicabilă pentru {country_code}:
-{json.dumps(framework, indent=2, ensure_ascii=False)}
+Legislație aplicabilă: {json.dumps(framework, indent=2, ensure_ascii=False)}
 
-Instrucțiuni speciale:
-─────────────────────
-- Completează fiecare punct cu date EXTRASE sau DEDUSE din document, chiar dacă nu apar explicit (dar fără a inventa date false!)
-- Dacă o informație nu există, explică "De ce lipsește", "Cum se procedează în practică" sau "Care este uzanța locală"
-- Nu folosi "N/A" decât dacă este absolut imposibil de completat sau dedus
-- Ordonează fiecare secțiune cu bulleturi, subpuncte sau alineate scurte și clare
-- Dacă identifici un risc, semnalează-l clar și vizibil ("ATENȚIE: ...")
-- Folosește limbaj clar, fără fraze vagi
-- Evită paragrafe foarte lungi
-- După fiecare sub-secțiune importantă, oferă și o scurtă explicație ("Ce înseamnă pentru cumpărător?")
-- NU folosi simboluri markdown (*, #, ##, ###)!
+Analizează concis și clar în 7 secțiuni:
 
-Structura de analiză – răspunde complet și explicit la fiecare subpunct!
-─────────────────────────────────────────────
+1. METADATE CONTRACT (părți, obiect, preț, dată)
+2. BAZA LEGALĂ ȘI VALIDITATE (legi aplicabile, elemente esențiale)
+3. VERIFICAREA LEGALITĂȚII (conformitate, deficiențe)
+4. CLAUZE ABUZIVE (identificare clauze potențial abuzive)
+5. ASPECTE FISCALE (taxe, impozite datorate)
+6. RECOMANDĂRI PRACTICE (sfaturi concrete pentru părți)
+7. DISCLAIMER (notă informativă)
 
-0. METADATE CONTRACT
-   • Denumire contract: [Citează titlul]
-   • Țara / jurisdicția: [Citează exact]
-   • Data semnării: [Zi-Lună-An]
-   • Părți contractante:
-      – Vânzător: [Nume, date identificare, adresă]
-      – Cumpărător: [Nume, date identificare, adresă]
-   • Imobil vândut:
-      – Tip imobil: [ex: apartament]
-      – Adresă: [...]
-      – Suprafață: [...]
-      – Nr. cadastral / CF: [...]
-   • Preț total și modalitate plată: [...]
-   • Avans / ipotecă / alte garanții: [...]
-   • Alte detalii-cheie: [termene, penalități, condiții de predare]
-
-1. BAZĂ LEGALĂ
-   • Legea principală aplicabilă (cu articol și titlu, dacă e citată)
-   • Alte reglementări locale sau internaționale relevante
-   • Explică pe scurt ce obligă fiecare lege menționată
-
-2. VERIFICARE NULITATE ȘI VALIDITATE
-   • Cerințe de formă și fond (semnătură, notar, identificare părți, obiect clar)
-   • Există elemente lipsă sau care ar putea duce la nulitate? Explică fiecare, chiar dacă nu se aplică aici
-   • Cum se poate ataca în instanță dacă apare o problemă?
-
-3. CLAUZE SPECIALE, RISCANTE SAU ABUZIVE
-   • Listează clar orice clauză "de risc" (cu citat sau rezumat)
-   • Explică DE CE poate fi problematică pentru cumpărător și cum se poate remedia/negocia
-   • Evidențiază penalități, clauze de reziliere, dobânzi sau taxe ascunse
-
-4. IMPLICAȚII FISCALE / CADASTRALE / ADMINISTRATIVE
-   • Ce taxe, comisioane și obligații de înregistrare sunt datorate (cu procente/sume dacă apar)
-   • Ce documente trebuie obținute după semnare (carte funciară, registru cadastral, etc)
-   • Cine trebuie să le obțină și în cât timp
-
-5. CONCLUZII ȘI RECOMANDĂRI
-   • Rezumă, pe scurt, toate riscurile principale
-   • Oferă 2-3 sfaturi practice (ex: cere clarificare la punctul X, nu plăti avans până nu..., solicită traducere autorizată etc.)
-   • Pentru fiecare sfat, explică de ce e important
-   • ATENȚIE: dacă lipsesc elemente importante, evidențiază-le la începutul acestei secțiuni cu "LIPSEȘTE: ..."
-
-6. DISCLAIMER
-   Analiza este informativă. Pentru decizii importante, consultați avocat/notar din jurisdicția contractului.
-
-───────────────────────────────
-
-Completează tot – nu lăsa nicio secțiune netratată!
-"""
+Instrucțiuni:
+- Răspunsuri concise dar complete
+- Limbaj clar pentru non-juriști
+- Evidențiază riscurile cu "ATENȚIE:"
+- Nu folosi simboluri markdown
+- Maximum 2000 cuvinte total"""
 
         user_prompt = f"""
 Analizează documentul de mai jos (completează tot – nu lăsa nicio secțiune netratată!):
@@ -904,11 +854,11 @@ Analizează documentul de mai jos (completează tot – nu lăsa nicio secțiune
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.3,  # Slightly higher for more natural language
-            max_tokens=None,  # Allow complete analysis
-            top_p=0.95,  # For better coherence
-            frequency_penalty=0.1,  # Reduce repetition
-            presence_penalty=0.1  # Encourage covering all topics
+            temperature=0.3,
+            max_tokens=2500,  # Limit response to prevent timeout
+            top_p=0.95,
+            frequency_penalty=0.1,
+            presence_penalty=0.1
         )
         
         analysis = response.choices[0].message.content or ""
