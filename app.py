@@ -652,7 +652,7 @@ def create_checkout_session():
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
-                    'unit_amount': 500,  # €5.00 for testing
+                    'unit_amount': 100,  # €1.00
                     'product_data': {
                         'name': 'Legal Document Analysis',
                         'description': 'Professional AI-powered legal document analysis and insights'
@@ -682,7 +682,7 @@ def create_checkout_session():
                 payment_record = PaymentRecord(
                     stripe_session_id=checkout_session.id,
                     document_analysis_id=analysis_id,
-                    amount=10000,  # €100.00 in cents
+                    amount=100,  # €1.00 in cents
                     currency='EUR',
                     status='pending'
                 )
