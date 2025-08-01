@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-08-01T02:39:08.463459",
+  "tests": [
+    {
+      "name": "Homepage Access",
+      "status": "PASS",
+      "details": "Homepage loaded successfully",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.476921"
+    },
+    {
+      "name": "Homepage Content",
+      "status": "WARNING",
+      "details": "Expected content not found",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.477201"
+    },
+    {
+      "name": "Language API",
+      "status": "PASS",
+      "details": "Language change successful",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.487986"
+    },
+    {
+      "name": "Discount API",
+      "status": "PASS",
+      "details": "LETSGO code validated",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.491762"
+    },
+    {
+      "name": "Database Connection",
+      "status": "WARNING",
+      "details": "Database URL not set",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.495512"
+    },
+    {
+      "name": "OpenAI Configuration",
+      "status": "PASS",
+      "details": "OpenAI API configured",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.495576"
+    },
+    {
+      "name": "Stripe Configuration",
+      "status": "PASS",
+      "details": "Stripe API configured",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.495654"
+    },
+    {
+      "name": "File Upload",
+      "status": "PASS",
+      "details": "Document uploaded successfully",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.505827"
+    },
+    {
+      "name": "Checkout Redirect",
+      "status": "PASS",
+      "details": "Redirected to checkout page",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.506061"
+    },
+    {
+      "name": "LETSGO Code Display",
+      "status": "WARNING",
+      "details": "LETSGO code not visible on checkout",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:08.515662"
+    },
+    {
+      "name": "Camera Upload",
+      "status": "PASS",
+      "details": "Camera image processed",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:09.908863"
+    },
+    {
+      "name": "Legal Chat Access",
+      "status": "PASS",
+      "details": "Correctly requires document analysis first",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:09.913294"
+    },
+    {
+      "name": "Empty Upload Handling",
+      "status": "WARNING",
+      "details": "No clear error message",
+      "error": null,
+      "timestamp": "2025-08-01T02:39:09.926875"
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "passed": 9,
+    "failed": 0,
+    "warnings": 4
+  }
+}

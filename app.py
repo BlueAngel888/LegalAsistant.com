@@ -504,6 +504,21 @@ def checkout():
     logging.info(f"Rendering checkout with {len(processed_files)} files")
     return render_template('checkout.html', files=processed_files, t=t, lang=lang)
 
+def validate_discount_code(code):
+    """Validate discount code and return discount info"""
+    if not code:
+        return None
+    
+    code = code.strip().upper()
+    
+    # Define valid discount codes
+    discount_codes = {
+        'LETSGO': {'discount_percent': 100, 'free_access': True},
+        'LETSGO50': {'discount_percent': 50, 'free_access': False}
+    }
+    
+    return discount_codes.get(code)
+
 @app.route('/apply-discount', methods=['POST'])
 def apply_discount():
     """Apply discount code and return discount information"""
@@ -511,14 +526,9 @@ def apply_discount():
         data = request.get_json()
         code = data.get('code', '').strip().upper()
         
-        # Define valid discount codes
-        discount_codes = {
-            'LETSGO': {'discount_percent': 100, 'free_access': True},
-            'LETSGO50': {'discount_percent': 50, 'free_access': False}
-        }
+        discount_info = validate_discount_code(code)
         
-        if code in discount_codes:
-            discount_info = discount_codes[code]
+        if discount_info:
             
             # Store discount in session
             session['discount_code'] = code
