@@ -1,0 +1,102 @@
+{
+  "timestamp": "2025-08-01T02:46:57.203329",
+  "summary": {
+    "total": 15,
+    "passed": 12,
+    "failed": 0,
+    "warnings": 1,
+    "success_rate": 80.0
+  },
+  "results": [
+    {
+      "test": "Upload fi\u0219ier simplu",
+      "status": "START",
+      "details": "",
+      "timestamp": "2025-08-01T02:46:51.077532"
+    },
+    {
+      "test": "Upload fi\u0219ier simplu",
+      "status": "PASS",
+      "details": "Fi\u0219ier \u00eenc\u0103rcat cu succes",
+      "timestamp": "2025-08-01T02:46:51.245472"
+    },
+    {
+      "test": "Redirec\u021bionare checkout",
+      "status": "PASS",
+      "details": "Redirec\u021bionat corect",
+      "timestamp": "2025-08-01T02:46:51.245805"
+    },
+    {
+      "test": "Upload fi\u0219iere multiple",
+      "status": "PASS",
+      "details": "3 fi\u0219iere \u00eenc\u0103rcate",
+      "timestamp": "2025-08-01T02:46:51.323885"
+    },
+    {
+      "test": "Creare imagine test",
+      "status": "PASS",
+      "details": "Imagine cu text juridic creat\u0103",
+      "timestamp": "2025-08-01T02:46:52.373617"
+    },
+    {
+      "test": "Scanare camer\u0103",
+      "status": "PASS",
+      "details": "Imagine procesat\u0103 cu succes",
+      "timestamp": "2025-08-01T02:46:54.011798"
+    },
+    {
+      "test": "OCR procesare",
+      "status": "PASS",
+      "details": "Text extras din imagine",
+      "timestamp": "2025-08-01T02:46:54.011859"
+    },
+    {
+      "test": "Prima \u00eenc\u0103rcare (fi\u0219ier)",
+      "status": "PASS",
+      "details": "Fi\u0219ier \u00eenc\u0103rcat",
+      "timestamp": "2025-08-01T02:46:55.075900"
+    },
+    {
+      "test": "Upload gol",
+      "status": "WARNING",
+      "details": "R\u0103spuns neclar",
+      "timestamp": "2025-08-01T02:46:56.089291"
+    },
+    {
+      "test": "Parametri lipsa",
+      "status": "PASS",
+      "details": "Validare func\u021bioneaz\u0103",
+      "timestamp": "2025-08-01T02:46:56.101288"
+    },
+    {
+      "test": "Tip fi\u0219ier invalid",
+      "status": "INFO",
+      "details": "Test executat",
+      "timestamp": "2025-08-01T02:46:56.147316"
+    },
+    {
+      "test": "Pre\u021b afi\u0219at",
+      "status": "PASS",
+      "details": "Element g\u0103sit",
+      "timestamp": "2025-08-01T02:46:57.201371"
+    },
+    {
+      "test": "Cod reducere",
+      "status": "PASS",
+      "details": "Element g\u0103sit",
+      "timestamp": "2025-08-01T02:46:57.201445"
+    },
+    {
+      "test": "Buton plat\u0103",
+      "status": "PASS",
+      "details": "Element g\u0103sit",
+      "timestamp": "2025-08-01T02:46:57.201508"
+    },
+    {
+      "test": "Document listat",
+      "status": "PASS",
+      "details": "Element g\u0103sit",
+      "timestamp": "2025-08-01T02:46:57.201551"
+    }
+  ]
+}
