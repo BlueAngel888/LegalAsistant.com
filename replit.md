@@ -54,9 +54,10 @@ Legal Assistant is a Flask-based web application that provides AI-powered legal 
 - **Continuous Improvement**: Feedback integration and analysis enhancement
 
 ### Multi-language Support
-- **Supported Languages**: English, Romanian, German, Italian, Spanish, Arabic
+- **Supported Languages**: Arabic, German, English, Spanish, Chinese, French, Italian, Japanese, Korean, Dutch, Portuguese, Russian, Turkish, Romanian
 - **Translation System**: Template-based with country-specific legal analysis
 - **Dynamic Language Switching**: User preference persistence
+- **Language Order**: Languages are now organized alphabetically by their native script (Arabic first, then Latin alphabets)
 
 ## Data Flow
 
