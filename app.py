@@ -149,6 +149,55 @@ def background_ocr_processing(analysis_id, files_data, app_context):
             logging.error(f"BACKGROUND OCR: Fatal error for analysis {analysis_id}: {str(e)}")
             # Don't let background processing crash the main app
 
+def background_ai_analysis(analysis_id, document_country, analysis_language, app_context):
+    """Process AI analysis in background thread immediately after upload"""
+    with app_context:
+        try:
+            logging.info(f"BACKGROUND AI: Starting analysis for document {analysis_id}")
+            
+            # Get analysis record
+            analysis_record = DocumentAnalysis.query.get(analysis_id)
+            if not analysis_record:
+                logging.error(f"BACKGROUND AI: Analysis record not found: {analysis_id}")
+                return
+            
+            # Check if we have document text to analyze
+            doc_text = analysis_record.document_text
+            if not doc_text or len(doc_text.strip()) < 10:
+                logging.warning(f"BACKGROUND AI: No valid document text for analysis {analysis_id}")
+                return
+            
+            # Import the AI analyzer
+            from utils.ai_analyzer import analyze_with_gpt4
+            
+            # Add country hint to document text for GPT analysis
+            doc_text_with_hint = f"countryHint: {document_country}\n\n{doc_text}"
+            
+            try:
+                # Call OpenAI API for analysis
+                logging.info(f"BACKGROUND AI: Calling OpenAI API for {document_country}")
+                analysis_result = analyze_with_gpt4(doc_text_with_hint, analysis_language)
+                
+                # Store the analysis result in database
+                analysis_record.analysis_result = analysis_result
+                analysis_record.updated_at = datetime.utcnow()
+                
+                db.session.commit()
+                
+                logging.info(f"BACKGROUND AI: Analysis completed successfully for {analysis_id}")
+                logging.info(f"BACKGROUND AI: Result length: {len(analysis_result)} characters")
+                
+            except Exception as api_error:
+                logging.error(f"BACKGROUND AI: OpenAI API error for {analysis_id}: {str(api_error)}")
+                # Store error message but don't crash
+                error_msg = f"AI Analysis Error: {str(api_error)}"
+                analysis_record.analysis_result = error_msg
+                db.session.commit()
+                
+        except Exception as e:
+            logging.error(f"BACKGROUND AI: Fatal error for analysis {analysis_id}: {str(e)}")
+            # Don't let background processing crash the main app
+
 @app.route('/')
 def index():
     # Initialize session if needed
@@ -422,6 +471,25 @@ def upload_file():
                 ocr_thread.start()
                 
                 logging.info(f"INSTANT MODE: Background OCR thread started successfully")
+            
+            # Start AI analysis immediately in background
+            document_country = session.get('document_country', 'RO')
+            analysis_language = session.get('analysis_language', 'ro')
+            
+            logging.info(f"STARTING IMMEDIATE AI ANALYSIS: Launching background AI thread for analysis {analysis_record.id}")
+            
+            # Create application context for background thread
+            app_context = app.app_context()
+            
+            # Start background AI analysis
+            ai_thread = threading.Thread(
+                target=background_ai_analysis,
+                args=(analysis_record.id, document_country, analysis_language, app_context),
+                daemon=True
+            )
+            ai_thread.start()
+            
+            logging.info(f"IMMEDIATE AI ANALYSIS: Background AI thread started successfully")
             
         except Exception as db_error:
             logging.error(f"Database error: {str(db_error)}")
@@ -820,54 +888,79 @@ def success():
         t = get_translation(lang)
         session_id = session.get('session_id', session.get('_id', 'anonymous'))
         
-        # Use different analysis approach based on access type
-        try:
-            # Debug logging for payment status
-            payment_status = session.get('payment_status')
-            logging.info(f"SUCCESS ROUTE: Payment status = {payment_status}")
-            logging.info(f"SUCCESS ROUTE: All session keys = {list(session.keys())}")
+        # Check if analysis is already done in background
+        if analysis_record.analysis_result:
+            logging.info(f"SUCCESS ROUTE: Using pre-computed analysis from background processing")
             
-            # Use enhanced AI analysis for ALL access types (paid and free access)
-            selected_country = session.get('document_country', 'RO')
-            country_name = {'RO': 'România', 'DE': 'Germania', 'FR': 'Franța', 'IT': 'Italia', 'US': 'SUA', 'UK': 'Marea Britanie', 'AE': 'EAU'}.get(selected_country, 'România')
+            # Get analysis language
+            analysis_language = session.get('analysis_language', 'ro')
             
-            logging.info(f"Using enhanced AI analysis for country: {selected_country} ({country_name})")
+            # Add access type header
+            if session.get('payment_status') == 'free_access':
+                access_header = f"ANALIZĂ JURIDICĂ COMPLETĂ - ACCES GRATUIT COD {session.get('discount_code', 'LETSGO')}\n\n"
+            else:
+                access_header = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM\n\n"
             
-            # Use OpenAI API with GlobalLegalAnalyserGPT format
-            logging.info(f"Using OpenAI API GlobalLegalAnalyserGPT analysis for {country_name}")
+            # Use the pre-computed analysis
+            analysis = access_header + analysis_record.analysis_result
+            logging.info(f"Retrieved pre-computed analysis, length: {len(analysis)}")
             
+        else:
+            # If analysis is not ready yet, compute it now
+            logging.info(f"SUCCESS ROUTE: Analysis not ready in background, computing now")
+            
+            # Use different analysis approach based on access type
             try:
-                # Import the AI analyzer
-                from utils.ai_analyzer import analyze_with_gpt4
+                # Debug logging for payment status
+                payment_status = session.get('payment_status')
+                logging.info(f"SUCCESS ROUTE: Payment status = {payment_status}")
+                logging.info(f"SUCCESS ROUTE: All session keys = {list(session.keys())}")
                 
-                # Add country hint to document text for GPT analysis
-                doc_text_with_hint = f"countryHint: {selected_country}\n\n{doc_text}"
+                # Use enhanced AI analysis for ALL access types (paid and free access)
+                selected_country = session.get('document_country', 'RO')
+                country_name = {'RO': 'România', 'DE': 'Germania', 'FR': 'Franța', 'IT': 'Italia', 'US': 'SUA', 'UK': 'Marea Britanie', 'AE': 'EAU'}.get(selected_country, 'România')
                 
-                # Get analysis language
-                analysis_language = session.get('analysis_language', 'ro')
+                logging.info(f"Using enhanced AI analysis for country: {selected_country} ({country_name})")
                 
-                # Add access type header
-                if session.get('payment_status') == 'free_access':
-                    access_header = f"ANALIZĂ JURIDICĂ COMPLETĂ - ACCES GRATUIT COD {session.get('discount_code', 'LETSGO')}\n\n"
-                else:
-                    access_header = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM\n\n"
+                # Use OpenAI API with GlobalLegalAnalyserGPT format
+                logging.info(f"Using OpenAI API GlobalLegalAnalyserGPT analysis for {country_name}")
                 
-                # Always use OpenAI API for both free and paid access
                 try:
-                    logging.info(f"Using OpenAI API for analysis - Payment status: {session.get('payment_status')}")
+                    # Import the AI analyzer
+                    from utils.ai_analyzer import analyze_with_gpt4
                     
-                    # Call OpenAI API with proper error handling
-                    analysis = analyze_with_gpt4(doc_text_with_hint, analysis_language)
+                    # Add country hint to document text for GPT analysis
+                    doc_text_with_hint = f"countryHint: {selected_country}\n\n{doc_text}"
                     
-                    # Prepend access header to analysis
-                    analysis = access_header + analysis
+                    # Get analysis language
+                    analysis_language = session.get('analysis_language', 'ro')
                     
-                    logging.info(f"OpenAI API GlobalLegalAnalyserGPT analysis completed successfully")
-                
-                except Exception as api_error:
-                    logging.error(f"OpenAI API error: {str(api_error)}")
-                    # Return error message with retry suggestion
-                    analysis = f"""{access_header}
+                    # Add access type header
+                    if session.get('payment_status') == 'free_access':
+                        access_header = f"ANALIZĂ JURIDICĂ COMPLETĂ - ACCES GRATUIT COD {session.get('discount_code', 'LETSGO')}\n\n"
+                    else:
+                        access_header = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM\n\n"
+                    
+                    # Always use OpenAI API for both free and paid access
+                    try:
+                        logging.info(f"Using OpenAI API for analysis - Payment status: {session.get('payment_status')}")
+                        
+                        # Call OpenAI API with proper error handling
+                        analysis = analyze_with_gpt4(doc_text_with_hint, analysis_language)
+                        
+                        # Prepend access header to analysis
+                        analysis = access_header + analysis
+                        
+                        # Save the analysis to database for future use
+                        analysis_record.analysis_result = analysis
+                        db.session.commit()
+                        
+                        logging.info(f"OpenAI API GlobalLegalAnalyserGPT analysis completed successfully")
+                    
+                    except Exception as api_error:
+                        logging.error(f"OpenAI API error: {str(api_error)}")
+                        # Return error message with retry suggestion
+                        analysis = f"""{access_header}
 
 ⚠️ **EROARE TEMPORARĂ**
 
@@ -884,13 +977,13 @@ Detalii tehnice:
 3. Documentul dvs. a fost salvat și va fi analizat automat
 
 Pentru asistență imediată: support@legalassistant.ai"""
-                
-                logging.info(f"Analysis completed for {country_name}")
-                
-            except Exception as ai_error:
-                logging.error(f"Enhanced AI analysis failed: {str(ai_error)}")
-                # Fallback comprehensive analysis
-                analysis = f"""ANALIZĂ JURIDICĂ COMPLETĂ - SISTEM AI
+                    
+                    logging.info(f"Analysis completed for {country_name}")
+                    
+                except Exception as ai_error:
+                    logging.error(f"Enhanced AI analysis failed: {str(ai_error)}")
+                    # Fallback comprehensive analysis
+                    analysis = f"""ANALIZĂ JURIDICĂ COMPLETĂ - SISTEM AI
 
 Status: Analiză completă prin serviciul Legal Assistant AI
 Țara selectată: {country_name}
@@ -904,14 +997,14 @@ Documentul dumneavoastră a fost procesat cu succes și va fi analizat în cel m
 Pentru asistență imediată, vă rugăm să contactați echipa noastră de suport.
 
 IMPORTANT: Analiza va fi reluată automat când sistemul revine online."""
-            
-            logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
-        except Exception as analysis_error:
-            logging.error(f"Analysis error: {str(analysis_error)}")
-            # Get analysis language from session for fallback
-            analysis_language = session.get('analysis_language', 'ro')
-            # Provide fallback analysis for any errors
-            analysis = f"""ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
+                
+                logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
+            except Exception as analysis_error:
+                logging.error(f"Analysis error: {str(analysis_error)}")
+                # Get analysis language from session for fallback
+                analysis_language = session.get('analysis_language', 'ro')
+                # Provide fallback analysis for any errors
+                analysis = f"""ANALIZĂ JURIDICĂ - DOCUMENT PROCESAT
 
 Tip Document: Document juridic identificat
 Status: Procesat cu succes

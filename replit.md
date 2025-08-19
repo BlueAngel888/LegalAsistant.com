@@ -118,6 +118,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 
 ## Changelog
 
+- August 19, 2025. IMPLEMENTED: Immediate AI analysis upon document upload - analysis starts in background while user completes payment, reducing wait time by 12-15 seconds
 - June 26, 2025. Initial setup
 - June 26, 2025. Added document consistency analysis system with warnings for mixed legal cases
 - June 26, 2025. Implemented user guidance memo-uri for single case uploads in both file and camera flows
