@@ -4,6 +4,7 @@ import json
 import uuid
 import threading
 import time
+import markdown
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, jsonify, session, flash, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -1083,8 +1084,11 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza."""
         except Exception as gdpr_error:
             logging.error(f"GDPR deletion error: {str(gdpr_error)}")
         
+        # Convert markdown to HTML for better formatting
+        analysis_html = markdown.markdown(analysis, extensions=['nl2br', 'tables'])
+        
         return render_template('result.html', 
-                             analysis=analysis, 
+                             analysis=analysis_html, 
                              files=processed_files, 
                              user_stats=user_stats,
                              analysis_gamification=session.get('analysis_gamification'),

@@ -2,6 +2,68 @@
 
 {% block title %}Legal Analysis Result{% endblock %}
 
+{% block head %}
+<style>
+.analysis-content h1 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+}
+.analysis-content h2 {
+    color: #34495e;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 0.8rem;
+}
+.analysis-content h3 {
+    color: #7f8c8d;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 1.2rem;
+    margin-bottom: 0.6rem;
+}
+.analysis-content ul, .analysis-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+.analysis-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+.analysis-content p {
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+.analysis-content strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+.analysis-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+.analysis-content table th {
+    background-color: #3498db;
+    color: white;
+    padding: 0.75rem;
+    text-align: left;
+}
+.analysis-content table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+}
+.analysis-content table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container analysis-result">
     <!-- Analysis Results (displayed immediately) -->
@@ -94,8 +156,8 @@
                             </div>
                             <div class="card-body">
                                 {% if analysis %}
-                                    <div class="analysis-content">
-                                        <pre style="white-space: pre-wrap; font-family: inherit; font-size: 1rem; line-height: 1.6; background: none; border: none; padding: 0;">{{ analysis }}</pre>
+                                    <div class="analysis-content" style="font-size: 1rem; line-height: 1.8;">
+                                        {{ analysis|safe }}
                                     </div>
                                 {% else %}
                                     <div class="alert alert-warning">

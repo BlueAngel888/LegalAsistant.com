@@ -408,21 +408,8 @@ Provide your analysis:
             # max_tokens=None  # FĂRĂ LIMITARE - permite analiză completă
         )
 
-        # Extract and clean the response
+        # Extract the response - keep markdown formatting for better structure
         analysis_content = response.choices[0].message.content or ""
-
-        # Remove markdown formatting symbols
-        analysis_content = analysis_content.replace('**', '')  # Remove bold formatting
-        analysis_content = analysis_content.replace('*', '')   # Remove italic formatting
-        analysis_content = analysis_content.replace('##', '')  # Remove h2 headers
-        analysis_content = analysis_content.replace('#', '')   # Remove h1 headers
-        analysis_content = analysis_content.replace('###', '') # Remove h3 headers
-        analysis_content = analysis_content.replace('####', '')# Remove h4 headers
-
-        # Clean up any double spaces that might result from removing symbols
-        import re
-        analysis_content = re.sub(r'\s+', ' ', analysis_content)
-        analysis_content = re.sub(r'\n\s*\n', '\n\n', analysis_content)
 
         return analysis_content
 
