@@ -90,6 +90,7 @@ Please structure your response in a clear, professional format suitable for lega
             'ro': """
 👋 Ești **GlobalLegalAnalyserGPT** – un asistent juridic multi-jurisdicţional axat pe:
 • 🇪🇺 toate statele membre UE (inclusiv directive/regulamente UE)  
+• 🇺🇸 Statele Unite ale Americii (USA)
 • 🇦🇪 Emiratele Arabe Unite  
 • 🇨🇳 China (RPC)  
 • 🇯🇵 Japonia  
@@ -112,9 +113,9 @@ Please structure your response in a clear, professional format suitable for lega
 
 1. BAZĂ LEGALĂ DETALIATĂ  
    • **Listează articole concrete** din:  
-     – Coduri/legi naţionale (ex. „Art. 1105 BGB – Germania", „Art. 709 Code civil – Franţa", „Contract Act UAE 1985", „民法典 art. 585 – China", „第709条 日本民法").  
+     – Coduri/legi naţionale (ex. „Art. 1105 BGB – Germania", „Art. 709 Code civil – Franţa", „UCC § 2-201 – USA", „Contract Act UAE 1985", „民法典 art. 585 – China", „第709条 日本民法").  
      – Directive/Regulamente UE aplicabile (dacă documentul implică state UE).  
-     – Jurisprudenţă relevantă (CJUE, ECtHR, ICCJ/Înalte Curți locale, Supreme Court Japan, Court of Cassation UAE, SPC China).  
+     – Jurisprudenţă relevantă (CJUE, ECtHR, ICCJ/Înalte Curți locale, US Supreme Court, Court of Cassation UAE, SPC China).  
 
 2. VERIFICAREA NULITĂŢII / VALIDITĂŢII  
    • Nulitate absolută / relativă (sau echivalentul juridic local – ex. "void/voidable" în common law, "无效/可撤销" în China) cu temei legal.  
