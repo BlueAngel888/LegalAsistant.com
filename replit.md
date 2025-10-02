@@ -118,6 +118,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 
 ## Changelog
 
+- October 2, 2025. FIXED: Legal analysis now correctly provided in user-selected language - added complete AI prompts and system messages for all 14 supported languages (Arabic, Chinese, Dutch, English, French, German, Italian, Japanese, Korean, Portuguese, Romanian, Russian, Spanish, Turkish)
 - August 19, 2025. IMPLEMENTED: Immediate AI analysis upon document upload - analysis starts in background while user completes payment, reducing wait time by 12-15 seconds
 - June 26, 2025. Initial setup
 - June 26, 2025. Added document consistency analysis system with warnings for mixed legal cases
