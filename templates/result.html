@@ -188,22 +188,22 @@
                             <div class="card-header bg-primary text-white">
                                 <h5 class="card-title mb-0">
                                     <i class="fas fa-comments me-2"></i>
-                                    Legal Chat Assistant
+                                    Asistent Legal - Întrebări despre Document
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <p class="text-muted mb-3">Ask questions about your analyzed document:</p>
+                                <p class="text-muted mb-3">Întreabă orice despre documentul analizat:</p>
                                 
-                                <div id="chat-messages" class="chat-messages mb-3" style="height: 200px; overflow-y: auto; border: 1px solid #e9ecef; padding: 1rem; background-color: #f8f9fa;">
+                                <div id="chat-messages" class="chat-messages mb-3" style="height: 300px; overflow-y: auto; border: 1px solid #e9ecef; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
                                     <div class="assistant-message mb-2">
-                                        <strong>Legal Assistant:</strong> Hello! I'm here to help you understand your legal document analysis. What would you like to know?
+                                        <strong>Asistent Legal:</strong> Bună! Sunt aici să vă ajut să înțelegeți analiza documentului dumneavoastră. Pot răspunde doar la întrebări despre acest document specific. Ce doriți să știți?
                                     </div>
                                 </div>
                                 
                                 <div class="input-group">
-                                    <input type="text" id="chat-input" class="form-control" placeholder="Type your question here..." maxlength="500">
+                                    <input type="text" id="chat-input" class="form-control" placeholder="Scrieți întrebarea dvs. despre document..." maxlength="500">
                                     <button class="btn btn-primary" type="button" onclick="sendChatMessage()">
-                                        <i class="fas fa-paper-plane"></i> Send
+                                        <i class="fas fa-paper-plane"></i> Trimite
                                     </button>
                                 </div>
                             </div>
@@ -216,6 +216,10 @@
 </div>
 
 <script>
+// Store the document analysis context
+const analysisContext = {{ analysis|tojson|safe }};
+const conversationHistory = [];
+
 function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
@@ -227,8 +231,11 @@ function sendChatMessage() {
     // Add user message
     const userDiv = document.createElement('div');
     userDiv.className = 'user-message mb-2 text-end';
-    userDiv.innerHTML = `<strong>You:</strong> ${message}`;
+    userDiv.innerHTML = `<strong>Dvs:</strong> ${message}`;
     chatMessages.appendChild(userDiv);
+    
+    // Track conversation history
+    conversationHistory.push({ role: 'user', content: message });
     
     // Clear input
     input.value = '';
@@ -236,19 +243,23 @@ function sendChatMessage() {
     // Add loading message
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'assistant-message mb-2';
-    loadingDiv.innerHTML = '<strong>Legal Assistant:</strong> <em>Typing...</em>';
+    loadingDiv.innerHTML = '<strong>Asistent Legal:</strong> <em>Scriu răspunsul...</em>';
     chatMessages.appendChild(loadingDiv);
     
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
-    // Send to backend
+    // Send to backend with analysis context
     fetch('/legal-chat', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: message })
+        body: JSON.stringify({ 
+            message: message,
+            analysis_context: analysisContext,
+            conversation_history: conversationHistory.slice(-6) // Last 6 messages for context
+        })
     })
     .then(response => response.json())
     .then(data => {
@@ -258,8 +269,12 @@ function sendChatMessage() {
         // Add response
         const responseDiv = document.createElement('div');
         responseDiv.className = 'assistant-message mb-2';
-        responseDiv.innerHTML = `<strong>Legal Assistant:</strong> ${data.response || 'I apologize, but I cannot provide a response at this time. Please try again later.'}`;
+        const assistantResponse = data.response || 'Ne pare rău, nu pot oferi un răspuns în acest moment. Vă rugăm să încercați din nou mai târziu.';
+        responseDiv.innerHTML = `<strong>Asistent Legal:</strong> ${assistantResponse}`;
         chatMessages.appendChild(responseDiv);
+        
+        // Track assistant response in conversation history
+        conversationHistory.push({ role: 'assistant', content: assistantResponse });
         
         // Scroll to bottom
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -271,7 +286,7 @@ function sendChatMessage() {
         // Add error message
         const errorDiv = document.createElement('div');
         errorDiv.className = 'assistant-message mb-2 text-danger';
-        errorDiv.innerHTML = '<strong>Error:</strong> Unable to send message. Please try again.';
+        errorDiv.innerHTML = '<strong>Eroare:</strong> Nu am putut trimite mesajul. Vă rugăm să încercați din nou.';
         chatMessages.appendChild(errorDiv);
         
         chatMessages.scrollTop = chatMessages.scrollHeight;
