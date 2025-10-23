@@ -3,6 +3,7 @@ import logging
 import re
 from openai import OpenAI
 from config import OPENAI_API_KEY
+from utils.document_registry_lookup import DocumentRegistryService, format_registry_data_for_analysis
 
 # Initialize OpenAI client with timeout settings
 openai_client = OpenAI(
@@ -361,6 +362,32 @@ Lütfen yanıtınızı hukuk profesyonelleri için uygun, net ve profesyonel bir
             from utils.enhanced_legal_analyzer import analyze_real_estate_contract
             return analyze_real_estate_contract(text, country_code, language)
 
+        # Extract country code for registry lookup
+        country_code = 'RO'  # Default
+        original_text = text
+        if 'countryHint:' in text:
+            lines = text.split('\n')
+            for line in lines:
+                if line.startswith('countryHint:'):
+                    country_code = line.replace('countryHint:', '').strip()
+                    text = text.replace(line + '\n', '')
+                    break
+        
+        # Perform registry lookup
+        registry_data_text = ""
+        try:
+            logging.info(f"Performing registry lookup for country: {country_code}")
+            registry_data = DocumentRegistryService.analyze_document_registry(text, country_code)
+            registry_data_text = format_registry_data_for_analysis(registry_data)
+            if registry_data_text:
+                logging.info(f"Registry lookup successful - found {len(registry_data.get('registry_lookups', []))} registrations")
+        except Exception as e:
+            logging.error(f"Registry lookup failed: {str(e)}")
+        
+        # Include registry data in the document text if available
+        if registry_data_text:
+            text = text + "\n\n" + registry_data_text
+        
         base_prompt = language_prompts.get(language, language_prompts['en'])
         prompt = f"""{base_prompt}
 
