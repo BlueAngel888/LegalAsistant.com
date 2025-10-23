@@ -188,22 +188,22 @@
                             <div class="card-header bg-primary text-white">
                                 <h5 class="card-title mb-0">
                                     <i class="fas fa-comments me-2"></i>
-                                    Asistent Legal - Întrebări despre Document
+                                    {{ analysis_t.get('legal_chat_title', 'Legal Assistant - Document Questions') }}
                                 </h5>
                             </div>
                             <div class="card-body">
-                                <p class="text-muted mb-3">Întreabă orice despre documentul analizat:</p>
+                                <p class="text-muted mb-3">{{ analysis_t.get('legal_chat_intro', 'Ask anything about your analyzed document:') }}</p>
                                 
                                 <div id="chat-messages" class="chat-messages mb-3" style="height: 300px; overflow-y: auto; border: 1px solid #e9ecef; padding: 1rem; background-color: #f8f9fa; border-radius: 8px;">
                                     <div class="assistant-message mb-2">
-                                        <strong>Asistent Legal:</strong> Bună! Sunt aici să vă ajut să înțelegeți analiza documentului dumneavoastră. Pot răspunde doar la întrebări despre acest document specific. Ce doriți să știți?
+                                        <strong>{{ analysis_t.get('legal_chat_assistant', 'Legal Assistant') }}:</strong> {{ analysis_t.get('legal_chat_welcome', 'Hello! I\'m here to help you understand your document analysis. I can only answer questions about this specific document. What would you like to know?') }}
                                     </div>
                                 </div>
                                 
                                 <div class="input-group">
-                                    <input type="text" id="chat-input" class="form-control" placeholder="Scrieți întrebarea dvs. despre document..." maxlength="500">
+                                    <input type="text" id="chat-input" class="form-control" placeholder="{{ analysis_t.get('legal_chat_placeholder', 'Type your question about the document...') }}" maxlength="500">
                                     <button class="btn btn-primary" type="button" onclick="sendChatMessage()">
-                                        <i class="fas fa-paper-plane"></i> Trimite
+                                        <i class="fas fa-paper-plane"></i> {{ analysis_t.get('legal_chat_send', 'Send') }}
                                     </button>
                                 </div>
                             </div>
@@ -220,6 +220,15 @@
 const analysisContext = {{ analysis|tojson|safe }};
 const conversationHistory = [];
 
+// Store chat translations
+const chatTranslations = {
+    you: {{ analysis_t.get('legal_chat_you', 'You')|tojson|safe }},
+    assistant: {{ analysis_t.get('legal_chat_assistant', 'Legal Assistant')|tojson|safe }},
+    typing: {{ analysis_t.get('legal_chat_typing', 'Typing...')|tojson|safe }},
+    error: {{ analysis_t.get('legal_chat_error', 'Unable to send message. Please try again.')|tojson|safe }},
+    noResponse: {{ analysis_t.get('legal_chat_no_response', 'Sorry, I cannot provide a response at this time. Please try again later.')|tojson|safe }}
+};
+
 function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const message = input.value.trim();
@@ -231,7 +240,7 @@ function sendChatMessage() {
     // Add user message
     const userDiv = document.createElement('div');
     userDiv.className = 'user-message mb-2 text-end';
-    userDiv.innerHTML = `<strong>Dvs:</strong> ${message}`;
+    userDiv.innerHTML = `<strong>${chatTranslations.you}:</strong> ${message}`;
     chatMessages.appendChild(userDiv);
     
     // Track conversation history
@@ -243,7 +252,7 @@ function sendChatMessage() {
     // Add loading message
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'assistant-message mb-2';
-    loadingDiv.innerHTML = '<strong>Asistent Legal:</strong> <em>Scriu răspunsul...</em>';
+    loadingDiv.innerHTML = `<strong>${chatTranslations.assistant}:</strong> <em>${chatTranslations.typing}</em>`;
     chatMessages.appendChild(loadingDiv);
     
     // Scroll to bottom
@@ -269,8 +278,8 @@ function sendChatMessage() {
         // Add response
         const responseDiv = document.createElement('div');
         responseDiv.className = 'assistant-message mb-2';
-        const assistantResponse = data.response || 'Ne pare rău, nu pot oferi un răspuns în acest moment. Vă rugăm să încercați din nou mai târziu.';
-        responseDiv.innerHTML = `<strong>Asistent Legal:</strong> ${assistantResponse}`;
+        const assistantResponse = data.response || chatTranslations.noResponse;
+        responseDiv.innerHTML = `<strong>${chatTranslations.assistant}:</strong> ${assistantResponse}`;
         chatMessages.appendChild(responseDiv);
         
         // Track assistant response in conversation history
@@ -286,7 +295,7 @@ function sendChatMessage() {
         // Add error message
         const errorDiv = document.createElement('div');
         errorDiv.className = 'assistant-message mb-2 text-danger';
-        errorDiv.innerHTML = '<strong>Eroare:</strong> Nu am putut trimite mesajul. Vă rugăm să încercați din nou.';
+        errorDiv.innerHTML = `<strong>${chatTranslations.error}</strong>`;
         chatMessages.appendChild(errorDiv);
         
         chatMessages.scrollTop = chatMessages.scrollHeight;

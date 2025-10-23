@@ -1087,12 +1087,18 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza."""
         # Convert markdown to HTML for better formatting
         analysis_html = markdown.markdown(analysis, extensions=['nl2br', 'tables'])
         
+        # Get analysis language and its translations for chat
+        analysis_lang = session.get('analysis_language', 'ro')
+        analysis_t = get_translation(analysis_lang)
+        
         return render_template('result.html', 
                              analysis=analysis_html, 
                              files=processed_files, 
                              user_stats=user_stats,
                              analysis_gamification=session.get('analysis_gamification'),
-                             t=t, lang=lang)
+                             t=t, lang=lang,
+                             analysis_lang=analysis_lang,
+                             analysis_t=analysis_t)
         
     except Exception as e:
         logging.error(f"Analysis error: {str(e)}")
@@ -1135,7 +1141,7 @@ def legal_chat():
                 message=message,
                 analysis_context=analysis_context,
                 conversation_history=conversation_history,
-                language=session.get('language', 'ro')
+                language=session.get('analysis_language', 'ro')  # Use the analysis language, not UI language
             )
             
             # Log chat interaction for learning

@@ -35,7 +35,17 @@ translations = {
         "file_selected": "File selected",
         "files_selected": "files selected",
         "clear_files": "Clear Files",
-        "upload_another": "Upload Another Document"
+        "upload_another": "Upload Another Document",
+        "legal_chat_title": "Legal Assistant - Document Questions",
+        "legal_chat_intro": "Ask anything about your analyzed document:",
+        "legal_chat_placeholder": "Type your question about the document...",
+        "legal_chat_send": "Send",
+        "legal_chat_welcome": "Hello! I'm here to help you understand your document analysis. I can only answer questions about this specific document. What would you like to know?",
+        "legal_chat_you": "You",
+        "legal_chat_assistant": "Legal Assistant",
+        "legal_chat_typing": "Typing...",
+        "legal_chat_error": "Unable to send message. Please try again.",
+        "legal_chat_no_response": "Sorry, I cannot provide a response at this time. Please try again later."
     },
     "ro": {
         "site_title": "Asistent Juridic",
@@ -69,7 +79,17 @@ translations = {
         "file_selected": "Fișier selectat",
         "files_selected": "fișiere selectate",
         "clear_files": "Șterge Fișierele",
-        "upload_another": "Încarcă Alt Document"
+        "upload_another": "Încarcă Alt Document",
+        "legal_chat_title": "Asistent Legal - Întrebări despre Document",
+        "legal_chat_intro": "Întreabă orice despre documentul analizat:",
+        "legal_chat_placeholder": "Scrieți întrebarea dvs. despre document...",
+        "legal_chat_send": "Trimite",
+        "legal_chat_welcome": "Bună! Sunt aici să vă ajut să înțelegeți analiza documentului dumneavoastră. Pot răspunde doar la întrebări despre acest document specific. Ce doriți să știți?",
+        "legal_chat_you": "Dvs",
+        "legal_chat_assistant": "Asistent Legal",
+        "legal_chat_typing": "Scriu răspunsul...",
+        "legal_chat_error": "Nu am putut trimite mesajul. Vă rugăm să încercați din nou.",
+        "legal_chat_no_response": "Ne pare rău, nu pot oferi un răspuns în acest moment. Vă rugăm să încercați din nou mai târziu."
     },
     "de": {
         "site_title": "Rechtsassistent",
