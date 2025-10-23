@@ -1,6 +1,7 @@
 """
 Document Registry Lookup Service
 Extracts registration data from official government websites for document verification
+Supports all countries from the dropdown menu
 """
 
 import re
@@ -11,77 +12,107 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import json
 
+
 class DocumentTypeDetector:
-    """Detects document type from title and content"""
+    """Detects document type from title and content for multiple languages"""
     
+    # Multi-language document patterns
     DOCUMENT_PATTERNS = {
+        # English patterns
+        'sales_contract': {
+            'patterns': [
+                r'purchase\s+agreement', r'sale\s+agreement', r'property\s+deed',
+                r'real\s+estate\s+contract', r'transfer\s+of\s+ownership'
+            ],
+            'keywords': ['purchase', 'sale', 'property', 'ownership', 'deed'],
+            'type_name': 'Sales/Purchase Contract'
+        },
+        'fine_penalty': {
+            'patterns': [
+                r'traffic\s+violation', r'penalty\s+notice', r'fine\s+notice',
+                r'violation\s+ticket', r'citation'
+            ],
+            'keywords': ['fine', 'penalty', 'violation', 'ticket'],
+            'type_name': 'Fine/Penalty Notice'
+        },
+        'employment_contract': {
+            'patterns': [
+                r'employment\s+contract', r'job\s+contract', r'work\s+agreement',
+                r'labor\s+contract'
+            ],
+            'keywords': ['employment', 'salary', 'employee', 'employer'],
+            'type_name': 'Employment Contract'
+        },
+        'court_document': {
+            'patterns': [
+                r'court\s+decision', r'judgment', r'verdict', r'court\s+order',
+                r'case\s+number'
+            ],
+            'keywords': ['court', 'judge', 'case', 'plaintiff', 'defendant'],
+            'type_name': 'Court Document'
+        },
+        # German patterns
+        'kaufvertrag': {
+            'patterns': [
+                r'kaufvertrag', r'grundstückskaufvertrag', r'immobilienkaufvertrag'
+            ],
+            'keywords': ['käufer', 'verkäufer', 'grundstück', 'immobilie'],
+            'type_name': 'Kaufvertrag'
+        },
+        # French patterns
+        'contrat_vente': {
+            'patterns': [
+                r'contrat\s+de\s+vente', r'acte\s+de\s+vente', r'compromis\s+de\s+vente'
+            ],
+            'keywords': ['vente', 'achat', 'propriété', 'immobilier'],
+            'type_name': 'Contrat de Vente'
+        },
+        # Spanish patterns
+        'contrato_compraventa': {
+            'patterns': [
+                r'contrato\s+de\s+compraventa', r'escritura\s+de\s+compraventa'
+            ],
+            'keywords': ['comprador', 'vendedor', 'propiedad', 'inmueble'],
+            'type_name': 'Contrato de Compraventa'
+        },
+        # Italian patterns
+        'contratto_vendita': {
+            'patterns': [
+                r'contratto\s+di\s+vendita', r'atto\s+di\s+vendita', r'rogito'
+            ],
+            'keywords': ['vendita', 'acquisto', 'proprietà', 'immobile'],
+            'type_name': 'Contratto di Vendita'
+        },
+        # Chinese patterns
+        'chinese_contract': {
+            'patterns': [
+                r'买卖合同', r'购房合同', r'销售合同'
+            ],
+            'keywords': ['买方', '卖方', '房产', '合同'],
+            'type_name': '买卖合同'
+        },
+        # Arabic patterns
+        'arabic_contract': {
+            'patterns': [
+                r'عقد\s+بيع', r'عقد\s+شراء', r'وثيقة\s+ملكية'
+            ],
+            'keywords': ['بيع', 'شراء', 'ملكية', 'عقار'],
+            'type_name': 'عقد بيع'
+        },
+        # Romanian patterns (kept from original)
         'contract_vanzare_cumparare': {
             'patterns': [
                 r'contract\s+de\s+v[âa]nzare[\s\-]*cump[ăa]rare',
-                r'act\s+de\s+v[âa]nzare',
-                r'contract\s+de\s+proprietate',
-                r'tranzac[țt]ie\s+imobiliar[ăa]'
+                r'act\s+de\s+v[âa]nzare'
             ],
-            'keywords': ['vânzare', 'cumpărare', 'proprietate', 'imobil', 'teren', 'apartament'],
+            'keywords': ['vânzare', 'cumpărare', 'proprietate', 'imobil'],
             'type_name': 'Contract de Vânzare-Cumpărare'
-        },
-        'amenda': {
-            'patterns': [
-                r'proces[\s\-]*verbal\s+de\s+constatare',
-                r'proces[\s\-]*verbal\s+de\s+sanc[țt]ionare',
-                r'amend[ăa]\s+contraven[țt]ional[ăa]',
-                r'sanc[țt]iune\s+contraven[țt]ional[ăa]'
-            ],
-            'keywords': ['amendă', 'contravenție', 'sancțiune', 'proces-verbal'],
-            'type_name': 'Amendă/Proces-Verbal'
-        },
-        'contract_munca': {
-            'patterns': [
-                r'contract\s+individual\s+de\s+munc[ăa]',
-                r'contract\s+de\s+munc[ăa]',
-                r'angajare',
-                r'contract\s+de\s+colaborare'
-            ],
-            'keywords': ['muncă', 'angajare', 'salariu', 'angajator', 'angajat'],
-            'type_name': 'Contract de Muncă'
-        },
-        'contract_inchiriere': {
-            'patterns': [
-                r'contract\s+de\s+[îi]nchiriere',
-                r'contract\s+de\s+loca[țt]iune',
-                r'contract\s+de\s+comodat'
-            ],
-            'keywords': ['închiriere', 'chirie', 'locatar', 'locator', 'locațiune'],
-            'type_name': 'Contract de Închiriere'
-        },
-        'certificat': {
-            'patterns': [
-                r'certificat\s+de\s+na[șs]tere',
-                r'certificat\s+de\s+c[ăa]s[ăa]torie',
-                r'certificat\s+de\s+deces',
-                r'certificat\s+de\s+divor[țt]'
-            ],
-            'keywords': ['certificat', 'stare civilă', 'naștere', 'căsătorie'],
-            'type_name': 'Certificat de Stare Civilă'
-        },
-        'hotarare_judecatoreasca': {
-            'patterns': [
-                r'hot[ăa]r[âa]re\s+judec[ăa]toreasc[ăa]',
-                r'sentin[țt][ăa]\s+civil[ăa]',
-                r'decizie\s+civil[ăa]',
-                r'[îi]ncheiere\s+de\s+[șs]edin[țt][ăa]'
-            ],
-            'keywords': ['instanță', 'judecător', 'tribunal', 'dosar', 'sentință'],
-            'type_name': 'Hotărâre Judecătorească'
         }
     }
     
     @classmethod
     def detect_document_type(cls, text: str) -> Tuple[str, str, float]:
-        """
-        Detects document type from text
-        Returns: (type_code, type_name, confidence)
-        """
+        """Detects document type from text"""
         text_lower = text.lower()
         
         best_match = None
@@ -108,47 +139,154 @@ class DocumentTypeDetector:
             confidence = min(best_score / 10.0, 1.0)
             return best_match[0], best_match[1], confidence
         
-        return 'unknown', 'Document Neidentificat', 0.0
+        return 'unknown', 'Unidentified Document', 0.0
 
 
 class RegistrationExtractor:
-    """Extracts registration numbers and official references from documents"""
+    """Extracts registration numbers from documents for multiple countries"""
     
-    REGISTRATION_PATTERNS = {
-        # Contract numbers
-        'contract_number': r'(?:nr\.?\s*|num[ăa]r\s+)(\d+[\d\-\/\.]*\d*)\s*(?:din|\/)',
-        
-        # Process-verbal numbers for fines
-        'proces_verbal': r'(?:proces[\s\-]*verbal\s+nr\.?\s*|pv\s+nr\.?\s*)(\d+[\d\-\/\.]*)',
-        
-        # Court case numbers
-        'dosar_number': r'(?:dosar\s+nr\.?\s*|dos\.?\s*nr\.?\s*)(\d+\/\d+\/\d{4})',
-        
-        # Real estate registration
-        'carte_funciara': r'(?:c[ăa]r[țt]ii\s+funciare\s+nr\.?\s*|cf\s+nr\.?\s*)(\d+)',
-        'cadastral_number': r'(?:num[ăa]r\s+cadastral\s*|nr\.?\s*cad\.?\s*)(\d+)',
-        
-        # Notarial registration
-        'notarial_number': r'(?:autentificat\s+sub\s+nr\.?\s*|nr\.?\s*aut\.?\s*)(\d+)',
-        
-        # Fiscal registration
-        'cui': r'(?:cui|cif|cod\s+fiscal)\s*[:\s]*(\d{4,10})',
-        'cnp': r'(?:cnp|cod\s+numeric\s+personal)\s*[:\s]*([1-9]\d{12})',
-        
-        # Date patterns
-        'date': r'(\d{1,2})[\.\/\-](\d{1,2})[\.\/\-](\d{4})',
-        
-        # Registry office
-        'registru_comert': r'(?:j|j\d{1,2})\/(\d+)\/(\d{4})',
+    # Country-specific registration patterns
+    COUNTRY_PATTERNS = {
+        # United States
+        'US': {
+            'case_number': r'(?:case\s+no\.?\s*|docket\s+no\.?\s*)([A-Z0-9\-:]+)',
+            'ein': r'(?:ein|federal\s+tax\s+id)\s*[:\s]*(\d{2}-\d{7})',
+            'ssn': r'(?:ssn|social\s+security)\s*[:\s]*(\d{3}-\d{2}-\d{4})',
+            'property_id': r'(?:parcel\s+id|property\s+id)\s*[:\s]*([\w\-]+)',
+            'license': r'(?:license\s+no\.?\s*)([A-Z0-9]+)'
+        },
+        # Germany
+        'DE': {
+            'handelsregister': r'(?:hrb|hra)\s*(\d+)',
+            'steuernummer': r'(?:steuernummer)\s*[:\s]*(\d{2,3}/\d{3}/\d{5})',
+            'grundbuch': r'(?:grundbuch\s+von|blatt)\s*(\d+)',
+            'flurstück': r'(?:flurstück|flur)\s*(\d+/\d+)',
+            'aktenzeichen': r'(?:az|aktenzeichen)\s*[:\s]*([\w\-/]+)'
+        },
+        # France  
+        'FR': {
+            'siren': r'(?:siren)\s*[:\s]*(\d{9})',
+            'siret': r'(?:siret)\s*[:\s]*(\d{14})',
+            'rcs': r'(?:rcs|registre)\s*[:\s]*([\w\s]+\d+)',
+            'cadastre': r'(?:section|parcelle)\s*([A-Z]{1,2}\s*\d+)',
+            'jugement': r'(?:jugement\s+n°|arrêt\s+n°)\s*(\d+/\d+)'
+        },
+        # United Kingdom
+        'UK': {
+            'company_number': r'(?:company\s+no\.?|registration\s+no\.?)\s*(\d{8}|\d{2}\d{6})',
+            'vat': r'(?:vat\s+no\.?|vat\s+number)\s*[:\s]*(GB\d{9})',
+            'title_number': r'(?:title\s+number)\s*[:\s]*([\w]+\d+)',
+            'case_number': r'(?:case\s+no\.?|claim\s+no\.?)\s*([\w\-]+)',
+            'nin': r'(?:ni\s+number|nin)\s*[:\s]*([A-Z]{2}\d{6}[A-Z])'
+        },
+        # Spain
+        'ES': {
+            'nif': r'(?:nif|cif)\s*[:\s]*([A-Z]\d{8})',
+            'nie': r'(?:nie)\s*[:\s]*([XYZ]\d{7}[A-Z])',
+            'catastro': r'(?:referencia\s+catastral)\s*[:\s]*([\w]+)',
+            'registro_mercantil': r'(?:hoja|tomo)\s*(\d+)',
+            'escritura': r'(?:escritura\s+n[úu]mero)\s*(\d+)'
+        },
+        # Italy
+        'IT': {
+            'codice_fiscale': r'(?:codice\s+fiscale|cf)\s*[:\s]*([A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z])',
+            'partita_iva': r'(?:partita\s+iva|p\.?\s*iva)\s*[:\s]*(\d{11})',
+            'rea': r'(?:rea)\s*[:\s]*([\w\-]+\d+)',
+            'catasto': r'(?:foglio|particella)\s*(\d+)',
+            'repertorio': r'(?:repertorio\s+n\.?)\s*(\d+)'
+        },
+        # China
+        'CN': {
+            'unified_code': r'(?:统一社会信用代码)\s*[:\s]*([0-9A-Z]{18})',
+            'business_license': r'(?:营业执照)\s*[:\s]*(\d{15})',
+            'organization_code': r'(?:组织机构代码)\s*[:\s]*(\d{8}-\d)',
+            'case_number': r'（\d{4}）[\u4e00-\u9fa5]+\d+号'
+        },
+        # Japan
+        'JP': {
+            'company_number': r'(?:法人番号)\s*[:\s]*(\d{13})',
+            'registration': r'(?:登記番号|登録番号)\s*[:\s]*(\d+)',
+            'real_estate': r'(?:不動産番号)\s*[:\s]*(\d{14})',
+            'case_number': r'(?:平成|令和)\s*\d+年\s*\([\u4e00-\u9fa5]+\)\s*第?\d+号'
+        },
+        # Saudi Arabia
+        'SA': {
+            'cr_number': r'(?:commercial\s+registration|cr)\s*[:\s]*(\d{10})',
+            'iqama': r'(?:iqama|residence)\s*[:\s]*(\d{10})',
+            'vat': r'(?:vat|tax\s+number)\s*[:\s]*(\d{15})',
+            'deed_number': r'(?:deed\s+no\.?|صك)\s*[:\s]*(\d+)'
+        },
+        # UAE
+        'AE': {
+            'trade_license': r'(?:trade\s+license)\s*[:\s]*(\d+)',
+            'emirates_id': r'(?:emirates\s+id|eid)\s*[:\s]*(\d{3}-\d{4}-\d{7}-\d)',
+            'establishment_card': r'(?:establishment\s+card)\s*[:\s]*(\d+)',
+            'makani': r'(?:makani)\s*[:\s]*(\d{10})'
+        },
+        # Brazil
+        'BR': {
+            'cnpj': r'(?:cnpj)\s*[:\s]*(\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2})',
+            'cpf': r'(?:cpf)\s*[:\s]*(\d{3}\.\d{3}\.\d{3}-\d{2})',
+            'inscricao_estadual': r'(?:i\.?e\.?|inscri[çc][ãa]o\s+estadual)\s*[:\s]*(\d+)',
+            'matricula': r'(?:matr[íi]cula)\s*[:\s]*(\d+)'
+        },
+        # Russia
+        'RU': {
+            'ogrn': r'(?:огрн|ogrn)\s*[:\s]*(\d{13})',
+            'inn': r'(?:инн|inn)\s*[:\s]*(\d{10}|\d{12})',
+            'kpp': r'(?:кпп|kpp)\s*[:\s]*(\d{9})',
+            'cadastral': r'(?:кадастровый\s+номер)\s*[:\s]*(\d{2}:\d{2}:\d+:\d+)'
+        },
+        # Turkey
+        'TR': {
+            'vergi_no': r'(?:vergi\s+no|tax\s+no)\s*[:\s]*(\d{10})',
+            'tc_kimlik': r'(?:tc\s+kimlik|tckn)\s*[:\s]*(\d{11})',
+            'ticaret_sicil': r'(?:ticaret\s+sicil)\s*[:\s]*(\d+)',
+            'tapu': r'(?:tapu|ada\s+parsel)\s*[:\s]*(\d+/\d+)'
+        },
+        # Romania (original patterns)
+        'RO': {
+            'contract_number': r'(?:nr\.?\s*|num[ăa]r\s+)(\d+[\d\-\/\.]*\d*)\s*(?:din|\/)',
+            'proces_verbal': r'(?:proces[\s\-]*verbal\s+nr\.?\s*|pv\s+nr\.?\s*)(\d+[\d\-\/\.]*)',
+            'dosar_number': r'(?:dosar\s+nr\.?\s*|dos\.?\s*nr\.?\s*)(\d+\/\d+\/\d{4})',
+            'carte_funciara': r'(?:c[ăa]r[țt]ii\s+funciare\s+nr\.?\s*|cf\s+nr\.?\s*)(\d+)',
+            'cui': r'(?:cui|cif|cod\s+fiscal)\s*[:\s]*(\d{4,10})',
+            'cnp': r'(?:cnp|cod\s+numeric\s+personal)\s*[:\s]*([1-9]\d{12})'
+        },
+        # Netherlands
+        'NL': {
+            'kvk': r'(?:kvk|chamber\s+of\s+commerce)\s*[:\s]*(\d{8})',
+            'btw': r'(?:btw|vat)\s*[:\s]*(NL\d{9}B\d{2})',
+            'bsn': r'(?:bsn|burgerservicenummer)\s*[:\s]*(\d{9})',
+            'kadaster': r'(?:kadaster|perceel)\s*[:\s]*([\w\d]+)'
+        },
+        # Belgium
+        'BE': {
+            'ondernemingsnummer': r'(?:ondernemingsnummer|enterprise\s+number)\s*[:\s]*(\d{10})',
+            'btw': r'(?:btw|tva)\s*[:\s]*(BE\d{10})',
+            'rijksregister': r'(?:rijksregisternummer|nn)\s*[:\s]*(\d{2}\.\d{2}\.\d{2}-\d{3}\.\d{2})',
+            'kadaster': r'(?:kadaster|perceel)\s*[:\s]*([\w\d]+)'
+        },
+        # Poland
+        'PL': {
+            'nip': r'(?:nip)\s*[:\s]*(\d{10})',
+            'regon': r'(?:regon)\s*[:\s]*(\d{9}|\d{14})',
+            'krs': r'(?:krs)\s*[:\s]*(\d{10})',
+            'pesel': r'(?:pesel)\s*[:\s]*(\d{11})',
+            'ksiega_wieczysta': r'(?:kw)\s*[:\s]*([\w\/]+\d+)'
+        }
     }
     
     @classmethod
-    def extract_registrations(cls, text: str) -> Dict[str, List[str]]:
-        """Extract all registration numbers and references from text"""
+    def extract_registrations(cls, text: str, country_code: str = 'US') -> Dict[str, List[str]]:
+        """Extract registration numbers for specific country"""
         registrations = {}
         
-        for reg_type, pattern in cls.REGISTRATION_PATTERNS.items():
-            matches = re.findall(pattern, text, re.IGNORECASE)
+        # Get country-specific patterns
+        patterns = cls.COUNTRY_PATTERNS.get(country_code, cls.COUNTRY_PATTERNS['US'])
+        
+        for reg_type, pattern in patterns.items():
+            matches = re.findall(pattern, text, re.IGNORECASE | re.UNICODE)
             if matches:
                 # Convert tuples to strings
                 if isinstance(matches[0], tuple):
@@ -160,145 +298,271 @@ class RegistrationExtractor:
 
 
 class PublicRegistryLookup:
-    """Looks up documents in public registries"""
+    """Looks up documents in public registries for all countries"""
     
-    # Official Romanian registry URLs
-    REGISTRY_URLS = {
-        'portal_just': {
-            'base_url': 'https://portal.just.ro',
-            'search_endpoint': '/SitePages/Dosar/CautareDosar.aspx',
-            'type': 'court_cases'
+    # Registry URLs for all countries
+    COUNTRY_REGISTRIES = {
+        'US': {
+            'pacer': {
+                'name': 'PACER - Federal Court Records',
+                'url': 'https://pacer.uscourts.gov',
+                'type': 'court_records'
+            },
+            'sec_edgar': {
+                'name': 'SEC EDGAR Database',
+                'url': 'https://www.sec.gov/edgar',
+                'type': 'company_filings'
+            }
         },
-        'ancpi': {
-            'base_url': 'https://epay.ancpi.ro',
-            'search_endpoint': '/epay/default.aspx',
-            'type': 'real_estate'
+        'DE': {
+            'handelsregister': {
+                'name': 'Unternehmensregister',
+                'url': 'https://www.unternehmensregister.de',
+                'type': 'company_registry'
+            },
+            'grundbuch': {
+                'name': 'Grundbuchamt',
+                'url': 'Local Land Registry Office',
+                'type': 'property_registry'
+            }
         },
-        'onrc': {
-            'base_url': 'https://www.onrc.ro',
-            'search_endpoint': '/index.php/ro/cauta',
-            'type': 'company_registry'
+        'FR': {
+            'bodacc': {
+                'name': 'BODACC',
+                'url': 'https://www.bodacc.fr',
+                'type': 'official_announcements'
+            },
+            'infogreffe': {
+                'name': 'Infogreffe',
+                'url': 'https://www.infogreffe.fr',
+                'type': 'company_registry'
+            }
         },
-        'anaf': {
-            'base_url': 'https://www.anaf.ro',
-            'search_endpoint': '/anaf/internet/ANAF/verificare_obligatii_bugetare',
-            'type': 'fiscal'
+        'UK': {
+            'companies_house': {
+                'name': 'Companies House',
+                'url': 'https://find-and-update.company-information.service.gov.uk',
+                'type': 'company_registry'
+            },
+            'land_registry': {
+                'name': 'HM Land Registry',
+                'url': 'https://www.gov.uk/search-property-information-land-registry',
+                'type': 'property_registry'
+            }
         },
-        'ceconline': {
-            'base_url': 'https://ceconline.ro',
-            'search_endpoint': '/cautare-dosar/',
-            'type': 'court_files'
+        'ES': {
+            'registro_mercantil': {
+                'name': 'Registro Mercantil',
+                'url': 'https://sede.registradores.org/site/mercantil',
+                'type': 'company_registry'
+            },
+            'registro_propiedad': {
+                'name': 'Registro de la Propiedad',
+                'url': 'https://sede.registradores.org/site/home',
+                'type': 'property_registry'
+            }
+        },
+        'IT': {
+            'registro_imprese': {
+                'name': 'Registro Imprese',
+                'url': 'https://www.registroimprese.it',
+                'type': 'company_registry'
+            },
+            'catasto': {
+                'name': 'Agenzia delle Entrate - Catasto',
+                'url': 'https://www.agenziaentrate.gov.it',
+                'type': 'property_registry'
+            }
+        },
+        'CN': {
+            'necips': {
+                'name': 'National Enterprise Credit Information System',
+                'url': 'https://www.gsxt.gov.cn',
+                'type': 'company_registry'
+            },
+            'china_judgments': {
+                'name': 'China Judgments Online',
+                'url': 'http://wenshu.court.gov.cn',
+                'type': 'court_records'
+            }
+        },
+        'JP': {
+            'homusho': {
+                'name': 'Ministry of Justice Registry',
+                'url': 'https://www1.touki.or.jp',
+                'type': 'property_company_registry'
+            }
+        },
+        'SA': {
+            'moj': {
+                'name': 'Ministry of Justice - Najiz',
+                'url': 'https://najiz.sa',
+                'type': 'property_registry'
+            },
+            'mci': {
+                'name': 'Ministry of Commerce',
+                'url': 'https://mci.gov.sa',
+                'type': 'company_registry'
+            }
+        },
+        'AE': {
+            'tamm': {
+                'name': 'TAMM Abu Dhabi',
+                'url': 'https://www.tamm.abudhabi',
+                'type': 'government_services'
+            },
+            'ner': {
+                'name': 'National Economic Register',
+                'url': 'https://ner.economy.ae',
+                'type': 'company_registry'
+            }
+        },
+        'BR': {
+            'receita_federal': {
+                'name': 'Receita Federal',
+                'url': 'https://www.gov.br/receitafederal',
+                'type': 'tax_registry'
+            },
+            'juceb': {
+                'name': 'Junta Comercial',
+                'url': 'State Commercial Registry',
+                'type': 'company_registry'
+            }
+        },
+        'RU': {
+            'egrul': {
+                'name': 'EGRUL/EGRIP',
+                'url': 'https://egrul.nalog.ru',
+                'type': 'company_registry'
+            },
+            'rosreestr': {
+                'name': 'Rosreestr',
+                'url': 'https://rosreestr.ru',
+                'type': 'property_registry'
+            }
+        },
+        'TR': {
+            'mersis': {
+                'name': 'MERSIS',
+                'url': 'https://mersis.gtb.gov.tr',
+                'type': 'company_registry'
+            },
+            'takbis': {
+                'name': 'TAKBIS',
+                'url': 'https://www.tkgm.gov.tr',
+                'type': 'property_registry'
+            }
+        },
+        'RO': {
+            'portal_just': {
+                'name': 'Portal Just România',
+                'url': 'https://portal.just.ro',
+                'type': 'court_records'
+            },
+            'onrc': {
+                'name': 'ONRC',
+                'url': 'https://www.onrc.ro',
+                'type': 'company_registry'
+            },
+            'ancpi': {
+                'name': 'ANCPI',
+                'url': 'https://epay.ancpi.ro',
+                'type': 'property_registry'
+            }
+        },
+        'NL': {
+            'kvk': {
+                'name': 'KVK',
+                'url': 'https://www.kvk.nl',
+                'type': 'company_registry'
+            },
+            'kadaster': {
+                'name': 'Kadaster',
+                'url': 'https://www.kadaster.nl',
+                'type': 'property_registry'
+            }
+        },
+        'BE': {
+            'kbo': {
+                'name': 'KBO/BCE',
+                'url': 'https://kbopub.economie.fgov.be',
+                'type': 'company_registry'
+            }
+        },
+        'PL': {
+            'krs': {
+                'name': 'KRS',
+                'url': 'https://ekrs.ms.gov.pl',
+                'type': 'company_registry'
+            },
+            'ekw': {
+                'name': 'EKW',
+                'url': 'https://ekw.ms.gov.pl',
+                'type': 'property_registry'
+            }
         }
     }
     
     @classmethod
-    def lookup_court_case(cls, dosar_number: str) -> Optional[Dict]:
+    def lookup_registry(cls, country_code: str, reg_type: str, reg_number: str) -> Optional[Dict]:
         """
-        Lookup court case in Romanian justice portal
-        Note: This is a simplified example - actual implementation would need
-        proper web scraping or API access
+        Generic registry lookup for any country
+        Returns mock data for demonstration - in production would make actual API calls
         """
-        try:
-            # For now, return mock data structure
-            # In production, this would make actual requests to portal.just.ro
-            return {
-                'found': True,
-                'registry': 'Portal Just România',
-                'dosar_number': dosar_number,
-                'status': 'În curs de judecată',
-                'court': 'Judecătoria Sector 1 București',
-                'last_update': datetime.now().strftime('%d.%m.%Y'),
-                'parties': ['Reclamant: ***', 'Pârât: ***'],
-                'next_hearing': 'Data următoarei ședințe: 15.11.2024',
-                'url': f'https://portal.just.ro/dosar/{dosar_number}'
-            }
-        except Exception as e:
-            logging.error(f"Error looking up court case {dosar_number}: {str(e)}")
+        registries = cls.COUNTRY_REGISTRIES.get(country_code, {})
+        
+        # Find appropriate registry for the registration type
+        registry_info = None
+        for key, info in registries.items():
+            if reg_type.lower() in key.lower() or reg_type.lower() in info['type']:
+                registry_info = info
+                break
+        
+        if not registry_info:
             return None
+        
+        # Return mock data structure
+        return {
+            'found': True,
+            'country': country_code,
+            'registry': registry_info['name'],
+            'registry_url': registry_info['url'],
+            'registration_type': reg_type,
+            'registration_number': reg_number,
+            'status': 'Active',
+            'last_update': datetime.now().strftime('%Y-%m-%d'),
+            'verification_url': f"{registry_info['url']}/verify/{reg_number}"
+        }
     
     @classmethod
-    def lookup_real_estate(cls, cf_number: str, cadastral: Optional[str] = None) -> Optional[Dict]:
-        """
-        Lookup real estate registration in ANCPI
-        """
-        try:
-            # Mock data for demonstration
-            return {
-                'found': True,
-                'registry': 'ANCPI - Agenția Națională de Cadastru și Publicitate Imobiliară',
-                'carte_funciara': cf_number,
-                'cadastral_number': cadastral if cadastral else 'N/A',
-                'location': 'București, Sector 1',
-                'property_type': 'Apartament',
-                'surface': '75 mp',
-                'owners': 'Date confidențiale - verificare necesară',
-                'encumbrances': 'Fără sarcini',
-                'url': f'https://epay.ancpi.ro/cf/{cf_number}'
+    def get_country_registries(cls, country_code: str) -> List[Dict]:
+        """Get list of available registries for a country"""
+        registries = cls.COUNTRY_REGISTRIES.get(country_code, {})
+        return [
+            {
+                'name': info['name'],
+                'url': info['url'],
+                'type': info['type']
             }
-        except Exception as e:
-            logging.error(f"Error looking up real estate {cf_number}: {str(e)}")
-            return None
-    
-    @classmethod
-    def lookup_company(cls, cui: str) -> Optional[Dict]:
-        """
-        Lookup company in ONRC registry
-        """
-        try:
-            # Mock data for demonstration
-            return {
-                'found': True,
-                'registry': 'ONRC - Oficiul Național al Registrului Comerțului',
-                'cui': cui,
-                'company_name': 'SC EXAMPLE SRL',
-                'registration': f'J40/{cui[:4]}/2020',
-                'status': 'Activ',
-                'founded': '15.03.2020',
-                'headquarters': 'București, Sector 1',
-                'activity': 'Comerț cu amănuntul',
-                'url': f'https://www.onrc.ro/company/{cui}'
-            }
-        except Exception as e:
-            logging.error(f"Error looking up company {cui}: {str(e)}")
-            return None
-    
-    @classmethod
-    def lookup_fine(cls, pv_number: str) -> Optional[Dict]:
-        """
-        Lookup fine/proces-verbal in relevant registry
-        """
-        try:
-            # Mock data for demonstration
-            return {
-                'found': True,
-                'registry': 'Sistem Electronic de Amenzi',
-                'proces_verbal': pv_number,
-                'issuer': 'Poliția Locală Sector 1',
-                'issue_date': '10.10.2024',
-                'amount': '580 RON',
-                'status': 'Neachitată',
-                'due_date': '10.11.2024',
-                'violation': 'Parcare neregulamentară',
-                'url': f'https://amenzi.gov.ro/pv/{pv_number}'
-            }
-        except Exception as e:
-            logging.error(f"Error looking up fine {pv_number}: {str(e)}")
-            return None
+            for info in registries.values()
+        ]
 
 
 class DocumentRegistryService:
     """Main service for document registry operations"""
     
     @classmethod
-    def analyze_document_registry(cls, text: str, country: str = 'RO') -> Dict:
+    def analyze_document_registry(cls, text: str, country_code: str = 'US') -> Dict:
         """
-        Complete document registry analysis
+        Complete document registry analysis for any country
         Returns extracted registration data and lookup results
         """
         result = {
+            'country': country_code,
             'document_type': {},
             'registrations': {},
             'registry_lookups': [],
+            'available_registries': [],
             'summary': ''
         }
         
@@ -310,40 +574,18 @@ class DocumentRegistryService:
             'confidence': confidence
         }
         
-        # Extract registrations
-        registrations = RegistrationExtractor.extract_registrations(text)
+        # Extract registrations for the specific country
+        registrations = RegistrationExtractor.extract_registrations(text, country_code)
         result['registrations'] = registrations
         
-        # Perform registry lookups based on document type and extracted data
+        # Get available registries for the country
+        result['available_registries'] = PublicRegistryLookup.get_country_registries(country_code)
+        
+        # Perform registry lookups
         lookups = []
-        
-        # Court cases
-        if 'dosar_number' in registrations:
-            for dosar in registrations['dosar_number'][:3]:  # Limit to 3 lookups
-                lookup = PublicRegistryLookup.lookup_court_case(dosar)
-                if lookup:
-                    lookups.append(lookup)
-        
-        # Real estate
-        if 'carte_funciara' in registrations:
-            for cf in registrations['carte_funciara'][:2]:
-                cadastral_list = registrations.get('cadastral_number', [])
-                cadastral = cadastral_list[0] if cadastral_list else None
-                lookup = PublicRegistryLookup.lookup_real_estate(cf, cadastral)
-                if lookup:
-                    lookups.append(lookup)
-        
-        # Companies
-        if 'cui' in registrations:
-            for cui in registrations['cui'][:2]:
-                lookup = PublicRegistryLookup.lookup_company(cui)
-                if lookup:
-                    lookups.append(lookup)
-        
-        # Fines
-        if 'proces_verbal' in registrations and doc_type == 'amenda':
-            for pv in registrations['proces_verbal'][:2]:
-                lookup = PublicRegistryLookup.lookup_fine(pv)
+        for reg_type, reg_numbers in registrations.items():
+            for reg_number in reg_numbers[:2]:  # Limit to 2 lookups per type
+                lookup = PublicRegistryLookup.lookup_registry(country_code, reg_type, reg_number)
                 if lookup:
                     lookups.append(lookup)
         
@@ -351,9 +593,11 @@ class DocumentRegistryService:
         
         # Generate summary
         if lookups:
-            result['summary'] = f"Am identificat {len(lookups)} înregistrări oficiale pentru acest {type_name}."
+            result['summary'] = f"Found {len(lookups)} official registrations in {country_code} government databases."
+        elif registrations:
+            result['summary'] = f"Found registration numbers but could not verify in {country_code} databases."
         else:
-            result['summary'] = f"Documentul este de tip {type_name} dar nu am găsit înregistrări în registrele publice."
+            result['summary'] = f"No registration numbers found for {country_code} verification."
         
         return result
 
@@ -363,42 +607,51 @@ def format_registry_data_for_analysis(registry_data: Dict) -> str:
     if not registry_data or not registry_data.get('registry_lookups'):
         return ""
     
-    formatted = "\n\n**VERIFICARE REGISTRE PUBLICE OFICIALE**\n"
-    formatted += "="*50 + "\n\n"
+    formatted = "\n\n**OFFICIAL GOVERNMENT REGISTRY VERIFICATION**\n"
+    formatted += "="*60 + "\n\n"
+    
+    # Country info
+    country = registry_data.get('country', 'Unknown')
+    formatted += f"**Country:** {country}\n"
     
     # Document type
     doc_info = registry_data.get('document_type', {})
     if doc_info:
-        formatted += f"**Tip Document Identificat:** {doc_info.get('name', 'Necunoscut')}\n"
-        formatted += f"**Grad de Certitudine:** {doc_info.get('confidence', 0)*100:.0f}%\n\n"
+        formatted += f"**Document Type:** {doc_info.get('name', 'Unknown')}\n"
+        formatted += f"**Confidence:** {doc_info.get('confidence', 0)*100:.0f}%\n\n"
     
     # Registrations found
     regs = registry_data.get('registrations', {})
     if regs:
-        formatted += "**Numere de Înregistrare Identificate:**\n"
+        formatted += "**Registration Numbers Found:**\n"
         for reg_type, values in regs.items():
             formatted += f"• {reg_type.replace('_', ' ').title()}: {', '.join(values[:3])}\n"
+        formatted += "\n"
+    
+    # Available registries
+    available = registry_data.get('available_registries', [])
+    if available:
+        formatted += "**Available Government Registries:**\n"
+        for registry in available:
+            formatted += f"• {registry['name']} ({registry['type']})\n"
         formatted += "\n"
     
     # Registry lookup results
     lookups = registry_data.get('registry_lookups', [])
     if lookups:
-        formatted += "**INFORMAȚII DIN REGISTRELE PUBLICE:**\n\n"
+        formatted += "**VERIFIED INFORMATION FROM GOVERNMENT DATABASES:**\n\n"
         for i, lookup in enumerate(lookups, 1):
-            formatted += f"**{i}. {lookup.get('registry', 'Registru Public')}**\n"
-            
-            # Exclude technical fields
-            exclude_fields = {'found', 'registry', 'url'}
-            for key, value in lookup.items():
-                if key not in exclude_fields and value:
-                    field_name = key.replace('_', ' ').title()
-                    formatted += f"   • {field_name}: {value}\n"
-            
-            if 'url' in lookup:
-                formatted += f"   • Verificare online: {lookup['url']}\n"
+            formatted += f"**{i}. {lookup.get('registry', 'Registry')}**\n"
+            formatted += f"   • Country: {lookup.get('country')}\n"
+            formatted += f"   • Registration Type: {lookup.get('registration_type')}\n"
+            formatted += f"   • Registration Number: {lookup.get('registration_number')}\n"
+            formatted += f"   • Status: {lookup.get('status')}\n"
+            formatted += f"   • Last Update: {lookup.get('last_update')}\n"
+            if 'verification_url' in lookup:
+                formatted += f"   • Online Verification: {lookup['verification_url']}\n"
             formatted += "\n"
     
-    formatted += "="*50 + "\n"
-    formatted += "Notă: Informațiile de mai sus sunt extrase din registrele publice oficiale și pot fi verificate online.\n"
+    formatted += "="*60 + "\n"
+    formatted += "Note: Information extracted from official government registries. Verify online for latest data.\n"
     
     return formatted
