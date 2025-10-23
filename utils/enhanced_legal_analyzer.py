@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 import re
+from utils.document_registry_lookup import DocumentRegistryService, format_registry_data_for_analysis
 
 def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_language: str = 'ro') -> str:
     """
@@ -12,6 +13,21 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_lan
     """
     try:
         client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        
+        # Perform registry lookup
+        registry_data_text = ""
+        try:
+            logging.info(f"Performing registry lookup for enhanced analyzer - country: {country_code}")
+            registry_data = DocumentRegistryService.analyze_document_registry(text, country_code)
+            registry_data_text = format_registry_data_for_analysis(registry_data)
+            if registry_data_text:
+                logging.info(f"Registry lookup successful - found data for enhanced analysis")
+        except Exception as e:
+            logging.error(f"Registry lookup failed in enhanced analyzer: {str(e)}")
+        
+        # Include registry data in the document text if available
+        if registry_data_text:
+            text = text + "\n\n" + registry_data_text
 
         # Country-specific legal framework
         legal_frameworks = {
@@ -36,6 +52,9 @@ def analyze_with_enhanced_gpt4(text: str, country_code: str = 'RO', analysis_lan
         3. VERIFICAREA LEGALITĂȚII
         4. RISCURI ȘI RECOMANDĂRI
         5. ASPECTE FISCALE ȘI CIVILE
+        
+        IMPORTANT: Dacă documentul conține date din registrele publice oficiale (marcate cu "VERIFICARE REGISTRE PUBLICE OFICIALE"),
+        integrează aceste informații în analiza ta și verifică consistența cu conținutul documentului.
 
         Folosește terminologie juridică precisă și oferă sfaturi concrete.
         """
@@ -788,6 +807,17 @@ def analyze_real_estate_contract(text: str, country_code: str = 'RO', analysis_l
     try:
         client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         
+        # Perform registry lookup for real estate
+        registry_data_text = ""
+        try:
+            logging.info(f"Performing registry lookup for real estate contract - country: {country_code}")
+            registry_data = DocumentRegistryService.analyze_document_registry(text, country_code)
+            registry_data_text = format_registry_data_for_analysis(registry_data)
+            if registry_data_text:
+                logging.info(f"Registry lookup successful - found real estate registrations")
+        except Exception as e:
+            logging.error(f"Registry lookup failed for real estate: {str(e)}")
+        
         # Country-specific legal frameworks for real estate
         real_estate_frameworks = {
             'RO': {
@@ -840,8 +870,13 @@ Instrucțiuni:
 - Nu folosi simboluri markdown
 - Maximum 2000 cuvinte total"""
 
+        # Include registry data in the document text if available
+        if registry_data_text:
+            text = text + "\n\n" + registry_data_text
+        
         user_prompt = f"""
 Analizează documentul de mai jos (completează tot – nu lăsa nicio secțiune netratată!):
+IMPORTANT: Dacă documentul conține date din registrele publice oficiale, verifică consistența acestora cu documentul.
 
 <<START DOC>>
 {text}
