@@ -161,7 +161,8 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 - July 10, 2025. MAJOR UPDATE: Replaced offline analysis system with OpenAI GPT-4 API integration for all document analyses (both paid and free access)
 - July 10, 2025. IMPLEMENTED: New GlobalLegalAnalyserGPT format with 8-section comprehensive legal analysis structure including metadata, legal basis, validity checks, legal remedies, abusive clauses detection, tax/civil/criminal implications, practical recommendations, and executive summary
 - July 10, 2025. ENHANCED: Multi-jurisdictional support for EU member states, UAE, China, and Japan with specific legal framework references
-- July 21, 2025. ENHANCED: Legal chat system now uses GPT-4o-mini with strict document-focused responses based on country-specific laws
+- October 23, 2025. ENHANCED: Legal chat system now uses GPT-4o-mini with strict document-focused responses based on country-specific laws
+- October 23, 2025. FIXED: Legal chat now receives document analysis context and restricts responses to analyzed document only
 - July 21, 2025. IMPLEMENTED: Specialized LegalAnalyserGPT format for real estate contracts with automatic detection and comprehensive 7-section analysis including metadata, legal basis, validity verification, abusive clauses, fiscal implications, practical recommendations and disclaimer
 - July 21, 2025. IMPROVED: Enhanced real estate contract analysis prompt to provide clearer, more user-friendly explanations without "N/A", including practical explanations for non-specialists and risk warnings
 - August 1, 2025. FIXED: Resolved critical Internal Server Error (500) for LETSGO code by implementing offline analysis system that bypasses OpenAI API timeout issues, providing instant legal analysis for free access users while maintaining comprehensive 5-section format
