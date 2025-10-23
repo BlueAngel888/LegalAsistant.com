@@ -118,6 +118,7 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 
 ## Changelog
 
+- October 2, 2025. REMOVED: Eliminated gamification XP notifications (+25 XP) from analysis completion page for cleaner professional presentation
 - October 2, 2025. MAJOR FIX: Legal analysis now displays with proper structure and formatting - removed markdown symbol stripping, added markdown-to-HTML conversion with styled headings, bullet points, tables, and professional typography for enhanced readability
 - October 2, 2025. ENHANCED: Added USA (United States) to GlobalLegalAnalyserGPT jurisdictions with specific legal references (UCC, US Supreme Court)
 - October 2, 2025. FIXED: Legal analysis now correctly provided in user-selected language - added complete AI prompts and system messages for all 14 supported languages (Arabic, Chinese, Dutch, English, French, German, Italian, Japanese, Korean, Portuguese, Romanian, Russian, Spanish, Turkish)

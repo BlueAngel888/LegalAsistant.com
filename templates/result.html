@@ -68,24 +68,8 @@
 <div class="container analysis-result">
     <!-- Analysis Results (displayed immediately) -->
     <div id="analysis-results">
-        <!-- Gamification Achievement Display -->
-        {% if analysis_gamification and (analysis_gamification.xp_gained > 0 or analysis_gamification.earned_achievements) %}
-        <div class="achievement-notification mb-4">
-            <div class="alert alert-success">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h4 class="alert-heading mb-2">
-                            🏆 Analysis Complete!
-                        </h4>
-                        <p class="mb-0">XP Gained: +{{ analysis_gamification.xp_gained }}</p>
-                        {% if analysis_gamification.level_up %}
-                        <p class="mb-0">🎉 Level Up! New Level: {{ analysis_gamification.new_level }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+        <!-- Gamification Achievement Display - DISABLED -->
+        <!-- Removed XP notification as per user request -->
 
         <section class="py-3">
             <div class="container">
