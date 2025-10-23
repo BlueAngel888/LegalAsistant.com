@@ -20,6 +20,16 @@ from translations import get_translation
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+def clean_text_for_db(text):
+    """Remove NUL characters and other problematic characters from text before database storage"""
+    if not text:
+        return text
+    # Remove NUL (0x00) characters which PostgreSQL doesn't allow
+    cleaned = text.replace('\x00', '')
+    # Also remove other control characters that might cause issues (except newline, tab, carriage return)
+    cleaned = ''.join(char for char in cleaned if ord(char) >= 32 or char in '\n\r\t')
+    return cleaned
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_development")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
@@ -135,7 +145,8 @@ def background_ocr_processing(analysis_id, files_data, app_context):
             # Update analysis record with real OCR content
             if all_text_content:
                 final_text = "\n".join(all_text_content)
-                analysis_record.document_text = final_text
+                # Clean text before saving to database to remove NUL characters
+                analysis_record.document_text = clean_text_for_db(final_text)
                 
                 # Mark as fully processed
                 analysis_record.updated_at = datetime.utcnow()
@@ -179,8 +190,8 @@ def background_ai_analysis(analysis_id, document_country, analysis_language, app
                 logging.info(f"BACKGROUND AI: Calling OpenAI API for {document_country}")
                 analysis_result = analyze_with_gpt4(doc_text_with_hint, analysis_language)
                 
-                # Store the analysis result in database
-                analysis_record.analysis_result = analysis_result
+                # Store the analysis result in database (clean it first)
+                analysis_record.analysis_result = clean_text_for_db(analysis_result)
                 analysis_record.updated_at = datetime.utcnow()
                 
                 db.session.commit()
@@ -304,6 +315,8 @@ def upload_file():
                 }
                 ocr_lang = ocr_lang_map.get(user_lang, 'eng')
                 text = pytesseract.image_to_string(image, lang=ocr_lang)
+                # Clean the text to remove NUL characters
+                text = clean_text_for_db(text)
                 if text.strip():
                     texts.append(text)
                     processed_files.append('Scanned Document')
@@ -371,6 +384,8 @@ def upload_file():
                         try:
                             logging.info(f"Quick processing file {i+1}/{len(all_files)}: {file.filename}")
                             text = extract_text_from_file(file)
+                            # Clean the text to remove NUL characters
+                            text = clean_text_for_db(text)
                             if text.strip():
                                 texts.append(text)
                                 processed_files.append(file.filename)
@@ -438,10 +453,13 @@ def upload_file():
             # Check if this is fast-track processing
             is_fast_track = len(all_files) > 3
             
+            # Clean the document text to remove NUL characters before saving to database
+            cleaned_doc_text = clean_text_for_db(doc_text)
+            
             analysis_record = DocumentAnalysis(
                 session_id=session['_id'],
                 file_names=json.dumps(processed_files),
-                document_text=doc_text,
+                document_text=cleaned_doc_text,
                 language=session.get('language', 'en'),
                 payment_status='pending'
             )
