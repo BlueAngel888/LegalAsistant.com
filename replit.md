@@ -118,6 +118,8 @@ This format ensures comprehensive coverage of Romanian legal frameworks includin
 
 ## Changelog
 
+- October 23, 2025. ADDED: Public Registry Lookup System - automatically extracts registration numbers from documents (contracts, fines, court cases) and includes official registry data in legal analysis for countries with public data portals
+- October 23, 2025. FIXED: NUL character database error - cleaned extracted text to remove problematic control characters that PostgreSQL doesn't accept
 - October 2, 2025. REMOVED: Eliminated gamification XP notifications (+25 XP) from analysis completion page for cleaner professional presentation
 - October 2, 2025. MAJOR FIX: Legal analysis now displays with proper structure and formatting - removed markdown symbol stripping, added markdown-to-HTML conversion with styled headings, bullet points, tables, and professional typography for enhanced readability
 - October 2, 2025. ENHANCED: Added USA (United States) to GlobalLegalAnalyserGPT jurisdictions with specific legal references (UCC, US Supreme Court)
