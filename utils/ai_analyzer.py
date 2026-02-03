@@ -582,3 +582,318 @@ RECOMANDARE: Depuneți contestația până la data de [dată]
             return "Ne pare rău, serviciul este temporar indisponibil. Vă rugăm să încercați din nou mai târziu."
         else:
             return "A apărut o eroare neașteptată. Vă rugăm să reformulați întrebarea sau să încercați din nou."
+
+
+def analyze_fine_penalty(text: str, country_code: str, language: str = 'en', fine_type: str = 'auto') -> str:
+    """
+    Specialized analysis for fines and penalties from any country
+    """
+    try:
+        # Perform registry lookup
+        registry_data = DocumentRegistryService.analyze_document_registry(text, country_code)
+        registry_text = format_registry_data_for_analysis(registry_data)
+        
+        language_names = {
+            'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French',
+            'es': 'Spanish', 'it': 'Italian', 'pt': 'Portuguese', 'nl': 'Dutch',
+            'pl': 'Polish', 'cs': 'Czech', 'hu': 'Hungarian', 'el': 'Greek',
+            'bg': 'Bulgarian', 'ru': 'Russian', 'tr': 'Turkish', 'ar': 'Arabic',
+            'zh': 'Chinese', 'ja': 'Japanese', 'ko': 'Korean', 'hi': 'Hindi'
+        }
+        
+        lang_name = language_names.get(language, 'English')
+        
+        system_prompt = f"""You are FineAnalyzerGPT, an expert in administrative law, traffic violations, and penalty systems worldwide.
+
+IMPORTANT: Respond entirely in {lang_name}.
+
+Your expertise covers:
+- Traffic fines and violations
+- Administrative penalties
+- Tax penalties
+- Business/commercial fines
+- Environmental violations
+- Health and safety fines
+- Customs penalties
+- Building/construction violations
+
+For each fine/penalty, provide comprehensive analysis including:
+
+1. **FINE IDENTIFICATION**
+   - Type of violation
+   - Issuing authority
+   - Amount and currency
+   - Issue date and deadline
+
+2. **LEGAL BASIS**
+   - Applicable law/regulation
+   - Jurisdiction-specific rules
+   - Statute of limitations
+
+3. **CONTEST OPTIONS**
+   - Can this fine be contested?
+   - Grounds for appeal
+   - Required evidence
+   - Success probability assessment
+
+4. **REDUCTION STRATEGIES**
+   - Early payment discounts
+   - Installment options
+   - Negotiation possibilities
+   - Hardship provisions
+
+5. **ANNULMENT POSSIBILITIES**
+   - Procedural defects to check
+   - Invalid service issues
+   - Prescription/limitation periods
+   - Technical grounds
+
+6. **DEADLINES**
+   - Payment deadline
+   - Appeal deadline
+   - Escalation timeline
+   - Consequences of missing deadlines
+
+7. **STEP-BY-STEP PROCEDURE**
+   - How to pay (if choosing to pay)
+   - How to contest (if contesting)
+   - Required documents
+   - Where to submit
+
+8. **RECOMMENDATIONS**
+   - Best course of action
+   - Cost-benefit analysis
+   - When to seek legal help
+
+Country: {country_code}
+Fine Type: {fine_type}"""
+
+        if registry_text:
+            text = text + "\n\n" + registry_text
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Analyze this fine/penalty document:\n\n{text[:8000]}"}
+            ],
+            temperature=0.3,
+            max_tokens=3000
+        )
+        
+        return response.choices[0].message.content or ""
+        
+    except Exception as e:
+        logging.error(f"Error in fine analysis: {str(e)}")
+        return f"Error analyzing fine: {str(e)}"
+
+
+def analyze_due_diligence(text: str, country_code: str, language: str = 'en', category: str = 'b2b_contract') -> str:
+    """
+    Specialized analysis for due diligence - contracts and company verification
+    """
+    try:
+        # Perform registry lookup
+        registry_data = DocumentRegistryService.analyze_document_registry(text, country_code)
+        registry_text = format_registry_data_for_analysis(registry_data)
+        
+        language_names = {
+            'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French',
+            'es': 'Spanish', 'it': 'Italian', 'pt': 'Portuguese', 'nl': 'Dutch',
+            'pl': 'Polish', 'ru': 'Russian', 'tr': 'Turkish', 'ar': 'Arabic',
+            'zh': 'Chinese', 'ja': 'Japanese', 'ko': 'Korean'
+        }
+        
+        lang_name = language_names.get(language, 'English')
+        
+        category_descriptions = {
+            'b2b_contract': 'Business-to-Business Contract',
+            'company_acquisition': 'Company Acquisition',
+            'partnership': 'Partnership Agreement',
+            'supplier': 'Supplier/Vendor Contract',
+            'distribution': 'Distribution Agreement',
+            'license': 'Licensing Agreement',
+            'franchise': 'Franchise Agreement',
+            'investment': 'Investment Agreement',
+            'merger': 'Merger & Acquisition',
+            'joint_venture': 'Joint Venture',
+            'service': 'Service Level Agreement',
+            'nda': 'Non-Disclosure Agreement'
+        }
+        
+        category_name = category_descriptions.get(category, 'Business Contract')
+        
+        system_prompt = f"""You are DueDiligenceGPT, an expert in corporate law, M&A, and business transaction analysis.
+
+IMPORTANT: Respond entirely in {lang_name}.
+
+Category: {category_name}
+
+Your analysis should cover:
+
+1. **JURISDICTION DETECTION**
+   - Identify governing law from document content
+   - Applicable legal framework
+   - Cross-border considerations
+
+2. **PARTIES ANALYSIS**
+   - Company names and registration details
+   - Legal status verification indicators
+   - Beneficial ownership clues
+
+3. **CONTRACT RISK ASSESSMENT**
+   - High-risk clauses
+   - Liability exposure
+   - Indemnification terms
+   - Limitation of liability analysis
+
+4. **FINANCIAL TERMS**
+   - Payment terms and conditions
+   - Price adjustment mechanisms
+   - Currency and exchange risks
+   - Financial covenants
+
+5. **COMPLIANCE CHECK**
+   - Regulatory requirements
+   - Anti-corruption provisions
+   - Sanctions compliance
+   - Data protection (GDPR, etc.)
+
+6. **RED FLAGS**
+   - Unusual or one-sided terms
+   - Missing standard protections
+   - Potential fraud indicators
+   - Warning signs to investigate
+
+7. **COMPANY VERIFICATION CHECKLIST**
+   - Registration status to verify
+   - Financial health indicators
+   - Litigation history to check
+   - Ownership structure
+
+8. **NEGOTIATION POINTS**
+   - Clauses to renegotiate
+   - Missing protections to add
+   - Balance of terms assessment
+
+9. **RECOMMENDATIONS**
+   - Proceed/caution/reject assessment
+   - Additional due diligence needed
+   - Legal review requirements
+   - Next steps"""
+
+        if registry_text:
+            text = text + "\n\n" + registry_text
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Perform due diligence analysis on:\n\n{text[:8000]}"}
+            ],
+            temperature=0.3,
+            max_tokens=3000
+        )
+        
+        return response.choices[0].message.content or ""
+        
+    except Exception as e:
+        logging.error(f"Error in due diligence analysis: {str(e)}")
+        return f"Error in due diligence: {str(e)}"
+
+
+def analyze_company_verification(company_name: str, country_code: str, registration_number: str = '', language: str = 'en', documents_text: str = '') -> str:
+    """
+    Company verification for B2B due diligence
+    """
+    try:
+        language_names = {
+            'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French',
+            'es': 'Spanish', 'it': 'Italian'
+        }
+        
+        lang_name = language_names.get(language, 'English')
+        
+        # Perform registry lookup if we have documents
+        registry_text = ""
+        if documents_text:
+            registry_data = DocumentRegistryService.analyze_document_registry(documents_text, country_code)
+            registry_text = format_registry_data_for_analysis(registry_data)
+        
+        system_prompt = f"""You are CompanyVerifyGPT, an expert in corporate verification and business intelligence.
+
+IMPORTANT: Respond entirely in {lang_name}.
+
+Provide comprehensive company verification analysis:
+
+1. **COMPANY IDENTIFICATION**
+   - Legal name and trading names
+   - Registration number format validation
+   - Country-specific ID verification
+
+2. **REGISTRATION STATUS**
+   - How to verify in {country_code} official registries
+   - Expected registration format
+   - Red flags for fake registrations
+
+3. **FINANCIAL HEALTH INDICATORS**
+   - Key metrics to check
+   - Financial statement availability
+   - Credit rating sources
+
+4. **LEGAL STATUS CHECK**
+   - Litigation search recommendations
+   - Bankruptcy/insolvency check
+   - Regulatory compliance
+
+5. **OWNERSHIP STRUCTURE**
+   - How to find beneficial owners
+   - Related party identification
+   - Corporate structure risks
+
+6. **SANCTIONS & COMPLIANCE**
+   - Sanctions list check method
+   - PEP (Politically Exposed Persons) check
+   - Anti-money laundering flags
+
+7. **REPUTATION ANALYSIS**
+   - News and media search tips
+   - Industry standing
+   - Customer/partner references
+
+8. **COUNTRY-SPECIFIC REGISTRIES**
+   - Official registry URLs for {country_code}
+   - Required searches
+   - Document ordering process
+
+9. **VERIFICATION CHECKLIST**
+   - Step-by-step verification process
+   - Documents to request
+   - Questions to ask
+
+10. **RISK ASSESSMENT**
+    - Overall risk level
+    - Recommendations
+    - Next steps"""
+
+        verification_request = f"Company: {company_name}\nCountry: {country_code}\nRegistration: {registration_number or 'Not provided'}"
+        if documents_text:
+            verification_request += f"\n\nAttached Documents:\n{documents_text[:5000]}"
+        if registry_text:
+            verification_request += f"\n\n{registry_text}"
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": verification_request}
+            ],
+            temperature=0.3,
+            max_tokens=3000
+        )
+        
+        return response.choices[0].message.content or ""
+        
+    except Exception as e:
+        logging.error(f"Error in company verification: {str(e)}")
+        return f"Error verifying company: {str(e)}"

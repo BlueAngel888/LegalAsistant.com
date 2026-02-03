@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Fine & Penalty Analysis - {{ t.site_title if t else 'Legal Assistant' }}{% endblock %}
+
+{% block content %}
+<section class="hero-section py-5" style="background: linear-gradient(135deg, #dc3545 0%, #721c24 100%);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 text-white">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-gavel me-3"></i>
+                    Fine & Penalty Analysis
+                </h1>
+                <p class="lead mb-4">
+                    Upload any fine, penalty notice, traffic violation, or administrative sanction from any country. 
+                    Get expert analysis on how to contest, reduce, or annul your penalty.
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-warning fa-2x me-3"></i>
+                            <span>Contest & Appeal Options</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-warning fa-2x me-3"></i>
+                            <span>Reduction Strategies</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-warning fa-2x me-3"></i>
+                            <span>Deadline Calculations</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-warning fa-2x me-3"></i>
+                            <span>Country-Specific Legal Procedures</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="fas fa-file-invoice-dollar display-1 text-white opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-danger text-white py-4">
+                        <h2 class="text-center mb-0">
+                            <i class="fas fa-upload me-2"></i>
+                            Upload Your Fine or Penalty
+                        </h2>
+                    </div>
+                    <div class="card-body p-5">
+                        <form id="finesForm" method="POST" action="{{ url_for('analyze_fine') }}" enctype="multipart/form-data">
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="fineCountry" class="form-label fw-bold">
+                                        <i class="fas fa-globe me-2"></i>Country/Jurisdiction
+                                    </label>
+                                    <select class="form-select form-select-lg" id="fineCountry" name="country" required>
+                                        <option value="">Select country where fine was issued...</option>
+                                        <option value="SA">🇸🇦 Saudi Arabia</option>
+                                        <option value="DE">🇩🇪 Germany</option>
+                                        <option value="UK">🇬🇧 United Kingdom</option>
+                                        <option value="ES">🇪🇸 Spain</option>
+                                        <option value="CN">🇨🇳 China</option>
+                                        <option value="FR">🇫🇷 France</option>
+                                        <option value="IT">🇮🇹 Italy</option>
+                                        <option value="JP">🇯🇵 Japan</option>
+                                        <option value="KR">🇰🇷 South Korea</option>
+                                        <option value="NL">🇳🇱 Netherlands</option>
+                                        <option value="BR">🇧🇷 Brazil</option>
+                                        <option value="RU">🇷🇺 Russia</option>
+                                        <option value="TR">🇹🇷 Turkey</option>
+                                        <option value="RO">🇷🇴 Romania</option>
+                                        <option value="US">🇺🇸 United States</option>
+                                        <option value="AE">🇦🇪 United Arab Emirates</option>
+                                        <option value="BE">🇧🇪 Belgium</option>
+                                        <option value="AT">🇦🇹 Austria</option>
+                                        <option value="CH">🇨🇭 Switzerland</option>
+                                        <option value="PL">🇵🇱 Poland</option>
+                                        <option value="HU">🇭🇺 Hungary</option>
+                                        <option value="CZ">🇨🇿 Czech Republic</option>
+                                        <option value="BG">🇧🇬 Bulgaria</option>
+                                        <option value="GR">🇬🇷 Greece</option>
+                                        <option value="PT">🇵🇹 Portugal</option>
+                                        <option value="AU">🇦🇺 Australia</option>
+                                        <option value="CA">🇨🇦 Canada</option>
+                                        <option value="MX">🇲🇽 Mexico</option>
+                                        <option value="IN">🇮🇳 India</option>
+                                        <option value="OTHER">🌍 Other Country</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="fineLanguage" class="form-label fw-bold">
+                                        <i class="fas fa-language me-2"></i>Analysis Language
+                                    </label>
+                                    <select class="form-select form-select-lg" id="fineLanguage" name="language" required>
+                                        <option value="">Select language for analysis...</option>
+                                        <option value="en">🇬🇧 English</option>
+                                        <option value="ar">🇸🇦 العربية (Arabic)</option>
+                                        <option value="de">🇩🇪 Deutsch (German)</option>
+                                        <option value="es">🇪🇸 Español (Spanish)</option>
+                                        <option value="fr">🇫🇷 Français (French)</option>
+                                        <option value="it">🇮🇹 Italiano (Italian)</option>
+                                        <option value="ja">🇯🇵 日本語 (Japanese)</option>
+                                        <option value="ko">🇰🇷 한국어 (Korean)</option>
+                                        <option value="nl">🇳🇱 Nederlands (Dutch)</option>
+                                        <option value="pt">🇧🇷 Português (Portuguese)</option>
+                                        <option value="ro">🇷🇴 Română (Romanian)</option>
+                                        <option value="ru">🇷🇺 Русский (Russian)</option>
+                                        <option value="tr">🇹🇷 Türkçe (Turkish)</option>
+                                        <option value="zh">🇨🇳 简体中文 (Chinese)</option>
+                                        <option value="pl">🇵🇱 Polski (Polish)</option>
+                                        <option value="cs">🇨🇿 Čeština (Czech)</option>
+                                        <option value="hu">🇭🇺 Magyar (Hungarian)</option>
+                                        <option value="el">🇬🇷 Ελληνικά (Greek)</option>
+                                        <option value="bg">🇧🇬 Български (Bulgarian)</option>
+                                        <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="fineType" class="form-label fw-bold">
+                                    <i class="fas fa-tag me-2"></i>Type of Fine/Penalty
+                                </label>
+                                <select class="form-select form-select-lg" id="fineType" name="fine_type">
+                                    <option value="auto">Auto-detect from document</option>
+                                    <option value="traffic">Traffic Violation / Speeding</option>
+                                    <option value="parking">Parking Fine</option>
+                                    <option value="administrative">Administrative Penalty</option>
+                                    <option value="tax">Tax Penalty</option>
+                                    <option value="customs">Customs Fine</option>
+                                    <option value="environmental">Environmental Violation</option>
+                                    <option value="labor">Labor Law Violation</option>
+                                    <option value="health_safety">Health & Safety Fine</option>
+                                    <option value="construction">Construction/Building Violation</option>
+                                    <option value="business">Business/Commercial Penalty</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-file-upload me-2"></i>Upload Fine/Penalty Document
+                                </label>
+                                <div class="upload-zone border border-2 border-dashed rounded-3 p-5 text-center" id="fineUploadZone">
+                                    <i class="fas fa-cloud-upload-alt fa-4x text-muted mb-3"></i>
+                                    <p class="mb-2">Drag & drop your fine/penalty document here</p>
+                                    <p class="text-muted small mb-3">or click to browse files</p>
+                                    <input type="file" name="file" id="fineFile" class="d-none" accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" required>
+                                    <button type="button" class="btn btn-outline-danger" onclick="document.getElementById('fineFile').click()">
+                                        <i class="fas fa-folder-open me-2"></i>Browse Files
+                                    </button>
+                                    <p class="text-muted small mt-3">Accepted formats: PDF, JPG, PNG, DOCX</p>
+                                </div>
+                                <div id="fineFilePreview" class="mt-3" style="display: none;">
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <span id="fineFileName"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-danger btn-lg py-3">
+                                    <i class="fas fa-search me-2"></i>
+                                    Analyze Fine & Get Legal Options
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            What We Analyze
+        </h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-gavel fa-3x text-danger mb-3"></i>
+                        <h5>Contest Options</h5>
+                        <p class="text-muted">Learn if your fine can be contested, the grounds for appeal, and the legal procedures in your jurisdiction.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-percentage fa-3x text-warning mb-3"></i>
+                        <h5>Reduction Strategies</h5>
+                        <p class="text-muted">Discover options for reducing the fine amount, early payment discounts, and negotiation possibilities.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-calendar-alt fa-3x text-info mb-3"></i>
+                        <h5>Deadlines & Procedures</h5>
+                        <p class="text-muted">Get exact deadlines for payment or appeal, and step-by-step procedures for your country.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fineFile');
+    const uploadZone = document.getElementById('fineUploadZone');
+    const filePreview = document.getElementById('fineFilePreview');
+    const fileName = document.getElementById('fineFileName');
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            fileName.textContent = this.files[0].name;
+            filePreview.style.display = 'block';
+            uploadZone.classList.add('border-success');
+        }
+    });
+
+    uploadZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-success');
+    });
+
+    uploadZone.addEventListener('dragleave', function() {
+        this.classList.remove('border-success');
+    });
+
+    uploadZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileInput.files = e.dataTransfer.files;
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+            filePreview.style.display = 'block';
+        }
+    });
+
+    uploadZone.addEventListener('click', function() {
+        fileInput.click();
+    });
+});
+</script>
+{% endblock %}

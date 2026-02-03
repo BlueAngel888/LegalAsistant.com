@@ -946,13 +946,16 @@ def success():
                 
                 try:
                     # Import the AI analyzer
-                    from utils.ai_analyzer import analyze_with_gpt4
+                    from utils.ai_analyzer import analyze_with_gpt4, analyze_fine_penalty, analyze_due_diligence, analyze_company_verification
                     
                     # Add country hint to document text for GPT analysis
                     doc_text_with_hint = f"countryHint: {selected_country}\n\n{doc_text}"
                     
                     # Get analysis language
                     analysis_language = session.get('analysis_language', 'ro')
+                    
+                    # Get analysis type
+                    analysis_type = session.get('analysis_type', 'document')
                     
                     # Add access type header
                     if session.get('payment_status') == 'free_access':
@@ -962,10 +965,22 @@ def success():
                     
                     # Always use OpenAI API for both free and paid access
                     try:
-                        logging.info(f"Using OpenAI API for analysis - Payment status: {session.get('payment_status')}")
+                        logging.info(f"Using OpenAI API for analysis - Payment status: {session.get('payment_status')}, Analysis type: {analysis_type}")
                         
-                        # Call OpenAI API with proper error handling
-                        analysis = analyze_with_gpt4(doc_text_with_hint, analysis_language)
+                        # Call appropriate analysis function based on type
+                        if analysis_type == 'fine':
+                            fine_type = session.get('fine_type', 'auto')
+                            analysis = analyze_fine_penalty(doc_text_with_hint, selected_country, analysis_language, fine_type)
+                        elif analysis_type == 'due_diligence':
+                            dd_category = session.get('dd_category', 'b2b_contract')
+                            analysis = analyze_due_diligence(doc_text_with_hint, selected_country, analysis_language, dd_category)
+                        elif analysis_type == 'company_verification':
+                            company_name = session.get('company_name', '')
+                            reg_number = session.get('registration_number', '')
+                            analysis = analyze_company_verification(company_name, selected_country, reg_number, analysis_language, doc_text)
+                        else:
+                            # Default document analysis
+                            analysis = analyze_with_gpt4(doc_text_with_hint, analysis_language)
                         
                         # Prepend access header to analysis
                         analysis = access_header + analysis
@@ -1180,6 +1195,128 @@ def legal_chat():
     except Exception as e:
         logging.error(f"Legal chat error: {str(e)}")
         return jsonify({'success': False, 'error': 'Internal server error'}), 500
+
+@app.route('/fines')
+def fines_analysis():
+    """Fines and Penalty Analysis page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('fines_analysis.html', t=t, lang=lang)
+
+@app.route('/analyze-fine', methods=['POST'])
+def analyze_fine():
+    """Analyze a fine/penalty document"""
+    try:
+        if 'file' not in request.files:
+            flash('No file uploaded', 'error')
+            return redirect(url_for('fines_analysis'))
+        
+        file = request.files['file']
+        if file.filename == '':
+            flash('No file selected', 'error')
+            return redirect(url_for('fines_analysis'))
+        
+        country = request.form.get('country', 'US')
+        language = request.form.get('language', 'en')
+        fine_type = request.form.get('fine_type', 'auto')
+        
+        # Extract text from document
+        doc_text = extract_text_from_file(file)
+        doc_text = clean_text_for_db(doc_text)
+        
+        if not doc_text or len(doc_text.strip()) < 50:
+            flash('Could not extract text from document', 'error')
+            return redirect(url_for('fines_analysis'))
+        
+        # Store in session for payment flow
+        session['doc_text'] = doc_text
+        session['document_country'] = country
+        session['analysis_language'] = language
+        session['analysis_type'] = 'fine'
+        session['fine_type'] = fine_type
+        
+        # Redirect to checkout
+        return redirect(url_for('checkout'))
+        
+    except Exception as e:
+        logging.error(f"Fine analysis error: {str(e)}")
+        flash(f'Error processing document: {str(e)}', 'error')
+        return redirect(url_for('fines_analysis'))
+
+@app.route('/due-diligence')
+def due_diligence():
+    """Due Diligence Analysis page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('due_diligence.html', t=t, lang=lang)
+
+@app.route('/analyze-due-diligence', methods=['POST'])
+def analyze_due_diligence():
+    """Analyze contract for due diligence"""
+    try:
+        analysis_type = request.form.get('analysis_type', 'contract')
+        language = request.form.get('language', 'en')
+        
+        if analysis_type == 'contract':
+            if 'file' not in request.files:
+                flash('No file uploaded', 'error')
+                return redirect(url_for('due_diligence'))
+            
+            file = request.files['file']
+            if file.filename == '':
+                flash('No file selected', 'error')
+                return redirect(url_for('due_diligence'))
+            
+            category = request.form.get('category', 'b2b_contract')
+            
+            # Extract text from document
+            doc_text = extract_text_from_file(file)
+            doc_text = clean_text_for_db(doc_text)
+            
+            if not doc_text or len(doc_text.strip()) < 50:
+                flash('Could not extract text from document', 'error')
+                return redirect(url_for('due_diligence'))
+            
+            # Store in session for payment flow
+            session['doc_text'] = doc_text
+            session['document_country'] = 'AUTO'  # Auto-detect from content
+            session['analysis_language'] = language
+            session['analysis_type'] = 'due_diligence'
+            session['dd_category'] = category
+            
+        else:  # company verification
+            company_country = request.form.get('company_country', '')
+            company_name = request.form.get('company_name', '')
+            registration_number = request.form.get('registration_number', '')
+            
+            if not company_name and not registration_number:
+                flash('Please provide company name or registration number', 'error')
+                return redirect(url_for('due_diligence'))
+            
+            # Create verification text
+            doc_text = f"Company Verification Request:\nCompany Name: {company_name}\nCountry: {company_country}\nRegistration Number: {registration_number}"
+            
+            # Handle optional file upload
+            if 'file' in request.files:
+                file = request.files['file']
+                if file.filename:
+                    file_text = extract_text_from_file(file)
+                    file_text = clean_text_for_db(file_text)
+                    if file_text:
+                        doc_text += f"\n\nCompany Documents:\n{file_text}"
+            
+            session['doc_text'] = doc_text
+            session['document_country'] = company_country
+            session['analysis_language'] = language
+            session['analysis_type'] = 'company_verification'
+        
+        # Redirect to checkout
+        return redirect(url_for('checkout'))
+        
+    except Exception as e:
+        logging.error(f"Due diligence error: {str(e)}")
+        flash(f'Error processing request: {str(e)}', 'error')
+        return redirect(url_for('due_diligence'))
 
 @app.route('/terms')
 def terms():

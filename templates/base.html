@@ -134,6 +134,24 @@
                 </div>
             </div>
             <hr class="border-secondary my-3">
+            
+            <!-- Service Navigation Buttons -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-lg px-4">
+                            <i class="fas fa-file-alt me-2"></i>Analyze Document
+                        </a>
+                        <a href="{{ url_for('fines_analysis') }}" class="btn btn-outline-warning btn-lg px-4">
+                            <i class="fas fa-gavel me-2"></i>Fines & Penalties
+                        </a>
+                        <a href="{{ url_for('due_diligence') }}" class="btn btn-outline-info btn-lg px-4">
+                            <i class="fas fa-search-dollar me-2"></i>Due Diligence
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
             <div class="row">
                 <div class="col-12 text-center">
                     <small class="text-muted">
