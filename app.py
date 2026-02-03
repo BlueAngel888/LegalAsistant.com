@@ -957,11 +957,20 @@ def success():
                     # Get analysis type
                     analysis_type = session.get('analysis_type', 'document')
                     
-                    # Add access type header
+                    # Add analysis type-specific header
+                    analysis_type_headers = {
+                        'document': 'ANALIZĂ JURIDICĂ COMPLETĂ',
+                        'fine': 'ANALIZĂ AMENDĂ / PENALITATE',
+                        'due_diligence': 'ANALIZĂ DUE DILIGENCE',
+                        'company_verification': 'VERIFICARE COMPANIE B2B'
+                    }
+                    header_title = analysis_type_headers.get(analysis_type, 'ANALIZĂ JURIDICĂ')
+                    
+                    # Add access type suffix
                     if session.get('payment_status') == 'free_access':
-                        access_header = f"ANALIZĂ JURIDICĂ COMPLETĂ - ACCES GRATUIT COD {session.get('discount_code', 'LETSGO')}\n\n"
+                        access_header = f"{header_title} - ACCES GRATUIT COD {session.get('discount_code', 'LETSGO')}\n\n"
                     else:
-                        access_header = "ANALIZĂ JURIDICĂ COMPLETĂ - ACCES PREMIUM\n\n"
+                        access_header = f"{header_title} - ACCES PREMIUM\n\n"
                     
                     # Always use OpenAI API for both free and paid access
                     try:
@@ -1309,6 +1318,8 @@ def analyze_due_diligence():
             session['document_country'] = company_country
             session['analysis_language'] = language
             session['analysis_type'] = 'company_verification'
+            session['company_name'] = company_name
+            session['registration_number'] = registration_number
         
         # Redirect to checkout
         return redirect(url_for('checkout'))
