@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}International Contracts - Legal Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h3 class="mb-0">
+                        <i class="fas fa-file-signature me-2"></i>
+                        International Contract Analysis & Drafting
+                    </h3>
+                    <small>INCOTERMS, FIDIC, ICC, ISDA compliant contracts</small>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="nav nav-tabs mb-4" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#review-tab">
+                                <i class="fas fa-search me-1"></i>Review Contract
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#draft-tab">
+                                <i class="fas fa-edit me-1"></i>Draft Contract
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="review-tab">
+                            <form action="{{ url_for('analyze_international_contract') }}" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="action" value="review">
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-file-upload me-1"></i>Upload Contract
+                                    </label>
+                                    <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx" required>
+                                </div>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Contract Type</label>
+                                        <select name="contract_type" class="form-select" required>
+                                            <option value="sale">International Sale of Goods</option>
+                                            <option value="distribution">Distribution Agreement</option>
+                                            <option value="agency">Agency Agreement</option>
+                                            <option value="license">License Agreement</option>
+                                            <option value="joint_venture">Joint Venture Agreement</option>
+                                            <option value="construction">Construction Contract (FIDIC)</option>
+                                            <option value="supply">Supply Agreement</option>
+                                            <option value="service">Service Agreement</option>
+                                            <option value="franchise">Franchise Agreement</option>
+                                            <option value="loan">Loan Agreement (LMA Style)</option>
+                                            <option value="derivatives">Derivatives (ISDA)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Governing Law</label>
+                                        <select name="governing_law" class="form-select">
+                                            <option value="auto">Auto-detect from contract</option>
+                                            <option value="UK">English Law</option>
+                                            <option value="US-NY">New York Law</option>
+                                            <option value="US-DE">Delaware Law</option>
+                                            <option value="DE">German Law</option>
+                                            <option value="FR">French Law</option>
+                                            <option value="CH">Swiss Law</option>
+                                            <option value="SG">Singapore Law</option>
+                                            <option value="HK">Hong Kong Law</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Focus Areas</label>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="focus[]" value="incoterms" checked>
+                                                <label class="form-check-label">INCOTERMS Compliance</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="focus[]" value="sanctions" checked>
+                                                <label class="form-check-label">Sanctions Risks</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="focus[]" value="aml" checked>
+                                                <label class="form-check-label">AML/KYC Issues</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="focus[]" value="abusive" checked>
+                                                <label class="form-check-label">Abusive Clauses</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="focus[]" value="dispute" checked>
+                                                <label class="form-check-label">Dispute Resolution</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="focus[]" value="force_majeure" checked>
+                                                <label class="form-check-label">Force Majeure</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Response Language</label>
+                                        <select name="language" class="form-select">
+                                            <option value="en">English</option>
+                                            <option value="ro">Română</option>
+                                            <option value="de">Deutsch</option>
+                                            <option value="fr">Français</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-search me-2"></i>Review Contract
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="draft-tab">
+                            <form action="{{ url_for('analyze_international_contract') }}" method="POST">
+                                <input type="hidden" name="action" value="draft">
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Contract Type</label>
+                                        <select name="contract_type" class="form-select" required>
+                                            <option value="sale">International Sale of Goods (CISG)</option>
+                                            <option value="nda">Non-Disclosure Agreement</option>
+                                            <option value="distribution">Distribution Agreement</option>
+                                            <option value="agency">Commercial Agency</option>
+                                            <option value="license">IP License Agreement</option>
+                                            <option value="consulting">Consulting Agreement</option>
+                                            <option value="joint_venture">Joint Venture MOU</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Governing Law</label>
+                                        <select name="governing_law" class="form-select" required>
+                                            <option value="UK">English Law</option>
+                                            <option value="US-NY">New York Law</option>
+                                            <option value="DE">German Law</option>
+                                            <option value="FR">French Law</option>
+                                            <option value="CH">Swiss Law</option>
+                                            <option value="SG">Singapore Law</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Party A (Your Client)</label>
+                                        <input type="text" name="party_a" class="form-control" placeholder="Company name and country" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Party B (Counterparty)</label>
+                                        <input type="text" name="party_b" class="form-control" placeholder="Company name and country" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Key Terms & Requirements</label>
+                                    <textarea name="requirements" class="form-control" rows="4" required
+                                        placeholder="Describe the main terms: subject matter, payment terms, duration, territory, special clauses needed..."></textarea>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Dispute Resolution</label>
+                                    <select name="dispute_resolution" class="form-select">
+                                        <option value="icc">ICC Arbitration (Paris)</option>
+                                        <option value="lcia">LCIA Arbitration (London)</option>
+                                        <option value="siac">SIAC Arbitration (Singapore)</option>
+                                        <option value="hkiac">HKIAC Arbitration (Hong Kong)</option>
+                                        <option value="court">Court Litigation</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-edit me-2"></i>Generate Contract Draft
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

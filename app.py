@@ -946,7 +946,10 @@ def success():
                 
                 try:
                     # Import the AI analyzer
-                    from utils.ai_analyzer import analyze_with_gpt4, analyze_fine_penalty, analyze_due_diligence, analyze_company_verification
+                    from utils.ai_analyzer import (analyze_with_gpt4, analyze_fine_penalty, analyze_due_diligence, 
+                        analyze_company_verification, analyze_jurisdiction_comparison, analyze_conflict_of_laws,
+                        analyze_international_contract, analyze_sanctions_compliance, analyze_arbitration,
+                        analyze_immigration, analyze_legal_translation)
                     
                     # Add country hint to document text for GPT analysis
                     doc_text_with_hint = f"countryHint: {selected_country}\n\n{doc_text}"
@@ -962,7 +965,14 @@ def success():
                         'document': 'ANALIZĂ JURIDICĂ COMPLETĂ',
                         'fine': 'ANALIZĂ AMENDĂ / PENALITATE',
                         'due_diligence': 'ANALIZĂ DUE DILIGENCE',
-                        'company_verification': 'VERIFICARE COMPANIE B2B'
+                        'company_verification': 'VERIFICARE COMPANIE B2B',
+                        'jurisdiction_compare': 'COMPARARE JURISDICȚII',
+                        'conflict_laws': 'CONFLICT DE LEGI - LEA APLICABILĂ',
+                        'international_contract': 'CONTRACT INTERNAȚIONAL',
+                        'sanctions': 'VERIFICARE SANCȚIUNI & CONFORMITATE',
+                        'arbitration': 'ANALIZĂ ARBITRAJ INTERNAȚIONAL',
+                        'immigration': 'ANALIZĂ IMIGRARE & VIZE',
+                        'translation': 'TRADUCERE JURIDICĂ'
                     }
                     header_title = analysis_type_headers.get(analysis_type, 'ANALIZĂ JURIDICĂ')
                     
@@ -987,6 +997,25 @@ def success():
                             company_name = session.get('company_name', '')
                             reg_number = session.get('registration_number', '')
                             analysis = analyze_company_verification(company_name, selected_country, reg_number, analysis_language, doc_text)
+                        elif analysis_type == 'jurisdiction_compare':
+                            countries = session.get('compare_countries', '').split(',')
+                            legal_area = session.get('legal_area', 'data_protection')
+                            analysis = analyze_jurisdiction_comparison(countries, legal_area, doc_text, analysis_language)
+                        elif analysis_type == 'conflict_laws':
+                            analysis = analyze_conflict_of_laws(doc_text, analysis_language)
+                        elif analysis_type == 'international_contract':
+                            action = session.get('contract_action', 'review')
+                            analysis = analyze_international_contract(doc_text, action, analysis_language)
+                        elif analysis_type == 'sanctions':
+                            analysis = analyze_sanctions_compliance(doc_text, analysis_language)
+                        elif analysis_type == 'arbitration':
+                            analysis = analyze_arbitration(doc_text, analysis_language)
+                        elif analysis_type == 'immigration':
+                            analysis = analyze_immigration(doc_text, analysis_language)
+                        elif analysis_type == 'translation':
+                            source = session.get('source_lang', 'auto')
+                            target = session.get('target_lang', 'en')
+                            analysis = analyze_legal_translation(doc_text, source, target)
                         else:
                             # Default document analysis
                             analysis = analyze_with_gpt4(doc_text_with_hint, analysis_language)
@@ -1328,6 +1357,290 @@ def analyze_due_diligence():
         logging.error(f"Due diligence error: {str(e)}")
         flash(f'Error processing request: {str(e)}', 'error')
         return redirect(url_for('due_diligence'))
+
+@app.route('/jurisdiction-compare')
+def jurisdiction_compare():
+    """Jurisdiction Comparison page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('jurisdiction_compare.html', t=t, lang=lang)
+
+@app.route('/analyze-jurisdiction-compare', methods=['POST'])
+def analyze_jurisdiction_compare():
+    """Compare laws across jurisdictions"""
+    try:
+        country1 = request.form.get('country1', '')
+        country2 = request.form.get('country2', '')
+        legal_area = request.form.get('legal_area', 'data_protection')
+        specific_question = request.form.get('specific_question', '')
+        language = request.form.get('language', 'en')
+        
+        doc_text = f"Jurisdiction Comparison Request:\nCountry 1: {country1}\nCountry 2: {country2}\nLegal Area: {legal_area}\nSpecific Question: {specific_question}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = country1
+        session['analysis_language'] = language
+        session['analysis_type'] = 'jurisdiction_compare'
+        session['compare_countries'] = f"{country1},{country2}"
+        session['legal_area'] = legal_area
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Jurisdiction compare error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('jurisdiction_compare'))
+
+@app.route('/conflict-laws')
+def conflict_laws():
+    """Conflict of Laws page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('conflict_laws.html', t=t, lang=lang)
+
+@app.route('/analyze-conflict-laws', methods=['POST'])
+def analyze_conflict_laws():
+    """Analyze conflict of laws"""
+    try:
+        party_a = request.form.get('party_a_country', '')
+        party_b = request.form.get('party_b_country', '')
+        performance = request.form.get('performance_country', '')
+        relationship_type = request.form.get('relationship_type', 'contract')
+        situation = request.form.get('situation', '')
+        language = request.form.get('language', 'en')
+        
+        doc_text = f"Conflict of Laws Analysis:\nParty A: {party_a}\nParty B: {party_b}\nPlace of Performance: {performance}\nRelationship Type: {relationship_type}\nSituation: {situation}"
+        
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                file_text = extract_text_from_file(file)
+                file_text = clean_text_for_db(file_text)
+                if file_text:
+                    doc_text += f"\n\nDocument Content:\n{file_text}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = party_a
+        session['analysis_language'] = language
+        session['analysis_type'] = 'conflict_laws'
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Conflict laws error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('conflict_laws'))
+
+@app.route('/international-contracts')
+def international_contracts():
+    """International Contracts page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('international_contracts.html', t=t, lang=lang)
+
+@app.route('/analyze-international-contract', methods=['POST'])
+def analyze_international_contract():
+    """Analyze or draft international contract"""
+    try:
+        action = request.form.get('action', 'review')
+        contract_type = request.form.get('contract_type', 'sale')
+        governing_law = request.form.get('governing_law', 'UK')
+        language = request.form.get('language', 'en')
+        
+        if action == 'review':
+            if 'file' not in request.files:
+                flash('Please upload a contract', 'error')
+                return redirect(url_for('international_contracts'))
+            file = request.files['file']
+            if file.filename == '':
+                flash('Please select a file', 'error')
+                return redirect(url_for('international_contracts'))
+            
+            doc_text = extract_text_from_file(file)
+            doc_text = clean_text_for_db(doc_text)
+            doc_text = f"Contract Review Request:\nContract Type: {contract_type}\nGoverning Law: {governing_law}\n\nContract Content:\n{doc_text}"
+        else:
+            party_a = request.form.get('party_a', '')
+            party_b = request.form.get('party_b', '')
+            requirements = request.form.get('requirements', '')
+            dispute_resolution = request.form.get('dispute_resolution', 'icc')
+            
+            doc_text = f"Contract Drafting Request:\nContract Type: {contract_type}\nGoverning Law: {governing_law}\nParty A: {party_a}\nParty B: {party_b}\nDispute Resolution: {dispute_resolution}\nRequirements: {requirements}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = governing_law
+        session['analysis_language'] = language
+        session['analysis_type'] = 'international_contract'
+        session['contract_action'] = action
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"International contract error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('international_contracts'))
+
+@app.route('/sanctions-compliance')
+def sanctions_compliance():
+    """Sanctions & Compliance page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('sanctions_compliance.html', t=t, lang=lang)
+
+@app.route('/analyze-sanctions', methods=['POST'])
+def analyze_sanctions():
+    """Analyze sanctions and compliance"""
+    try:
+        entity_name = request.form.get('entity_name', '')
+        entity_country = request.form.get('entity_country', '')
+        from_country = request.form.get('from_country', '')
+        to_country = request.form.get('to_country', '')
+        transaction_type = request.form.get('transaction_type', '')
+        product_description = request.form.get('product_description', '')
+        end_use = request.form.get('end_use', '')
+        language = request.form.get('language', 'en')
+        
+        doc_text = f"Sanctions & Compliance Check:\nEntity: {entity_name}\nEntity Country: {entity_country}\nFrom: {from_country}\nTo: {to_country}\nTransaction Type: {transaction_type}\nProduct: {product_description}\nEnd Use: {end_use}"
+        
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                file_text = extract_text_from_file(file)
+                file_text = clean_text_for_db(file_text)
+                if file_text:
+                    doc_text += f"\n\nDocument:\n{file_text}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = from_country or entity_country
+        session['analysis_language'] = language
+        session['analysis_type'] = 'sanctions'
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Sanctions error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('sanctions_compliance'))
+
+@app.route('/arbitration')
+def arbitration():
+    """International Arbitration page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('arbitration.html', t=t, lang=lang)
+
+@app.route('/analyze-arbitration', methods=['POST'])
+def analyze_arbitration():
+    """Analyze arbitration case"""
+    try:
+        institution = request.form.get('institution', 'icc')
+        seat = request.form.get('seat', '')
+        claimant = request.form.get('claimant_country', '')
+        respondent = request.form.get('respondent_country', '')
+        dispute_amount = request.form.get('dispute_amount', 'medium')
+        dispute_description = request.form.get('dispute_description', '')
+        language = request.form.get('language', 'en')
+        
+        doc_text = f"Arbitration Analysis:\nInstitution: {institution}\nSeat: {seat}\nClaimant: {claimant}\nRespondent: {respondent}\nAmount: {dispute_amount}\nDescription: {dispute_description}"
+        
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                file_text = extract_text_from_file(file)
+                file_text = clean_text_for_db(file_text)
+                if file_text:
+                    doc_text += f"\n\nArbitration Clause/Contract:\n{file_text}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = claimant
+        session['analysis_language'] = language
+        session['analysis_type'] = 'arbitration'
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Arbitration error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('arbitration'))
+
+@app.route('/immigration')
+def immigration():
+    """Immigration & Visa page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('immigration.html', t=t, lang=lang)
+
+@app.route('/analyze-immigration', methods=['POST'])
+def analyze_immigration():
+    """Analyze immigration options"""
+    try:
+        nationality = request.form.get('nationality', '')
+        destination = request.form.get('destination', '')
+        purpose = request.form.get('purpose', 'employment')
+        occupation = request.form.get('occupation', '')
+        investment = request.form.get('investment_budget', '')
+        details = request.form.get('details', '')
+        language = request.form.get('language', 'en')
+        
+        doc_text = f"Immigration Analysis:\nNationality: {nationality}\nDestination: {destination}\nPurpose: {purpose}\nOccupation: {occupation}\nInvestment Budget: {investment}\nDetails: {details}"
+        
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                file_text = extract_text_from_file(file)
+                file_text = clean_text_for_db(file_text)
+                if file_text:
+                    doc_text += f"\n\nDocuments:\n{file_text}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = destination
+        session['analysis_language'] = language
+        session['analysis_type'] = 'immigration'
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Immigration error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('immigration'))
+
+@app.route('/legal-translation')
+def legal_translation():
+    """Legal Translation page"""
+    lang = session.get('language', 'en')
+    t = get_translation(lang)
+    return render_template('legal_translation.html', t=t, lang=lang)
+
+@app.route('/analyze-translation', methods=['POST'])
+def analyze_translation():
+    """Perform legal translation"""
+    try:
+        source_lang = request.form.get('source_lang', 'auto')
+        target_lang = request.form.get('target_lang', 'en')
+        legal_domain = request.form.get('legal_domain', 'general')
+        text = request.form.get('text', '')
+        language = target_lang
+        
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                file_text = extract_text_from_file(file)
+                file_text = clean_text_for_db(file_text)
+                if file_text:
+                    text = file_text
+        
+        if not text:
+            flash('Please provide text or upload a document', 'error')
+            return redirect(url_for('legal_translation'))
+        
+        doc_text = f"Legal Translation Request:\nSource: {source_lang}\nTarget: {target_lang}\nDomain: {legal_domain}\n\nText to Translate:\n{text}"
+        
+        session['doc_text'] = doc_text
+        session['document_country'] = 'INT'
+        session['analysis_language'] = language
+        session['analysis_type'] = 'translation'
+        session['source_lang'] = source_lang
+        session['target_lang'] = target_lang
+        
+        return redirect(url_for('checkout'))
+    except Exception as e:
+        logging.error(f"Translation error: {str(e)}")
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('legal_translation'))
 
 @app.route('/terms')
 def terms():

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}International Arbitration - Legal Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-secondary text-white py-3">
+                    <h3 class="mb-0">
+                        <i class="fas fa-landmark me-2"></i>
+                        International Arbitration Analysis
+                    </h3>
+                    <small>ICC, UNCITRAL, LCIA, ICSID, SIAC expertise</small>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('analyze_arbitration') }}" method="POST" enctype="multipart/form-data">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-gavel me-1"></i>Arbitration Institution
+                                </label>
+                                <select name="institution" class="form-select" required>
+                                    <option value="icc">ICC (International Chamber of Commerce)</option>
+                                    <option value="lcia">LCIA (London Court of International Arbitration)</option>
+                                    <option value="uncitral">UNCITRAL Rules (Ad Hoc)</option>
+                                    <option value="siac">SIAC (Singapore)</option>
+                                    <option value="hkiac">HKIAC (Hong Kong)</option>
+                                    <option value="icsid">ICSID (Investment Disputes)</option>
+                                    <option value="scc">SCC (Stockholm)</option>
+                                    <option value="aaa_icdr">AAA-ICDR (American Arbitration)</option>
+                                    <option value="viac">VIAC (Vienna)</option>
+                                    <option value="diac">DIAC (Dubai)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Seat of Arbitration
+                                </label>
+                                <select name="seat" class="form-select">
+                                    <option value="">Select seat...</option>
+                                    <option value="Paris">Paris</option>
+                                    <option value="London">London</option>
+                                    <option value="Singapore">Singapore</option>
+                                    <option value="Hong Kong">Hong Kong</option>
+                                    <option value="Geneva">Geneva / Zurich</option>
+                                    <option value="New York">New York</option>
+                                    <option value="Stockholm">Stockholm</option>
+                                    <option value="Dubai">Dubai / DIFC</option>
+                                    <option value="Vienna">Vienna</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Claimant Country</label>
+                                <select name="claimant_country" class="form-select" required>
+                                    <option value="">Select...</option>
+                                    <option value="US">🇺🇸 USA</option>
+                                    <option value="UK">🇬🇧 UK</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Respondent Country</label>
+                                <select name="respondent_country" class="form-select" required>
+                                    <option value="">Select...</option>
+                                    <option value="US">🇺🇸 USA</option>
+                                    <option value="UK">🇬🇧 UK</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-euro-sign me-1"></i>Amount in Dispute (EUR)
+                            </label>
+                            <select name="dispute_amount" class="form-select">
+                                <option value="small">Under €1 million</option>
+                                <option value="medium">€1 - 10 million</option>
+                                <option value="large">€10 - 100 million</option>
+                                <option value="mega">Over €100 million</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-upload me-1"></i>Upload Arbitration Clause / Contract
+                            </label>
+                            <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-clipboard-list me-1"></i>Describe the Dispute
+                            </label>
+                            <textarea name="dispute_description" class="form-control" rows="4" required
+                                placeholder="Describe the nature of the dispute, main claims, facts, and any emergency measures needed..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">What Do You Need?</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="needs[]" value="clause_review" checked>
+                                        <label class="form-check-label">Arbitration Clause Review</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="needs[]" value="cost_estimate">
+                                        <label class="form-check-label">Cost & Duration Estimate</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="needs[]" value="enforcement">
+                                        <label class="form-check-label">Enforcement Analysis (NYC)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="needs[]" value="strategy">
+                                        <label class="form-check-label">Strategic Recommendations</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="needs[]" value="draft_ror">
+                                        <label class="form-check-label">Draft Request for Arbitration</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="needs[]" value="emergency">
+                                        <label class="form-check-label">Emergency Measures</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Response Language</label>
+                                <select name="language" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="ro">Română</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="fr">Français</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-gavel me-2"></i>Analyze Arbitration Case
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

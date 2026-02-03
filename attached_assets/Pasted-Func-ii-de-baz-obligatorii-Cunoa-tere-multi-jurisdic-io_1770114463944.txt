@@ -1,0 +1,151 @@
+Funcții de bază (obligatorii)
+
+Cunoaștere multi-jurisdicțională actualizată în timp real
+Acces la legislație, jurisprudență și tratate din majoritatea țărilor (UE, SUA, China, India, Brazilia, Rusia, țări arabe, Africa etc.)
+Actualizare automată zilnică / săptămânală (prin crawling legal oficial + baze de date ca Westlaw, LexisNexis, vLex, EUR-Lex, WTO, ICC etc.)
+
+Comparare și analiză a legilor din mai multe jurisdicții
+„Care este diferența între GDPR și CCPA + LGPD în privința transferului de date către India?”
+Tabele comparative automate + evidențiere riscuri
+
+Rezolvarea conflictelor de legi (conflict of laws / private international law)
+Determinarea legii aplicabile (Rome I, Rome II, Hague Conventions etc.)
+Analiză forum shopping și jurisdicție internațională
+
+Suport pentru dreptul internațional public & privat
+Tratate bilaterale / multilaterale, Convenția de la Viena, UNCLOS, WTO, ICSID, New York Convention
+Sancțiuni ONU / UE / OFAC / OFSI / alte regimuri
+
+Traducere juridică precisă multi-lingvă
+Traducere contextuală în / din peste 50–100 limbi juridice (inclusiv limbi cu sisteme diferite: arabă, chineză, rusă, hindi, ebraică etc.)
+Detectare nuanțe terminologice (ex: „force majeure” vs „vis major” vs „impreviziune”)
+
+Analiză și redactare contracte internaționale
+Generare / review de contracte în engleză juridică internațională (common law style) + adaptare la civil law
+Clauze standard INCOTERMS, ISDA, FIDIC, LMA, ICC Model Contracts
+Detectare clauze abuzive, riscuri geopolitice, sancțiuni, AML / KYC
+
+Cercetare juridică globală rapidă & citare precisă
+Căutare semantică peste baze internaționale
+Citare automată în format Bluebook / OSCOLA / Harvard / stil național cerut
+
+
+Funcții avansate (agentice & practice)
+
+Simulare scenarii transfrontaliere
+„Ce se întâmplă dacă compania X din Delaware semnează un contract cu Y din Shanghai și dispută în Singapore?”
+Estimare costuri, durată, probabilitate de succes în arbitraj ICC / LCIA / SIAC
+
+Suport imigrație & relocare globală
+Analiză vize / permise de muncă (EB-5, Golden Visa, EU Blue Card, UK Global Talent etc.)
+Verificare schimbări recente în politici (ex: H-1B lottery, UK points-based system)
+
+Conformitate globală & riscuri
+AML / CFT / sanctions screening multi-jurisdicțional
+Export control (EAR, ITAR, EU dual-use)
+ESG & due diligence internațional
+
+Arbitraj & litigii internaționale
+Analiză reguli UNCITRAL, ICC, LCIA, ICSID, New York Convention
+Drafting cereri de arbitraj / memorii
+
+Interfață agentică (multi-step reasoning)
+Poate executa task-uri complexe în lanț: „Caută ultimul caz ICSID cu România → rezumă → compară cu cazul meu → propune clauză de arbitraj”
+
+Confidențialitate & securitate la nivel planetar
+Procesare on-device / zero-knowledge pentru clienți sensibili
+Conformitate cu GDPR + CCPA + LGPD + PIPL + alte legi de date
+
+
+Funcții opționale dar foarte utile
+
+Integrare cu baze de date de arbitraj (italaw, Jus Mundi, PCA)
+Simulare negocierii contractuale multi-partener
+Monitorizare schimbări legislative globale (alert system)
+Suport pentru limbi rare / dialecte juridice (ex: dreptul islamic în mai multe variante)
+Analiză impact AI & tech regulation (ex: EU AI Act vs US state laws vs China regulations)
+
+Pe scurt: un adevărat asistent legal planetar ar trebui să fie un mix între:
+
+Westlaw / LexisNexis la scară globală
+DeepL juridic × 100
+un avocat internațional senior cu memorie perfectă
+un agent AI capabil să raționeze în lanțuri lungi de deducție juridică
+
+Dacă vrei să detaliem una dintre funcții (ex: cum ar arăta concret analiza conflict of laws sau draftul unui contract FIDIC adaptat la două jurisdicții), spune-mi!2.4sFast38 sourcesUn asistent legal planetar (global / internațional) ar trebui să fie mult mai mult decât un asistent juridic obișnuit dintr-o țară sau o jurisdicție. Ar trebui să funcționeze ca un instrument capabil să navigheze în peste 190 de sisteme juridice, să înțeleagă conflicte de legi, tratate internaționale, arbitraj, drepturi umane, comerț global, sancțiuni, imigrație, taxe transfrontaliere etc.
+Iată o listă realistă și comprehensivă cu funcțiile esențiale pe care un astfel de asistent AI ar trebui să le aibă în 2026–2030 (ordonate aproximativ după importanță practică):
+Funcții de bază (obligatorii)
+
+Cunoaștere multi-jurisdicțională actualizată în timp real
+
+   * Acces la legislație, jurisprudență și tratate din majoritatea țărilor (UE, SUA, China, India, Brazilia, Rusia, țări arabe, Africa etc.)
+   * Actualizare automată zilnică / săptămânală (prin crawling legal oficial + baze de date ca Westlaw, LexisNexis, vLex, EUR-Lex, WTO, ICC etc.)
+
+Comparare și analiză a legilor din mai multe jurisdicții
+
+   * „Care este diferența între GDPR și CCPA + LGPD în privința transferului de date către India?”
+   * Tabele comparative automate + evidențiere riscuri
+
+Rezolvarea conflictelor de legi (conflict of laws / private international law)
+
+   * Determinarea legii aplicabile (Rome I, Rome II, Hague Conventions etc.)
+   * Analiză forum shopping și jurisdicție internațională
+
+Suport pentru dreptul internațional public & privat
+
+   * Tratate bilaterale / multilaterale, Convenția de la Viena, UNCLOS, WTO, ICSID, New York Convention
+   * Sancțiuni ONU / UE / OFAC / OFSI / alte regimuri
+
+Traducere juridică precisă multi-lingvă
+
+   * Traducere contextuală în / din peste 50–100 limbi juridice (inclusiv limbi cu sisteme diferite: arabă, chineză, rusă, hindi, ebraică etc.)
+   * Detectare nuanțe terminologice (ex: „force majeure” vs „vis major” vs „impreviziune”)
+
+Analiză și redactare contracte internaționale
+
+   * Generare / review de contracte în engleză juridică internațională (common law style) + adaptare la civil law
+   * Clauze standard INCOTERMS, ISDA, FIDIC, LMA, ICC Model Contracts
+   * Detectare clauze abuzive, riscuri geopolitice, sancțiuni, AML / KYC
+
+Cercetare juridică globală rapidă & citare precisă
+
+   * Căutare semantică peste baze internaționale
+   * Citare automată în format Bluebook / OSCOLA / Harvard / stil național cerut
+Funcții avansate (agentice & practice)
+
+Simulare scenarii transfrontaliere
+
+   * „Ce se întâmplă dacă compania X din Delaware semnează un contract cu Y din Shanghai și dispută în Singapore?”
+   * Estimare costuri, durată, probabilitate de succes în arbitraj ICC / LCIA / SIAC
+
+Suport imigrație & relocare globală
+
+   * Analiză vize / permise de muncă (EB-5, Golden Visa, EU Blue Card, UK Global Talent etc.)
+   * Verificare schimbări recente în politici (ex: H-1B lottery, UK points-based system)
+
+Conformitate globală & riscuri
+
+    * AML / CFT / sanctions screening multi-jurisdicțional
+    * Export control (EAR, ITAR, EU dual-use)
+    * ESG & due diligence internațional
+
+Arbitraj & litigii internaționale
+
+    * Analiză reguli UNCITRAL, ICC, LCIA, ICSID, New York Convention
+    * Drafting cereri de arbitraj / memorii
+
+Interfață agentică (multi-step reasoning)
+
+    * Poate executa task-uri complexe în lanț: „Caută ultimul caz ICSID cu România → rezumă → compară cu cazul meu → propune clauză de arbitraj”
+
+Confidențialitate & securitate la nivel planetar
+
+    * Procesare on-device / zero-knowledge pentru clienți sensibili
+    * Conformitate cu GDPR + CCPA + LGPD + PIPL + alte legi de date
+Funcții opționale dar foarte utile
+
+Integrare cu baze de date de arbitraj (italaw, Jus Mundi, PCA)
+Simulare negocierii contractuale multi-partener
+Monitorizare schimbări legislative globale (alert system)
+Suport pentru limbi rare / dialecte juridice (ex: dreptul islamic în mai multe variante)
+Analiză impact AI & tech regulation (ex: EU AI Act vs US state laws vs China regulations)

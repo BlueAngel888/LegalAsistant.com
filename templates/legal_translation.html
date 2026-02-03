@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Legal Translation - Legal Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    <h3 class="mb-0">
+                        <i class="fas fa-language me-2"></i>
+                        Legal Translation
+                    </h3>
+                    <small>Precise multilingual legal translation with terminology expertise</small>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('analyze_translation') }}" method="POST" enctype="multipart/form-data">
+                        <div class="row mb-4">
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-file-alt me-1"></i>Source Language
+                                </label>
+                                <select name="source_lang" class="form-select" required>
+                                    <option value="auto">Auto-detect</option>
+                                    <option value="en">English</option>
+                                    <option value="de">German (Deutsch)</option>
+                                    <option value="fr">French (Français)</option>
+                                    <option value="es">Spanish (Español)</option>
+                                    <option value="it">Italian (Italiano)</option>
+                                    <option value="pt">Portuguese (Português)</option>
+                                    <option value="nl">Dutch (Nederlands)</option>
+                                    <option value="ro">Romanian (Română)</option>
+                                    <option value="pl">Polish (Polski)</option>
+                                    <option value="ru">Russian (Русский)</option>
+                                    <option value="ar">Arabic (العربية)</option>
+                                    <option value="zh">Chinese (中文)</option>
+                                    <option value="ja">Japanese (日本語)</option>
+                                    <option value="ko">Korean (한국어)</option>
+                                    <option value="tr">Turkish (Türkçe)</option>
+                                    <option value="he">Hebrew (עברית)</option>
+                                    <option value="hi">Hindi (हिन्दी)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end justify-content-center">
+                                <i class="fas fa-arrow-right fa-2x text-muted mb-3"></i>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-file-alt me-1"></i>Target Language
+                                </label>
+                                <select name="target_lang" class="form-select" required>
+                                    <option value="en">English</option>
+                                    <option value="de">German (Deutsch)</option>
+                                    <option value="fr">French (Français)</option>
+                                    <option value="es">Spanish (Español)</option>
+                                    <option value="it">Italian (Italiano)</option>
+                                    <option value="pt">Portuguese (Português)</option>
+                                    <option value="nl">Dutch (Nederlands)</option>
+                                    <option value="ro">Romanian (Română)</option>
+                                    <option value="pl">Polish (Polski)</option>
+                                    <option value="ru">Russian (Русский)</option>
+                                    <option value="ar">Arabic (العربية)</option>
+                                    <option value="zh">Chinese (中文)</option>
+                                    <option value="ja">Japanese (日本語)</option>
+                                    <option value="ko">Korean (한국어)</option>
+                                    <option value="tr">Turkish (Türkçe)</option>
+                                    <option value="he">Hebrew (עברית)</option>
+                                    <option value="hi">Hindi (हिन्दी)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-tags me-1"></i>Legal Domain
+                            </label>
+                            <select name="legal_domain" class="form-select">
+                                <option value="general">General Legal</option>
+                                <option value="contract">Contract Law</option>
+                                <option value="corporate">Corporate / Commercial</option>
+                                <option value="ip">Intellectual Property</option>
+                                <option value="litigation">Litigation / Court Documents</option>
+                                <option value="real_estate">Real Estate / Property</option>
+                                <option value="banking">Banking & Finance</option>
+                                <option value="employment">Employment / Labor</option>
+                                <option value="tax">Tax Law</option>
+                                <option value="criminal">Criminal Law</option>
+                                <option value="family">Family Law</option>
+                                <option value="immigration">Immigration</option>
+                                <option value="regulatory">Regulatory / Compliance</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-upload me-1"></i>Upload Document
+                            </label>
+                            <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.txt">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-keyboard me-1"></i>Or Paste Text
+                            </label>
+                            <textarea name="text" class="form-control" rows="6" 
+                                placeholder="Paste legal text for translation..."></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Translation Options</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="options[]" value="terminology" checked>
+                                        <label class="form-check-label">Include terminology glossary</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="options[]" value="notes" checked>
+                                        <label class="form-check-label">Translator's notes for ambiguities</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="options[]" value="adaptation">
+                                        <label class="form-check-label">Cultural/legal system adaptation</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="options[]" value="certified">
+                                        <label class="form-check-label">Certified translation format</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-lg text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                                <i class="fas fa-language me-2"></i>Translate Document
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 border-info">
+                <div class="card-body">
+                    <h5 class="text-info"><i class="fas fa-info-circle me-2"></i>Legal Translation Features</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <ul class="mb-0 small">
+                                <li>Contextual legal terminology</li>
+                                <li>Common law ↔ Civil law adaptation</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="mb-0 small">
+                                <li>Force majeure / Vis major nuances</li>
+                                <li>Latin legal phrases handling</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="mb-0 small">
+                                <li>50+ languages supported</li>
+                                <li>Sharia law terminology</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

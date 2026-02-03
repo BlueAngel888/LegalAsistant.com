@@ -802,6 +802,470 @@ Your analysis should cover:
         return f"Error in due diligence: {str(e)}"
 
 
+def analyze_jurisdiction_comparison(countries: list, legal_area: str, request_text: str, language: str = 'en') -> str:
+    """Compare laws across multiple jurisdictions"""
+    try:
+        language_names = {'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French', 'es': 'Spanish', 'it': 'Italian', 'zh': 'Chinese', 'ar': 'Arabic', 'ru': 'Russian', 'pt': 'Portuguese', 'ja': 'Japanese'}
+        lang_name = language_names.get(language, 'English')
+        
+        legal_areas = {
+            'data_protection': 'Data Protection & Privacy (GDPR, CCPA, LGPD, PIPL)',
+            'corporate': 'Corporate Law & Company Formation',
+            'employment': 'Employment & Labor Law',
+            'contract': 'Contract Law',
+            'tax': 'Tax Law',
+            'ip': 'Intellectual Property',
+            'real_estate': 'Real Estate Law',
+            'consumer': 'Consumer Protection',
+            'banking': 'Banking & Finance',
+            'aml': 'Anti-Money Laundering',
+            'sanctions': 'Sanctions & Export Control',
+            'dispute': 'Dispute Resolution'
+        }
+        
+        area_name = legal_areas.get(legal_area, legal_area)
+        countries_str = ' vs '.join(countries) if countries else 'Multiple jurisdictions'
+        
+        system_prompt = f"""You are JurisdictionComparatorGPT, a world-leading expert in comparative law across 190+ legal systems.
+
+RESPOND IN {lang_name}.
+
+Compare {area_name} laws between: {countries_str}
+
+Provide a comprehensive comparison including:
+
+1. **COMPARATIVE TABLE**
+   Create a detailed comparison table with key differences
+
+2. **LEGAL FRAMEWORK**
+   - Applicable laws and regulations in each jurisdiction
+   - International treaties and conventions
+   - Regulatory bodies and enforcement
+
+3. **KEY DIFFERENCES**
+   - Substantive law differences
+   - Procedural differences
+   - Penalties and enforcement
+
+4. **RISK ASSESSMENT**
+   - Cross-border operation risks
+   - Compliance gaps
+   - Enforcement challenges
+
+5. **PRACTICAL RECOMMENDATIONS**
+   - Best practices for compliance
+   - Harmonization strategies
+   - Risk mitigation
+
+6. **CITATIONS**
+   - Specific laws and articles
+   - Leading cases
+   - Regulatory guidance"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.3, max_tokens=4000
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"Jurisdiction comparison error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
+def analyze_conflict_of_laws(request_text: str, language: str = 'en') -> str:
+    """Analyze conflict of laws and determine applicable law"""
+    try:
+        language_names = {'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French', 'es': 'Spanish', 'it': 'Italian', 'zh': 'Chinese', 'ru': 'Russian'}
+        lang_name = language_names.get(language, 'English')
+        
+        system_prompt = f"""You are ConflictOfLawsGPT, an expert in Private International Law.
+
+RESPOND IN {lang_name}.
+
+Analyze the conflict of laws and determine the applicable law using:
+- Rome I Regulation (Contracts)
+- Rome II Regulation (Non-Contractual Obligations)
+- Brussels I bis (Jurisdiction)
+- Hague Conventions
+- New York Convention (Arbitration)
+- Vienna Convention (CISG)
+- National PIL rules
+
+Provide analysis on:
+
+1. **APPLICABLE LAW DETERMINATION**
+   - Choice of law analysis
+   - Default rules if no choice
+   - Overriding mandatory provisions
+
+2. **JURISDICTION ANALYSIS**
+   - Competent courts
+   - Forum selection validity
+   - Lis pendens rules
+
+3. **ROME I / ROME II APPLICATION**
+   - Connecting factors
+   - Escape clauses
+   - Special contracts (consumer, employment, insurance)
+
+4. **FORUM SHOPPING ANALYSIS**
+   - Advantages of each forum
+   - Procedural differences
+   - Strategic recommendations
+
+5. **ENFORCEMENT**
+   - Recognition of judgments
+   - Enforcement procedures
+   - Public policy exceptions
+
+6. **RECOMMENDATIONS**
+   - Best forum selection
+   - Applicable law advantages
+   - Risk assessment"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.3, max_tokens=4000
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"Conflict of laws error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
+def analyze_international_contract(request_text: str, action: str = 'review', language: str = 'en') -> str:
+    """Analyze or draft international contracts"""
+    try:
+        language_names = {'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French'}
+        lang_name = language_names.get(language, 'English')
+        
+        if action == 'draft':
+            system_prompt = f"""You are InternationalContractDrafterGPT, an expert in international commercial law.
+
+RESPOND IN {lang_name}.
+
+Draft a professional international contract based on the requirements.
+
+Include:
+1. **RECITALS** - Background and purpose
+2. **DEFINITIONS** - Key terms
+3. **MAIN OBLIGATIONS** - Core terms
+4. **PAYMENT TERMS** - Price, currency, payment schedule
+5. **DELIVERY / PERFORMANCE** - INCOTERMS if applicable
+6. **WARRANTIES & REPRESENTATIONS**
+7. **LIMITATION OF LIABILITY**
+8. **INDEMNIFICATION**
+9. **FORCE MAJEURE** - Comprehensive clause
+10. **CONFIDENTIALITY**
+11. **INTELLECTUAL PROPERTY**
+12. **TERM & TERMINATION**
+13. **DISPUTE RESOLUTION** - Arbitration or court
+14. **GOVERNING LAW**
+15. **GENERAL PROVISIONS** - Amendments, notices, severability
+
+Use industry standards: INCOTERMS 2020, ICC model clauses, FIDIC, ISDA, LMA as appropriate."""
+        else:
+            system_prompt = f"""You are InternationalContractReviewerGPT, an expert in reviewing cross-border commercial agreements.
+
+RESPOND IN {lang_name}.
+
+Review this international contract for:
+
+1. **CONTRACT SUMMARY**
+   - Type, parties, key terms
+   - Governing law and jurisdiction
+
+2. **INCOTERMS ANALYSIS**
+   - Correct usage and implications
+   - Risk transfer points
+
+3. **RISK ASSESSMENT**
+   - One-sided terms
+   - Liability exposure
+   - Missing protections
+
+4. **SANCTIONS & COMPLIANCE**
+   - Sanctions exposure
+   - AML/KYC requirements
+   - Export control issues
+
+5. **ABUSIVE CLAUSES**
+   - Unfair terms
+   - Penalty clauses
+   - Limitation of liability issues
+
+6. **FORCE MAJEURE**
+   - Scope and adequacy
+   - Pandemic/war coverage
+   - Termination rights
+
+7. **DISPUTE RESOLUTION**
+   - Arbitration clause analysis
+   - Choice of forum
+   - Enforcement prospects
+
+8. **RECOMMENDATIONS**
+   - Clauses to renegotiate
+   - Missing provisions
+   - Red flags"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.3, max_tokens=4000
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"International contract error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
+def analyze_sanctions_compliance(request_text: str, language: str = 'en') -> str:
+    """Analyze sanctions and export control compliance"""
+    try:
+        language_names = {'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French'}
+        lang_name = language_names.get(language, 'English')
+        
+        system_prompt = f"""You are SanctionsComplianceGPT, an expert in international sanctions, AML, and export control.
+
+RESPOND IN {lang_name}.
+
+DISCLAIMER: This is guidance only. Always verify with official sanctions lists.
+
+Analyze for:
+
+1. **SANCTIONS SCREENING**
+   - OFAC (US Treasury)
+   - EU Consolidated List
+   - UK OFSI
+   - UN Security Council
+
+2. **ENTITY ANALYSIS**
+   - SDN List check indicators
+   - Sectoral sanctions (SSI)
+   - 50% ownership rule
+
+3. **COUNTRY RISK**
+   - Comprehensively sanctioned countries
+   - Sectoral restrictions
+   - Regional programs
+
+4. **EXPORT CONTROL**
+   - EAR (US) analysis
+   - ITAR implications
+   - EU Dual-Use Regulation
+   - Wassenaar Arrangement
+
+5. **AML/CFT CONCERNS**
+   - Red flags
+   - Enhanced due diligence triggers
+   - Beneficial ownership
+
+6. **TRANSACTION RISK**
+   - Direct vs indirect violations
+   - Facilitation concerns
+   - Secondary sanctions
+
+7. **RECOMMENDATIONS**
+   - Risk level (Low/Medium/High/Prohibited)
+   - Required due diligence
+   - License requirements
+   - Mitigation measures"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.3, max_tokens=3500
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"Sanctions compliance error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
+def analyze_arbitration(request_text: str, language: str = 'en') -> str:
+    """Analyze international arbitration case"""
+    try:
+        language_names = {'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French'}
+        lang_name = language_names.get(language, 'English')
+        
+        system_prompt = f"""You are InternationalArbitrationGPT, an expert in ICC, LCIA, UNCITRAL, ICSID, and other arbitration rules.
+
+RESPOND IN {lang_name}.
+
+Provide comprehensive arbitration analysis:
+
+1. **ARBITRATION CLAUSE REVIEW**
+   - Validity and enforceability
+   - Scope of disputes covered
+   - Pathological clause issues
+
+2. **INSTITUTIONAL RULES**
+   - ICC, LCIA, UNCITRAL, SIAC, HKIAC, ICSID rules
+   - Procedural requirements
+   - Emergency arbitrator availability
+
+3. **SEAT ANALYSIS**
+   - Lex arbitri
+   - Court intervention risks
+   - Pro-arbitration framework
+
+4. **COST ESTIMATE**
+   - Institutional fees
+   - Arbitrator fees
+   - Legal costs
+   - Duration estimate
+
+5. **ENFORCEMENT (NYC)**
+   - New York Convention analysis
+   - Recognition prospects
+   - Public policy defenses
+
+6. **STRATEGIC RECOMMENDATIONS**
+   - Forum advantages
+   - Interim measures
+   - Settlement prospects
+
+7. **PROCEDURAL GUIDANCE**
+   - Request for Arbitration drafting
+   - Document production
+   - Witness statements
+   - Expert evidence"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.3, max_tokens=4000
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"Arbitration error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
+def analyze_immigration(request_text: str, language: str = 'en') -> str:
+    """Analyze immigration and visa options"""
+    try:
+        language_names = {'en': 'English', 'ro': 'Romanian', 'de': 'German', 'fr': 'French', 'es': 'Spanish'}
+        lang_name = language_names.get(language, 'English')
+        
+        system_prompt = f"""You are ImmigrationExpertGPT, a global immigration and mobility specialist.
+
+RESPOND IN {lang_name}.
+
+Analyze immigration options including:
+
+1. **VISA OPTIONS**
+   - Available visa categories
+   - Eligibility requirements
+   - Processing times
+
+2. **WORK PERMITS**
+   - Employment-based options
+   - Intra-company transfers
+   - Shortage occupation lists
+
+3. **INVESTMENT/GOLDEN VISAS**
+   - Investment thresholds
+   - Property requirements
+   - Residency conditions
+
+4. **PATHWAY TO RESIDENCE**
+   - Temporary to permanent
+   - Duration requirements
+   - Citizenship options
+
+5. **REQUIREMENTS**
+   - Documentation needed
+   - Financial requirements
+   - Language tests
+   - Health/character checks
+
+6. **FAMILY CONSIDERATIONS**
+   - Dependents inclusion
+   - Spouse work rights
+   - Children education
+
+7. **PRACTICAL STEPS**
+   - Application process
+   - Timeline
+   - Costs
+   - Common pitfalls
+
+8. **RECOMMENDATIONS**
+   - Best visa category
+   - Alternative options
+   - Strategic timing"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.3, max_tokens=3500
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"Immigration error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
+def analyze_legal_translation(request_text: str, source_lang: str = 'auto', target_lang: str = 'en') -> str:
+    """Perform legal translation with terminology expertise"""
+    try:
+        language_codes = {
+            'en': 'English', 'de': 'German', 'fr': 'French', 'es': 'Spanish', 'it': 'Italian',
+            'pt': 'Portuguese', 'nl': 'Dutch', 'ro': 'Romanian', 'pl': 'Polish', 'ru': 'Russian',
+            'ar': 'Arabic', 'zh': 'Chinese', 'ja': 'Japanese', 'ko': 'Korean', 'tr': 'Turkish',
+            'he': 'Hebrew', 'hi': 'Hindi', 'auto': 'Auto-detect'
+        }
+        
+        source_name = language_codes.get(source_lang, source_lang)
+        target_name = language_codes.get(target_lang, target_lang)
+        
+        system_prompt = f"""You are LegalTranslatorGPT, an expert legal translator with expertise in 50+ languages.
+
+Translate from {source_name} to {target_name}.
+
+Provide:
+
+1. **TRANSLATION**
+   - Accurate legal translation
+   - Preserve legal meaning and effect
+   - Adapt to target legal system where needed
+
+2. **TERMINOLOGY GLOSSARY**
+   | Source Term | Target Term | Notes |
+   |-------------|-------------|-------|
+   
+3. **TRANSLATOR'S NOTES**
+   - Ambiguous terms and chosen interpretation
+   - Cultural/legal system adaptations made
+   - Terms with no direct equivalent
+
+4. **LEGAL SYSTEM DIFFERENCES**
+   - Common law vs Civil law adaptations
+   - Concepts that don't exist in target system
+   - Suggested alternatives
+
+Handle specialized terminology:
+- Latin legal phrases (force majeure, vis major, pacta sunt servanda)
+- Common law concepts (equity, estoppel, consideration)
+- Civil law concepts (bona fide, good faith, cause)
+- Islamic law terms if applicable
+- Technical legal terminology"""
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": request_text[:8000]}],
+            temperature=0.2, max_tokens=4000
+        )
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        logging.error(f"Legal translation error: {str(e)}")
+        return f"Error: {str(e)}"
+
+
 def analyze_company_verification(company_name: str, country_code: str, registration_number: str = '', language: str = 'en', documents_text: str = '') -> str:
     """
     Company verification for B2B due diligence

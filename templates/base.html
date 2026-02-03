@@ -30,20 +30,29 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">
-                            <i class="fas fa-file-alt me-1"></i>Analyze Document
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-briefcase me-1"></i>Legal Services
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-warning" href="{{ url_for('fines_analysis') }}">
-                            <i class="fas fa-gavel me-1"></i>Fines & Penalties
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-info" href="{{ url_for('due_diligence') }}">
-                            <i class="fas fa-search-dollar me-1"></i>Due Diligence
-                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="servicesDropdown">
+                            <li><h6 class="dropdown-header">Document Analysis</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}"><i class="fas fa-file-alt me-2"></i>Analyze Document</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('fines_analysis') }}"><i class="fas fa-gavel me-2 text-warning"></i>Fines & Penalties</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('due_diligence') }}"><i class="fas fa-search-dollar me-2 text-info"></i>Due Diligence</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">International Law</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('jurisdiction_compare') }}"><i class="fas fa-balance-scale-left me-2 text-primary"></i>Compare Jurisdictions</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('conflict_laws') }}"><i class="fas fa-random me-2 text-danger"></i>Conflict of Laws</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('international_contracts') }}"><i class="fas fa-file-signature me-2 text-success"></i>International Contracts</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Compliance & Disputes</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('sanctions_compliance') }}"><i class="fas fa-shield-alt me-2"></i>Sanctions & Compliance</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('arbitration') }}"><i class="fas fa-landmark me-2"></i>International Arbitration</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Other Services</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('immigration') }}"><i class="fas fa-passport me-2" style="color: #667eea;"></i>Immigration & Visa</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('legal_translation') }}"><i class="fas fa-language me-2" style="color: #11998e;"></i>Legal Translation</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">

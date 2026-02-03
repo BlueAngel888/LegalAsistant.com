@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Immigration & Visa - Legal Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3 class="mb-0">
+                        <i class="fas fa-passport me-2"></i>
+                        Immigration & Global Relocation
+                    </h3>
+                    <small>Visa, Work Permits, Golden Visa, EU Blue Card Analysis</small>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('analyze_immigration') }}" method="POST" enctype="multipart/form-data">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-flag me-1"></i>Your Nationality
+                                </label>
+                                <select name="nationality" class="form-select" required>
+                                    <option value="">Select country...</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="RU">🇷🇺 Russia</option>
+                                    <option value="UA">🇺🇦 Ukraine</option>
+                                    <option value="TR">🇹🇷 Turkey</option>
+                                    <option value="NG">🇳🇬 Nigeria</option>
+                                    <option value="PK">🇵🇰 Pakistan</option>
+                                    <option value="BD">🇧🇩 Bangladesh</option>
+                                    <option value="PH">🇵🇭 Philippines</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-plane-arrival me-1"></i>Destination Country
+                                </label>
+                                <select name="destination" class="form-select" required>
+                                    <option value="">Select destination...</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="NL">🇳🇱 Netherlands</option>
+                                    <option value="ES">🇪🇸 Spain</option>
+                                    <option value="PT">🇵🇹 Portugal</option>
+                                    <option value="IT">🇮🇹 Italy</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-contract me-1"></i>Purpose of Relocation
+                            </label>
+                            <select name="purpose" class="form-select" required>
+                                <option value="employment">Employment / Work</option>
+                                <option value="business">Business / Entrepreneurship</option>
+                                <option value="investment">Investment (Golden Visa)</option>
+                                <option value="study">Study / Education</option>
+                                <option value="family">Family Reunification</option>
+                                <option value="talent">High-Skilled Talent Program</option>
+                                <option value="digital_nomad">Digital Nomad / Remote Work</option>
+                                <option value="retirement">Retirement</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-briefcase me-1"></i>Occupation / Field
+                                </label>
+                                <select name="occupation" class="form-select">
+                                    <option value="">Select field...</option>
+                                    <option value="tech">Technology / IT</option>
+                                    <option value="finance">Finance / Banking</option>
+                                    <option value="healthcare">Healthcare / Medical</option>
+                                    <option value="engineering">Engineering</option>
+                                    <option value="science">Science / Research</option>
+                                    <option value="legal">Legal</option>
+                                    <option value="arts">Arts / Entertainment</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="business">Business / Management</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-euro-sign me-1"></i>Investment Budget (if applicable)
+                                </label>
+                                <select name="investment_budget" class="form-select">
+                                    <option value="">Not applicable</option>
+                                    <option value="250k">€250,000 - €500,000</option>
+                                    <option value="500k">€500,000 - €1 million</option>
+                                    <option value="1m">€1 - 2 million</option>
+                                    <option value="2m+">Over €2 million</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-upload me-1"></i>Upload Supporting Documents (Optional)
+                            </label>
+                            <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                            <small class="text-muted">Job offer, CV, investment proof, etc.</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-comment-alt me-1"></i>Additional Details
+                            </label>
+                            <textarea name="details" class="form-control" rows="3" 
+                                placeholder="Education level, work experience, family situation, any previous visa applications..."></textarea>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Response Language</label>
+                                <select name="language" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="ro">Română</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="fr">Français</option>
+                                    <option value="es">Español</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-lg text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-search me-2"></i>Analyze Immigration Options
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card border-primary h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-id-card fa-2x text-primary mb-2"></i>
+                            <h6>Work Permits</h6>
+                            <small class="text-muted">H-1B, EU Blue Card, UK Skilled Worker</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-warning h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-coins fa-2x text-warning mb-2"></i>
+                            <h6>Golden Visas</h6>
+                            <small class="text-muted">Portugal, Spain, Greece, UAE, Malta</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-success h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-laptop-house fa-2x text-success mb-2"></i>
+                            <h6>Digital Nomad</h6>
+                            <small class="text-muted">Remote work visas worldwide</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

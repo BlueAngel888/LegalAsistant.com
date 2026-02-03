@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Jurisdiction Comparison - Legal Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="mb-0">
+                        <i class="fas fa-balance-scale-left me-2"></i>
+                        Jurisdiction Comparison
+                    </h3>
+                    <small>Compare laws across multiple countries</small>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('analyze_jurisdiction_compare') }}" method="POST">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-globe me-1"></i>First Jurisdiction
+                                </label>
+                                <select name="country1" class="form-select" required>
+                                    <option value="">Select country...</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="IT">🇮🇹 Italy</option>
+                                    <option value="ES">🇪🇸 Spain</option>
+                                    <option value="NL">🇳🇱 Netherlands</option>
+                                    <option value="BE">🇧🇪 Belgium</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="PL">🇵🇱 Poland</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="RU">🇷🇺 Russia</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                    <option value="SA">🇸🇦 Saudi Arabia</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="HK">🇭🇰 Hong Kong</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-globe me-1"></i>Second Jurisdiction
+                                </label>
+                                <select name="country2" class="form-select" required>
+                                    <option value="">Select country...</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="IT">🇮🇹 Italy</option>
+                                    <option value="ES">🇪🇸 Spain</option>
+                                    <option value="NL">🇳🇱 Netherlands</option>
+                                    <option value="BE">🇧🇪 Belgium</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="PL">🇵🇱 Poland</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="RU">🇷🇺 Russia</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                    <option value="SA">🇸🇦 Saudi Arabia</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="HK">🇭🇰 Hong Kong</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-tags me-1"></i>Legal Area
+                            </label>
+                            <select name="legal_area" class="form-select" required>
+                                <option value="data_protection">Data Protection (GDPR, CCPA, LGPD, PIPL)</option>
+                                <option value="corporate">Corporate Law & Company Formation</option>
+                                <option value="employment">Employment & Labor Law</option>
+                                <option value="contract">Contract Law</option>
+                                <option value="tax">Tax Law</option>
+                                <option value="ip">Intellectual Property</option>
+                                <option value="real_estate">Real Estate Law</option>
+                                <option value="consumer">Consumer Protection</option>
+                                <option value="banking">Banking & Finance</option>
+                                <option value="aml">AML / Anti-Money Laundering</option>
+                                <option value="sanctions">Sanctions & Export Control</option>
+                                <option value="dispute">Dispute Resolution</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-question-circle me-1"></i>Specific Question (Optional)
+                            </label>
+                            <textarea name="specific_question" class="form-control" rows="3" 
+                                placeholder="E.g., What are the differences in data transfer requirements between these jurisdictions?"></textarea>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-language me-1"></i>Response Language
+                                </label>
+                                <select name="language" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="ro">Română</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="fr">Français</option>
+                                    <option value="es">Español</option>
+                                    <option value="it">Italiano</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ja">日本語</option>
+                                    <option value="ar">العربية</option>
+                                    <option value="ru">Русский</option>
+                                    <option value="pt">Português</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-2"></i>Compare Jurisdictions
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 border-info">
+                <div class="card-body">
+                    <h5 class="text-info"><i class="fas fa-info-circle me-2"></i>What You'll Get</h5>
+                    <ul class="mb-0">
+                        <li>Comparative analysis table with key differences</li>
+                        <li>Risk assessment for cross-border operations</li>
+                        <li>Compliance requirements for each jurisdiction</li>
+                        <li>Practical recommendations for businesses</li>
+                        <li>Citations to relevant laws and regulations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

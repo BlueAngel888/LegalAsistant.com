@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Conflict of Laws - Legal Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h3 class="mb-0">
+                        <i class="fas fa-random me-2"></i>
+                        Conflict of Laws Analysis
+                    </h3>
+                    <small>Determine applicable law in cross-border disputes</small>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('analyze_conflict_laws') }}" method="POST" enctype="multipart/form-data">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-building me-1"></i>Party A Location
+                                </label>
+                                <select name="party_a_country" class="form-select" required>
+                                    <option value="">Select country...</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-building me-1"></i>Party B Location
+                                </label>
+                                <select name="party_b_country" class="form-select" required>
+                                    <option value="">Select country...</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-map-marker-alt me-1"></i>Place of Performance
+                                </label>
+                                <select name="performance_country" class="form-select">
+                                    <option value="">Select if different...</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="AE">🇦🇪 UAE</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-contract me-1"></i>Type of Legal Relationship
+                            </label>
+                            <select name="relationship_type" class="form-select" required>
+                                <option value="contract">Contractual Obligation (Rome I)</option>
+                                <option value="tort">Non-Contractual / Tort (Rome II)</option>
+                                <option value="employment">Employment Contract</option>
+                                <option value="consumer">Consumer Contract</option>
+                                <option value="insurance">Insurance Contract</option>
+                                <option value="property">Property / Real Estate</option>
+                                <option value="succession">Succession / Inheritance</option>
+                                <option value="family">Family Law / Matrimonial</option>
+                                <option value="corporate">Corporate / Company Law</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-file-upload me-1"></i>Upload Contract/Document (Optional)
+                            </label>
+                            <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                            <small class="text-muted">Upload for more precise applicable law determination</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-clipboard-list me-1"></i>Describe the Situation
+                            </label>
+                            <textarea name="situation" class="form-control" rows="4" required
+                                placeholder="Describe the legal situation, contract type, dispute nature, choice of law clause (if any), and any forum selection agreements..."></textarea>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-language me-1"></i>Response Language
+                                </label>
+                                <select name="language" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="ro">Română</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="fr">Français</option>
+                                    <option value="es">Español</option>
+                                    <option value="it">Italiano</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ru">Русский</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-gavel me-2"></i>Analyze Applicable Law
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mt-4 border-warning">
+                <div class="card-body">
+                    <h5 class="text-warning"><i class="fas fa-book me-2"></i>Legal Frameworks Applied</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li>Rome I Regulation (Contracts)</li>
+                                <li>Rome II Regulation (Torts)</li>
+                                <li>Hague Conventions</li>
+                                <li>Brussels I bis Regulation</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li>New York Convention (Arbitration)</li>
+                                <li>Vienna Convention (CISG)</li>
+                                <li>National PIL Rules</li>
+                                <li>Forum Shopping Analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
