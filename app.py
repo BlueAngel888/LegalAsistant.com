@@ -31,6 +31,19 @@ def clean_text_for_db(text):
     cleaned = ''.join(char for char in cleaned if ord(char) >= 32 or char in '\n\r\t')
     return cleaned
 
+
+def is_failed_analysis(text):
+    """Return True for transient analyzer output that must never be cached."""
+    if not text:
+        return False
+    normalized = text.strip().lower()
+    return (
+        normalized.startswith("analysis error:")
+        or normalized.startswith("ai analysis error:")
+        or "eroare temporară" in normalized
+        or "sistemul ai este temporar indisponibil" in normalized
+    )
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_development")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
@@ -287,10 +300,16 @@ def upload_file():
         session['analysis_language'] = analysis_language
         
         # Clear any previous session data
-        session.pop('doc_text', None)
-        session.pop('full_doc_text', None)
-        session.pop('processed_files', None)
-        session.pop('stripe_session_id', None)
+        for stale_key in (
+            'doc_text', 'full_doc_text', 'processed_files', 'analysis_id',
+            'has_document', 'stripe_session_id', 'background_processing',
+            'needs_full_processing', 'is_fast_track',
+            'payment_status', 'discount_code', 'discount_percent', 'free_access',
+            'analysis_type', 'fine_type', 'dd_category', 'company_name',
+            'registration_number', 'compare_countries', 'legal_area',
+            'contract_action', 'source_lang', 'target_lang',
+        ):
+            session.pop(stale_key, None)
         
         logging.info(f"Starting file upload process - Session ID: {session.get('_id', 'new')}")
         logging.info(f"Upload request details - Country: {document_country}, Language: {analysis_language}")
@@ -350,77 +369,24 @@ def upload_file():
                 logging.error(f"Error processing scanned image: {str(e)}")
                 flash('Error processing scanned document. Please try again.', 'error')
 
-        # Initialize files_data for potential background processing
-        files_data = []
-        
-        # Instant payment mode - skip all processing for multiple files
+        # Extract every uploaded document before checkout.  In particular, do not
+        # send batches to image OCR regardless of their actual file type.
         all_files = files + camera_files  # Combine regular files and camera files
         if all_files and not all(file.filename == '' for file in all_files):
-            
-            # For 3+ files, launch background OCR and go directly to payment (INSTANT MODE)
-            if len(all_files) >= 3:
-                logging.info(f"INSTANT MODE: {len(all_files)} files detected - launching background OCR")
-                
-                # Prepare files data for background processing
-                for file in all_files:
-                    if file.filename != '':
-                        # Read file content
-                        file_content = file.read()
-                        file.seek(0)  # Reset file pointer
-                        
-                        files_data.append({
-                            'filename': file.filename,
-                            'content': file_content
-                        })
-                        processed_files.append(file.filename)
-                
-                # Create placeholder text for immediate payment
-                placeholder_text = f"INSTANT UPLOAD: {len(processed_files)} files uploaded successfully.\n"
-                placeholder_text += f"Files: {', '.join(processed_files)}\n"
-                placeholder_text += "OCR processing started in background - analysis will be ready shortly after payment."
-                texts.append(placeholder_text)
-                
-                session['needs_full_processing'] = True
-                session['background_processing'] = True
-                logging.info(f"INSTANT MODE: {len(processed_files)} files ready for background OCR")
-                
-            else:
-                # For 1-2 files, do quick processing
-                import time
-                start_time = time.time()
-                max_instant_processing_time = 5  # Only 5 seconds max
-                # For 3 or fewer files, process normally with short timeout
-                for i, file in enumerate(all_files):
-                    if file.filename != '':
-                        # Check if we're running out of time
-                        elapsed_time = time.time() - start_time
-                        if elapsed_time > max_instant_processing_time:
-                            logging.warning(f"Quick processing timeout reached after {elapsed_time:.1f}s")
-                            # Add placeholder for remaining files
-                            remaining_files = len(all_files) - i
-                            placeholder_text = f"Additional {remaining_files} files will be processed after payment."
-                            texts.append(placeholder_text)
-                            processed_files.extend([f.filename for f in all_files[i:] if f.filename])
-                            break
-                        
-                        try:
-                            logging.info(f"Quick processing file {i+1}/{len(all_files)}: {file.filename}")
-                            text = extract_text_from_file(file)
-                            # Clean the text to remove NUL characters
-                            text = clean_text_for_db(text)
-                            if text.strip():
-                                texts.append(text)
-                                processed_files.append(file.filename)
-                                logging.info(f"Quick extracted {len(text)} characters from {file.filename}")
-                            else:
-                                logging.warning(f'No text extracted from {file.filename}')
-                                texts.append(f"File: {file.filename} - Text extraction pending")
-                                processed_files.append(file.filename)
-                        except Exception as e:
-                            logging.error(f"Error in quick processing {file.filename}: {str(e)}")
-                            texts.append(f"File: {file.filename} - Processing error, will retry after payment")
-                            processed_files.append(file.filename)
-                            continue
+            for i, file in enumerate(all_files):
+                if not file.filename:
+                    continue
+                try:
+                    logging.info(f"Extracting file {i + 1}/{len(all_files)}: {file.filename}")
+                    text = clean_text_for_db(extract_text_from_file(file))
+                    if not text or not text.strip():
+                        raise ValueError("No text could be extracted")
+                    texts.append(f"=== {file.filename} ===\n{text}")
+                    processed_files.append(file.filename)
+                except Exception as extraction_error:
+                    logging.error("Extraction failed for %s: %s", file.filename, extraction_error)
+                    flash(f'Could not extract text from {file.filename}. Please check the file and try again.', 'error')
+                    return redirect(url_for('index'))
         
         # Check if any text was extracted
         if not texts:
@@ -496,45 +462,12 @@ def upload_file():
             
             logging.info(f"Document analysis record created with ID: {analysis_record.id}, Fast-track: {is_fast_track}")
             
-            # Launch background OCR processing if in instant mode
-            if session.get('background_processing') and files_data:
-                logging.info(f"INSTANT MODE: Launching background OCR thread for analysis {analysis_record.id}")
-                
-                # Create application context for background thread
-                app_context = app.app_context()
-                
-                # Start background OCR processing
-                ocr_thread = threading.Thread(
-                    target=background_ocr_processing,
-                    args=(analysis_record.id, files_data, app_context),
-                    daemon=True
-                )
-                ocr_thread.start()
-                
-                logging.info(f"INSTANT MODE: Background OCR thread started successfully")
-            
-            # Start AI analysis immediately in background
-            document_country = session.get('document_country', 'RO')
-            analysis_language = session.get('analysis_language', 'ro')
-            
-            logging.info(f"STARTING IMMEDIATE AI ANALYSIS: Launching background AI thread for analysis {analysis_record.id}")
-            
-            # Create application context for background thread
-            app_context = app.app_context()
-            
-            # Start background AI analysis
-            ai_thread = threading.Thread(
-                target=background_ai_analysis,
-                args=(analysis_record.id, document_country, analysis_language, app_context),
-                daemon=True
-            )
-            ai_thread.start()
-            
-            logging.info(f"IMMEDIATE AI ANALYSIS: Background AI thread started successfully")
-            
+            # AI analysis intentionally starts only after verified payment/free access.
         except Exception as db_error:
             logging.error(f"Database error: {str(db_error)}")
-            # Continue without database storage if DB fails
+            db.session.rollback()
+            flash('Unable to save the uploaded document. Please try again.', 'error')
+            return redirect(url_for('index'))
             
         # Don't store large document text in session - only store metadata
         session['processed_files'] = processed_files
@@ -760,12 +693,18 @@ def create_checkout_session():
             return redirect(url_for('checkout'))
         
         # Create Stripe checkout session with better error handling
+        discount_percent = session.get('discount_percent', 0)
+        amount = max(0, round(100 * (100 - discount_percent) / 100))
+        if amount == 0:
+            flash('Please use the free access button for this discount code.', 'error')
+            return redirect(url_for('checkout'))
+
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
                     'currency': 'eur',
-                    'unit_amount': 100,  # €1.00
+                    'unit_amount': amount,
                     'product_data': {
                         'name': 'Legal Document Analysis',
                         'description': 'Professional AI-powered legal document analysis and insights'
@@ -795,7 +734,7 @@ def create_checkout_session():
                 payment_record = PaymentRecord(
                     stripe_session_id=checkout_session.id,
                     document_analysis_id=analysis_id,
-                    amount=100,  # €1.00 in cents
+                    amount=amount,
                     currency='EUR',
                     status='pending'
                 )
@@ -811,7 +750,9 @@ def create_checkout_session():
                 
         except Exception as db_error:
             logging.error(f"Database error creating payment record: {str(db_error)}")
-            # Continue with payment flow even if database fails
+            db.session.rollback()
+            flash('Unable to record the payment session. No payment was started.', 'error')
+            return redirect(url_for('checkout'))
         
         if checkout_session.url:
             # Store session ID for verification
@@ -853,12 +794,56 @@ def create_checkout_session():
         return redirect(url_for('checkout'))
 
 @app.route('/success')
+@login_required
 def success():
     try:
+        analysis_id = session.get('analysis_id')
+        if not analysis_id:
+            flash('No document found. Please start over.', 'error')
+            return redirect(url_for('index'))
+
+        analysis_record = DocumentAnalysis.query.get(analysis_id)
+        if (
+            not analysis_record
+            or not session.get('_id')
+            or analysis_record.session_id != session.get('_id')
+        ):
+            flash('Document not found. Please start over.', 'error')
+            return redirect(url_for('index'))
+
+        # A success URL is not proof of payment. Free access is persisted by the
+        # free-access route; paid access is verified against Stripe.
+        is_free = (
+            session.get('payment_status') == 'free_access'
+            and analysis_record.payment_status == 'free_access'
+        )
+        if not is_free:
+            requested_stripe_id = request.args.get('session_id', '')
+            stored_stripe_id = session.get('stripe_session_id', '')
+            if (
+                not requested_stripe_id
+                or requested_stripe_id != stored_stripe_id
+                or requested_stripe_id != analysis_record.stripe_session_id
+            ):
+                flash('Payment verification failed.', 'error')
+                return redirect(url_for('checkout'))
+            try:
+                verified_checkout = stripe.checkout.Session.retrieve(requested_stripe_id)
+                metadata = getattr(verified_checkout, 'metadata', {}) or {}
+                if (
+                    getattr(verified_checkout, 'payment_status', None) != 'paid'
+                    or metadata.get('analysis_id') != analysis_id
+                ):
+                    flash('Payment has not been completed.', 'error')
+                    return redirect(url_for('checkout'))
+            except Exception as stripe_error:
+                logging.error("Stripe verification error: %s", stripe_error)
+                flash('Unable to verify payment. Please try again.', 'error')
+                return redirect(url_for('checkout'))
+
         # Update payment status in database
         try:
             stripe_session_id = session.get('stripe_session_id')
-            analysis_id = session.get('analysis_id')
             
             if stripe_session_id and analysis_id:
                 # Update payment record
@@ -869,7 +854,7 @@ def success():
                 
                 # Update analysis record
                 analysis_record = DocumentAnalysis.query.get(analysis_id)
-                if analysis_record:
+                if analysis_record and not is_free:
                     analysis_record.payment_status = 'completed'
                 
                 db.session.commit()
@@ -879,16 +864,6 @@ def success():
             logging.error(f"Database error updating payment status: {str(db_error)}")
         
         # Retrieve document data from database
-        analysis_id = session.get('analysis_id')
-        if not analysis_id:
-            flash('No document found. Please start over.', 'error')
-            return redirect(url_for('index'))
-        
-        analysis_record = DocumentAnalysis.query.get(analysis_id)
-        if not analysis_record:
-            flash('Document not found. Please start over.', 'error')
-            return redirect(url_for('index'))
-        
         doc_text = analysis_record.document_text
         processed_files = json.loads(analysis_record.file_names) if analysis_record.file_names else []
         
@@ -934,7 +909,8 @@ def success():
         session_id = session.get('session_id', session.get('_id', 'anonymous'))
         
         # Check if analysis is already done in background
-        if analysis_record.analysis_result:
+        analysis_failed = False
+        if analysis_record.analysis_result and not is_failed_analysis(analysis_record.analysis_result):
             logging.info(f"SUCCESS ROUTE: Using pre-computed analysis from background processing")
             
             # Get analysis language
@@ -1057,6 +1033,7 @@ def success():
                     
                     except Exception as api_error:
                         logging.error(f"OpenAI API error: {str(api_error)}")
+                        analysis_failed = True
                         # Return error message with retry suggestion
                         analysis = f"""{access_header}
 
@@ -1080,6 +1057,7 @@ Pentru asistență imediată: support@legalassistant.ai"""
                     
                 except Exception as ai_error:
                     logging.error(f"Enhanced AI analysis failed: {str(ai_error)}")
+                    analysis_failed = True
                     # Fallback comprehensive analysis
                     analysis = f"""ANALIZĂ JURIDICĂ COMPLETĂ - SISTEM AI
 
@@ -1099,6 +1077,7 @@ IMPORTANT: Analiza va fi reluată automat când sistemul revine online."""
                 logging.info(f"Document analysis completed successfully, length: {len(analysis)}")
             except Exception as analysis_error:
                 logging.error(f"Analysis error: {str(analysis_error)}")
+                analysis_failed = True
                 # Get analysis language from session for fallback
                 analysis_language = session.get('analysis_language', 'ro')
                 # Provide fallback analysis for any errors
@@ -1128,7 +1107,7 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza."""
         # Store analysis result in database
         try:
             analysis_id = session.get('analysis_id')
-            if analysis_id and analysis:
+            if analysis_id and analysis and not analysis_failed and not is_failed_analysis(analysis):
                 analysis_record = DocumentAnalysis.query.get(analysis_id)
                 if analysis_record:
                     analysis_record.analysis_result = analysis
@@ -1170,7 +1149,7 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza."""
         # GDPR Compliance: Auto-delete document text after analysis completion
         try:
             analysis_id = session.get('analysis_id')
-            if analysis_id:
+            if analysis_id and not analysis_failed and not is_failed_analysis(analysis):
                 analysis_record = DocumentAnalysis.query.get(analysis_id)
                 if analysis_record and analysis_record.document_text:
                     # Keep only essential metadata, remove actual document content

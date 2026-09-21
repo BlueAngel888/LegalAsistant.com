@@ -46,22 +46,25 @@ def extract_text_from_pdf(file_content: bytes) -> str:
             try:
                 page_text = page.extract_text()
                 
-                # If no text found, try OCR on the page (would need pdf2image for this)
-                if not page_text.strip():
+                # A scanned page needs real OCR; never represent a placeholder as
+                # extracted legal text.
+                if not page_text or not page_text.strip():
                     logging.warning(f"No text found on page {page_num + 1}, OCR might be needed")
-                    page_text = f"[Page {page_num + 1} appears to be an image or has no extractable text]"
+                    continue
                 
                 text += f"\n--- Page {page_num + 1} ---\n{page_text}\n"
                 
             except Exception as page_error:
                 logging.warning(f"Error extracting text from page {page_num + 1}: {str(page_error)}")
-                text += f"\n--- Page {page_num + 1} ---\n[Error extracting text from this page]\n"
+                continue
         
-        return text if text.strip() else "No text could be extracted from this PDF."
+        if not text.strip():
+            raise ValueError("No text could be extracted from this PDF")
+        return text
         
     except Exception as e:
         logging.error(f"Error extracting text from PDF: {str(e)}")
-        return f"Error processing PDF: {str(e)}. Please try converting to DOCX or image format."
+        raise
 
 def extract_text_from_docx(file_content: bytes) -> str:
     """Extract text from DOCX content."""

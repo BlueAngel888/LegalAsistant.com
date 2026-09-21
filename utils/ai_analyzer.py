@@ -442,7 +442,9 @@ Provide your analysis:
 
     except Exception as e:
         logging.error(f"Error analyzing document with GPT-4: {str(e)}")
-        return f"Analysis Error: Unable to complete document analysis. Error: {str(e)}. Please contact support if this issue persists."
+        # Callers must be able to distinguish a transient provider failure from
+        # a legal analysis.  Raising also allows a later request to retry.
+        raise RuntimeError("Unable to complete document analysis") from e
 
 def get_document_summary(text: str) -> str:
     """
