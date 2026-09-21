@@ -4,10 +4,11 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-5">
+<section class="hero-section cl-home-hero py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
+                <span class="cl-eyebrow cl-eyebrow-light mb-3">Legal documents, brought into focus</span>
                 <h1 class="display-4 fw-bold mb-4">
                     {{ t.upload_title }}
                 </h1>
@@ -16,24 +17,29 @@
                 </p>
                 <div class="features-list">
                     <div class="feature-item mb-2">
-                        <i class="fas fa-check-circle text-warning me-2"></i>
-                        Comprehensive legal analysis
+                        <i class="fas fa-arrow-down-right me-2"></i>
+                        Identify the terms that deserve attention
                     </div>
                     <div class="feature-item mb-2">
-                        <i class="fas fa-check-circle text-warning me-2"></i>
-                        Risk assessment and recommendations
+                        <i class="fas fa-arrow-down-right me-2"></i>
+                        Consider questions across jurisdictions
                     </div>
                     <div class="feature-item mb-2">
-                        <i class="fas fa-check-circle text-warning me-2"></i>
-                        Secure and confidential processing
+                        <i class="fas fa-arrow-down-right me-2"></i>
+                        Read a structured analysis in your language
                     </div>
                 </div>
                 
 
             </div>
             <div class="col-lg-6">
-                <div class="text-center">
-                    <i class="fas fa-file-contract display-1 opacity-75"></i>
+                <div class="cl-hero-art" aria-hidden="true">
+                    <div class="cl-art-sheet cl-art-sheet-back"></div>
+                    <div class="cl-art-sheet">
+                        <span></span><span></span><span></span><span></span>
+                        <b>LEGAL / 01</b>
+                    </div>
+                    <div class="cl-art-seal"><i class="fas fa-scale-balanced"></i></div>
                 </div>
             </div>
         </div>
@@ -43,11 +49,11 @@
 
 
 <!-- Upload Section -->
-<section class="py-5">
+<section class="py-5 cl-upload-section">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-lg border-0">
+                <div class="card shadow-lg border-0 cl-upload-card">
                     <div class="card-header bg-white py-4">
                         <h2 class="text-center mb-0">
                             <i class="fas fa-upload text-primary me-2"></i>
@@ -198,7 +204,7 @@
                                                     </svg>
                                                     Selected Files
                                                 </h4>
-                                                <div class="file-list" id="fileList"></div>
+                                                <div class="file-list" id="uploadFileList"></div>
                                                 <div class="preview-actions">
                                                     <button type="button" class="btn-clear-files" id="clearFiles">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -225,7 +231,7 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="preview-container">
-                                                            <img id="previewImage" class="preview-image" alt="Document preview">
+                                                            <img id="documentPreviewImage" class="preview-image" alt="Document preview">
                                                             <div class="preview-text" id="previewText" style="display: none;"></div>
                                                         </div>
                                                     </div>
@@ -317,7 +323,7 @@
                                                 <div class="alert alert-success">
                                                     <i class="fas fa-check-circle me-2"></i>Document captured successfully!
                                                 </div>
-                                                <img id="previewImage" class="img-thumbnail" style="max-width: 300px;">
+                                                <img id="capturedPreviewImage" class="img-thumbnail" style="max-width: 300px;">
                                                 <div class="mt-2">
                                                     <button type="button" class="btn btn-outline-primary" onclick="captureAnother()">
                                                         <i class="fas fa-camera me-2"></i>Capture Another
@@ -442,7 +448,7 @@
                                 <input type="hidden" name="scannedImage" id="scannedImage">
                             </div>
                             
-                            <div id="fileList" class="mb-4" style="display: none;">
+                            <div id="selectedFilesContainer" class="mb-4" style="display: none;">
                                 <h6>Selected Files:</h6>
                                 <ul class="list-group" id="selectedFiles"></ul>
                             </div>
@@ -478,28 +484,28 @@
 </section>
 
 <!-- Features Section -->
-<section class="bg-light py-5">
+<section class="cl-feature-section py-5">
     <div class="container">
         <div class="row">
             <div class="col-md-4 text-center mb-4">
                 <div class="feature-box">
                     <i class="fas fa-brain fa-3x text-primary mb-3"></i>
                     <h4>AI-Powered Analysis</h4>
-                    <p class="text-muted">Advanced GPT-4 technology provides comprehensive legal document analysis</p>
+                    <p class="text-muted">A structured first read of the language, obligations, and points to investigate.</p>
                 </div>
             </div>
             <div class="col-md-4 text-center mb-4">
                 <div class="feature-box">
-                    <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
-                    <h4>Secure Processing</h4>
-                    <p class="text-muted">Your documents are processed securely and never stored on our servers</p>
+                    <i class="fas fa-globe fa-3x text-success mb-3"></i>
+                    <h4>Jurisdiction aware</h4>
+                    <p class="text-muted">Set the document’s country of origin to give the analysis useful legal context.</p>
                 </div>
             </div>
             <div class="col-md-4 text-center mb-4">
                 <div class="feature-box">
-                    <i class="fas fa-clock fa-3x text-warning mb-3"></i>
-                    <h4>Fast Results</h4>
-                    <p class="text-muted">Get detailed analysis results within minutes of payment completion</p>
+                    <i class="fas fa-list-check fa-3x text-warning mb-3"></i>
+                    <h4>Clear next questions</h4>
+                    <p class="text-muted">Use the report as a focused brief before seeking advice on important decisions.</p>
                 </div>
             </div>
         </div>
@@ -535,33 +541,7 @@ function showSuccessMessage(message) {
     }, 5000);
 }
 
-// Enhanced Loading Animation Integration
 document.addEventListener('DOMContentLoaded', function() {
-    // Override form submission to show appropriate loading animations
-    const uploadForm = document.getElementById('upload-form');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-            // Check if this is going to checkout or free access
-            const hasDiscountCode = sessionStorage.getItem('free_access');
-            
-            if (hasDiscountCode) {
-                // Free access - show document analysis animation
-                setTimeout(() => {
-                    if (window.legalLoader) {
-                        window.legalLoader.showDocumentAnalysis();
-                    }
-                }, 100);
-            } else {
-                // Regular flow - show upload animation
-                setTimeout(() => {
-                    if (window.legalLoader) {
-                        window.legalLoader.showDocumentUpload();
-                    }
-                }, 100);
-            }
-        });
-    }
-
     // Monitor for discount code applications
     document.addEventListener('click', function(e) {
         if (e.target.id === 'apply-discount-btn') {

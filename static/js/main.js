@@ -15,7 +15,7 @@ function initializeFileUpload() {
     const cameraInput = document.getElementById('cameraInput');
     const dropZone = document.getElementById('dropZone');
     const filePreview = document.getElementById('filePreview');
-    const fileList = document.getElementById('fileList');
+    const fileList = document.getElementById('uploadFileList');
     const clearFilesBtn = document.getElementById('clearFiles');
     
     let selectedFiles = [];
@@ -729,7 +729,7 @@ function captureDocument() {
     const video = document.getElementById('cameraVideo');
     const canvas = document.getElementById('captureCanvas');
     const preview = document.getElementById('capturedPreview');
-    const previewImg = document.getElementById('previewImage');
+    const previewImg = document.getElementById('capturedPreviewImage');
     const scannedInput = document.getElementById('scannedImage');
     
     if (!video.videoWidth || !video.videoHeight) {
@@ -1022,7 +1022,7 @@ function showDocumentPreview(imageUrl, fileName, fileIndex) {
     currentImageUrl = imageUrl;
     
     const modal = document.getElementById('documentPreviewModal');
-    const previewImage = document.getElementById('previewImage');
+    const previewImage = document.getElementById('documentPreviewImage');
     const previewText = document.getElementById('previewText');
     const enhanceBtn = document.getElementById('enhanceDocumentBtn');
     
@@ -1134,7 +1134,7 @@ function getGrayValue(data, idx) {
 }
 
 function showDocumentOutline(corners) {
-    const previewImage = document.getElementById('previewImage');
+    const previewImage = document.getElementById('documentPreviewImage');
     if (!previewImage) return;
     
     // Create overlay if it doesn't exist

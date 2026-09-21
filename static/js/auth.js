@@ -7,7 +7,12 @@
     }
 
     const proxyUrl = document.querySelector('meta[name="clerk-proxy-url"]')?.content || undefined;
-    await window.Clerk.load({ publishableKey, proxyUrl });
+    try {
+        await window.Clerk.load({ publishableKey, proxyUrl });
+    } catch (error) {
+        if (root) root.innerHTML = '<div class="alert alert-danger" role="alert">Unable to load sign-in. Please refresh the page and try again.</div>';
+        return;
+    }
 
     if (root) {
         const mode = root.dataset.mode;
@@ -17,7 +22,7 @@
             : "/";
         const appearance = {
             variables: {
-                colorPrimary: "#0d6efd",
+                colorPrimary: "#755d32",
                 colorForeground: "#172033",
                 colorMutedForeground: "#687386",
                 colorBackground: "#ffffff",
@@ -32,8 +37,9 @@
                 rootBox: { width: "100%" },
                 cardBox: { width: "100%", boxShadow: "none" },
                 card: { boxShadow: "none", border: "0" },
-                formButtonPrimary: { backgroundColor: "#0d6efd" },
-                footerActionLink: { color: "#0d6efd" }
+                formButtonPrimary: { backgroundColor: "#755d32", color: "#ffffff" },
+                footerActionLink: { color: "#755d32" },
+                socialButtonsBlockButtonText: { color: "#172033" }
             }
         };
 
@@ -43,6 +49,8 @@
             fallbackRedirectUrl: next
         };
 
+        root.replaceChildren();
+        root.removeAttribute("data-auth-loading");
         if (mode === "sign-up") {
             window.Clerk.mountSignUp(root, { ...options, path: "/sign-up", signInUrl: "/sign-in" });
         } else {
