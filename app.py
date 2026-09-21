@@ -16,6 +16,7 @@ from utils.document_consistency_analyzer import DocumentConsistencyAnalyzer
 from utils.learning_service import analyze_with_learning_integration
 from config import STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY
 from translations import get_translation
+from auth import clerk_template_context, load_auth_context, login_required
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -33,6 +34,8 @@ def clean_text_for_db(text):
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_development")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
+app.before_request(load_auth_context)
+app.context_processor(clerk_template_context)
 
 # Configure the database
 database_url = os.environ.get("DATABASE_URL")
@@ -232,6 +235,24 @@ def index():
                          gamification_result=session.pop('gamification_result', None),
                          t=t, lang=lang)
 
+
+@app.route('/sign-in', defaults={'path': ''})
+@app.route('/sign-in/<path:path>')
+def sign_in(path):
+    if clerk_template_context()["auth_user"]:
+        next_url = request.args.get("next", "")
+        return redirect(next_url if next_url.startswith("/") and not next_url.startswith("//") else url_for("index"))
+    return render_template("auth.html", mode="sign-in", t=get_translation(session.get("language", "en")))
+
+
+@app.route('/sign-up', defaults={'path': ''})
+@app.route('/sign-up/<path:path>')
+def sign_up(path):
+    if clerk_template_context()["auth_user"]:
+        next_url = request.args.get("next", "")
+        return redirect(next_url if next_url.startswith("/") and not next_url.startswith("//") else url_for("index"))
+    return render_template("auth.html", mode="sign-up", t=get_translation(session.get("language", "en")))
+
 @app.route('/set-language', methods=['POST'])
 def set_language():
     selected_lang = request.form.get('language')
@@ -241,6 +262,7 @@ def set_language():
     return redirect(url_for('index'))
 
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload_file():
     try:
         logging.info("=== UPLOAD ROUTE CALLED ===")
@@ -555,6 +577,7 @@ def upload_file():
         return redirect(url_for('index'))
 
 @app.route('/checkout')
+@login_required
 def checkout():
     # Enhanced debug session data
     logging.info(f"Checkout route - Full session data: {dict(session)}")
@@ -607,6 +630,7 @@ def validate_discount_code(code):
     return discount_codes.get(code)
 
 @app.route('/apply-discount', methods=['POST'])
+@login_required
 def apply_discount():
     """Apply discount code and return discount information"""
     try:
@@ -644,6 +668,7 @@ def apply_discount():
         })
 
 @app.route('/free-access', methods=['POST'])
+@login_required
 def free_access():
     """Handle free access with valid codes"""
     try:
@@ -687,6 +712,7 @@ def free_access():
         return redirect(url_for('checkout'))
 
 @app.route('/create-checkout-session', methods=['POST'])
+@login_required
 def create_checkout_session():
     try:
         # Debug session data
@@ -1181,6 +1207,7 @@ Nota: În caz de probleme tehnice, vă rugăm să reîncercați analiza."""
                              t=t, lang=lang)
 
 @app.route('/legal-chat', methods=['POST'])
+@login_required
 def legal_chat():
     """Handle legal chat questions about analyzed documents"""
     try:
@@ -1242,6 +1269,7 @@ def fines_analysis():
     return render_template('fines_analysis.html', t=t, lang=lang)
 
 @app.route('/analyze-fine', methods=['POST'])
+@login_required
 def analyze_fine():
     """Analyze a fine/penalty document"""
     try:
@@ -1289,6 +1317,7 @@ def due_diligence():
     return render_template('due_diligence.html', t=t, lang=lang)
 
 @app.route('/analyze-due-diligence', methods=['POST'])
+@login_required
 def analyze_due_diligence():
     """Analyze contract for due diligence"""
     try:
@@ -1366,6 +1395,7 @@ def jurisdiction_compare():
     return render_template('jurisdiction_compare.html', t=t, lang=lang)
 
 @app.route('/analyze-jurisdiction-compare', methods=['POST'])
+@login_required
 def analyze_jurisdiction_compare():
     """Compare laws across jurisdictions"""
     try:
@@ -1398,6 +1428,7 @@ def conflict_laws():
     return render_template('conflict_laws.html', t=t, lang=lang)
 
 @app.route('/analyze-conflict-laws', methods=['POST'])
+@login_required
 def analyze_conflict_laws():
     """Analyze conflict of laws"""
     try:
@@ -1437,6 +1468,7 @@ def international_contracts():
     return render_template('international_contracts.html', t=t, lang=lang)
 
 @app.route('/analyze-international-contract', methods=['POST'])
+@login_required
 def analyze_international_contract():
     """Analyze or draft international contract"""
     try:
@@ -1485,6 +1517,7 @@ def sanctions_compliance():
     return render_template('sanctions_compliance.html', t=t, lang=lang)
 
 @app.route('/analyze-sanctions', methods=['POST'])
+@login_required
 def analyze_sanctions():
     """Analyze sanctions and compliance"""
     try:
@@ -1526,6 +1559,7 @@ def arbitration():
     return render_template('arbitration.html', t=t, lang=lang)
 
 @app.route('/analyze-arbitration', methods=['POST'])
+@login_required
 def analyze_arbitration():
     """Analyze arbitration case"""
     try:
@@ -1566,6 +1600,7 @@ def immigration():
     return render_template('immigration.html', t=t, lang=lang)
 
 @app.route('/analyze-immigration', methods=['POST'])
+@login_required
 def analyze_immigration():
     """Analyze immigration options"""
     try:
@@ -1606,6 +1641,7 @@ def legal_translation():
     return render_template('legal_translation.html', t=t, lang=lang)
 
 @app.route('/analyze-translation', methods=['POST'])
+@login_required
 def analyze_translation():
     """Perform legal translation"""
     try:
