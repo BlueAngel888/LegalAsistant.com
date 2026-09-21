@@ -162,9 +162,27 @@ def test_discount_invalid_valid_and_simulated_checkout_amount(client, monkeypatc
     monkeypatch.setattr(application.stripe.checkout.Session, "create", fake_create)
     response = client.post("/create-checkout-session")
     assert response.status_code == 200
-    assert captured["line_items"][0]["price_data"]["unit_amount"] == 50
+    assert captured["line_items"][0]["price_data"]["unit_amount"] == 5000
     with app.app_context():
-        assert PaymentRecord.query.one().amount == 50
+        assert PaymentRecord.query.one().amount == 5000
+
+
+def test_standard_checkout_charges_100_euros(client, monkeypatch):
+    upload(client, [("contract.txt", b"Synthetic standard price contract with obligations.")])
+    captured = {}
+
+    def fake_create(**kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(id="cs_test_standard", url="https://stripe.invalid/simulated")
+
+    monkeypatch.setattr(application.stripe.checkout.Session, "create", fake_create)
+    response = client.post("/create-checkout-session")
+    assert response.status_code == 200
+    price = captured["line_items"][0]["price_data"]
+    assert price["unit_amount"] == 10000
+    assert price["currency"] == "eur"
+    with app.app_context():
+        assert PaymentRecord.query.one().amount == 10000
 
 
 def test_free_access_and_success_render_simulated_ai(client):

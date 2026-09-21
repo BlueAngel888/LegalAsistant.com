@@ -694,7 +694,8 @@ def create_checkout_session():
         
         # Create Stripe checkout session with better error handling
         discount_percent = session.get('discount_percent', 0)
-        amount = max(0, round(100 * (100 - discount_percent) / 100))
+        # Stripe expects minor units: €100.00 = 10,000 euro cents.
+        amount = max(0, round(10_000 * (100 - discount_percent) / 100))
         if amount == 0:
             flash('Please use the free access button for this discount code.', 'error')
             return redirect(url_for('checkout'))
