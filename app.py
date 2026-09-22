@@ -17,6 +17,7 @@ from utils.learning_service import analyze_with_learning_integration
 from config import STRIPE_PUBLIC_KEY, STRIPE_SECRET_KEY
 from translations import get_translation
 from auth import clerk_template_context, load_auth_context, login_required
+from clerk_proxy import install_clerk_proxy
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -47,6 +48,7 @@ def is_failed_analysis(text):
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "fallback_secret_key_for_development")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
+install_clerk_proxy(app)
 app.before_request(load_auth_context)
 app.context_processor(clerk_template_context)
 

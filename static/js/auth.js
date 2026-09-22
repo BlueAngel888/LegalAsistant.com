@@ -2,13 +2,18 @@
     const root = document.getElementById("clerk-auth-root");
     const publishableKey = document.querySelector('meta[name="clerk-publishable-key"]')?.content;
     if (!publishableKey || !window.Clerk) {
-        if (root) root.innerHTML = '<div class="alert alert-danger">Authentication could not be loaded.</div>';
+        if (root) root.innerHTML = '<div class="alert alert-danger" role="alert">Authentication could not be loaded. Please reload the page to try again. <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.location.reload()">Reload page</button></div>';
         return;
     }
 
     const proxyUrl = document.querySelector('meta[name="clerk-proxy-url"]')?.content || undefined;
     try {
-        await window.Clerk.load({ publishableKey, proxyUrl });
+        await window.Clerk.load({
+            publishableKey,
+            proxyUrl,
+            signInUrl: "/sign-in",
+            signUpUrl: "/sign-up"
+        });
     } catch (error) {
         if (root) root.innerHTML = '<div class="alert alert-danger" role="alert">Unable to load sign-in. Please refresh the page and try again.</div>';
         return;
