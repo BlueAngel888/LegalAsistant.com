@@ -121,7 +121,7 @@ def check_dependencies():
         'stripe',
         'openai',
         'pytesseract',
-        'pypdf2',
+        'pypdf',
         'python-docx',
         'pillow'
     ]

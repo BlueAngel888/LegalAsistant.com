@@ -1,1 +1,2 @@
 - [Clerk compatibility](clerk-compatibility.md) — preserve Flask while adapting the managed Clerk proxy contract; preview success does not validate production.
+- [Auditing uv projects](uv-auditing.md) — pip-audit may not recognize uv.lock directly; audit an exported pinned dependency set instead.

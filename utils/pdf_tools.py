@@ -6,8 +6,7 @@ import pytesseract
 import io
 from docx import Document
 
-# Import PyPDF2 for PDF processing
-import PyPDF2
+from pypdf import PdfReader
 
 def extract_text_from_file(file_storage: FileStorage) -> str:
     """
@@ -37,9 +36,9 @@ def extract_text_from_file(file_storage: FileStorage) -> str:
         raise
 
 def extract_text_from_pdf(file_content: bytes) -> str:
-    """Extract text from PDF content using PyPDF2."""
+    """Extract text from PDF content using pypdf."""
     try:
-        pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_content))
+        pdf_reader = PdfReader(io.BytesIO(file_content))
         text = ""
         
         for page_num, page in enumerate(pdf_reader.pages):

@@ -4,9 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 from docx import Document
-from PyPDF2 import PdfWriter
-from PyPDF2._page import PageObject
-from PyPDF2.generic import (
+from pypdf import PdfWriter
+from pypdf._page import PageObject
+from pypdf.generic import (
     DecodedStreamObject,
     DictionaryObject,
     NameObject,
