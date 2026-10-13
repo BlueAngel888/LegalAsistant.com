@@ -98,16 +98,16 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
           isDragActive
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+            ? 'border-cyan-400 bg-cyan-400/10'
+            : 'border-white/10 hover:border-gray-400 bg-white/5'
         } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <input {...getInputProps()} disabled={uploading} />
         <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-        <p className="text-lg font-medium text-gray-900 mb-2">
+        <p className="text-lg font-medium text-white mb-2">
           {isDragActive ? 'Drop files here' : 'Drag and drop your documents here'}
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-slate-300">
           or click to select files (PDF, Word, Text - max 50MB)
         </p>
       </div>
@@ -115,18 +115,18 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
       {/* Files List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-900">Selected Files:</h3>
+          <h3 className="text-sm font-medium text-white">Selected Files:</h3>
           <div className="space-y-2">
             {files.map((file, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-3 bg-gray-100 rounded-md"
+                className="flex items-center justify-between p-3 bg-white/10 rounded-md"
               >
                 <div className="flex items-center gap-3">
-                  <File className="w-5 h-5 text-gray-600" />
+                  <File className="w-5 h-5 text-slate-300" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-white">{file.name}</p>
+                    <p className="text-xs text-slate-400">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -134,7 +134,7 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
                 <button
                   onClick={() => removeFile(idx)}
                   disabled={uploading}
-                  className="p-1 text-gray-600 hover:text-red-600 disabled:opacity-50"
+                  className="p-1 text-slate-300 hover:text-red-600 disabled:opacity-50"
                 >
                   <X className="w-5 h-5" />
                 </button>

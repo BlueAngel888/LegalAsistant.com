@@ -25,9 +25,9 @@ export default function RootLayout({
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <meta name="theme-color" content="#ffffff" />
+          <meta name="theme-color" content="#05060f" />
         </head>
-        <body className="bg-gray-50 antialiased">
+        <body className="antialiased">
           <div className="min-h-screen">
             {children}
           </div>

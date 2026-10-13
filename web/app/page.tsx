@@ -1,18 +1,73 @@
 import { SignUpButton, SignInButton } from '@clerk/nextjs';
-import Link from 'next/link';
-import { ArrowRight, Shield, Zap, FileText, BarChart3 } from 'lucide-react';
+import {
+  ArrowRight,
+  Shield,
+  Zap,
+  FileText,
+  Globe2,
+  Scale,
+  AlertTriangle,
+  Target,
+  Gauge,
+  Languages,
+  ScanSearch,
+  Sparkles,
+  Lock,
+} from 'lucide-react';
+
+const features = [
+  {
+    icon: Zap,
+    title: 'Instant Analysis',
+    desc: 'Comprehensive results in seconds, powered by Claude AI.',
+  },
+  {
+    icon: Lock,
+    title: 'Secure by Design',
+    desc: 'Your documents are encrypted and stored securely.',
+  },
+  {
+    icon: Globe2,
+    title: 'Multi-Jurisdictional',
+    desc: 'Built for EU and US legal frameworks.',
+  },
+  {
+    icon: FileText,
+    title: 'Any Format',
+    desc: 'PDF, Word and plain text documents.',
+  },
+];
+
+const outputs = [
+  { icon: ScanSearch, title: 'Jurisdiction Detection', desc: 'Automatically identifies the applicable jurisdictions.' },
+  { icon: Scale, title: 'Strengths & Weaknesses', desc: 'A clear map of where your document stands firm and where it is exposed.' },
+  { icon: AlertTriangle, title: 'Legal Errors', desc: 'Flags potential legal issues, gaps and inconsistencies.' },
+  { icon: Target, title: 'Defense Strategy', desc: 'Recommended strategies tailored to your situation.' },
+  { icon: Gauge, title: 'Risk Assessment', desc: 'Risk levels scored from low to critical.' },
+  { icon: Languages, title: 'Multi-Language', desc: 'Romanian, English and other languages.' },
+];
+
+const riskRows = [
+  { label: 'Termination clause', level: 'High', width: 'w-4/5', color: 'from-red-400 to-orange-400', text: 'text-red-300' },
+  { label: 'Liability cap', level: 'Medium', width: 'w-1/2', color: 'from-amber-300 to-yellow-400', text: 'text-amber-300' },
+  { label: 'Governing law', level: 'Low', width: 'w-1/4', color: 'from-emerald-300 to-cyan-400', text: 'text-emerald-300' },
+];
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="relative min-h-screen overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 grid-bg" aria-hidden />
+
       {/* Header */}
-      <header className="bg-white shadow">
-        <nav className="container py-4 flex justify-between items-center">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/60 backdrop-blur-xl">
+        <nav className="container py-4 flex justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <Shield className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Legal Assistant</span>
+            <Shield className="w-7 h-7 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]" />
+            <span className="text-xl font-semibold tracking-tight text-white">
+              Legal<span className="text-gradient">Assistant</span>
+            </span>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-2 sm:gap-3">
             <SignInButton mode="modal">
               <button className="btn btn-secondary">Sign In</button>
             </SignInButton>
@@ -23,154 +78,171 @@ export default function HomePage() {
         </nav>
       </header>
 
-      {/* Hero Section */}
-      <section className="container py-20">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Hero */}
+      <section className="relative container pt-16 pb-24 sm:pt-24">
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
           <div>
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              AI-Powered Legal Document Analysis
+            <span className="badge-primary gap-1.5 mb-6">
+              <Sparkles className="w-3.5 h-3.5" /> Powered by Claude AI
+            </span>
+            <h1 className="text-4xl sm:text-6xl font-bold leading-[1.05] mb-6">
+              Legal document analysis,{' '}
+              <span className="text-gradient">reimagined.</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Upload your contracts, NDAs, and legal documents to get instant AI-powered analysis.
-              Identify strengths, weaknesses, risks, and defense strategies with Claude AI.
+            <p className="text-lg sm:text-xl text-slate-400 mb-10 max-w-xl">
+              Upload contracts, NDAs and legal documents. Get instant insight into strengths,
+              weaknesses, risks and defense strategies.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <SignUpButton mode="modal">
                 <button className="btn btn-primary btn-large">
-                  Start Analyzing <ArrowRight className="ml-2 w-5 h-5" />
+                  Start Analyzing <ArrowRight className="w-5 h-5" />
                 </button>
               </SignUpButton>
-              <Link href="#features">
-                <button className="btn btn-secondary btn-large">Learn More</button>
-              </Link>
+              <a href="#features" className="btn btn-secondary btn-large hover:text-white">
+                Learn More
+              </a>
+            </div>
+            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-slate-400">
+              <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-cyan-400" /> Encrypted storage</span>
+              <span className="flex items-center gap-2"><Globe2 className="w-4 h-4 text-cyan-400" /> EU &amp; US law</span>
+              <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-cyan-400" /> Results in seconds</span>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-xl p-8 border-2 border-blue-200">
-            <div className="space-y-4">
-              <div className="h-64 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-lg flex items-center justify-center">
-                <FileText className="w-24 h-24 text-blue-400" />
+
+          {/* Hero visual: mock analysis panel */}
+          <div className="relative animate-float">
+            <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-tr from-cyan-500/20 via-sky-500/10 to-violet-500/25 blur-3xl" aria-hidden />
+            <div className="relative card glow p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-cyan-300" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">Service_Agreement.pdf</p>
+                    <p className="text-xs text-slate-500">12 pages · EU jurisdiction</p>
+                  </div>
+                </div>
+                <span className="badge-success">Analyzed</span>
               </div>
-              <p className="text-sm text-gray-600 text-center">
-                Drag and drop your documents here or upload from your computer
-              </p>
+
+              <div className="relative h-36 rounded-xl border border-white/10 bg-slate-950/60 overflow-hidden mb-6 p-4 space-y-2.5">
+                <div className="scan-line" aria-hidden />
+                {['w-11/12', 'w-4/5', 'w-full', 'w-3/4', 'w-5/6', 'w-2/3'].map((w, i) => (
+                  <div key={i} className={`h-2 rounded-full bg-white/10 ${w}`} />
+                ))}
+              </div>
+
+              <div className="space-y-4">
+                {riskRows.map((r) => (
+                  <div key={r.label}>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-slate-300">{r.label}</span>
+                      <span className={r.text}>{r.level}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-white/5">
+                      <div className={`h-1.5 rounded-full bg-gradient-to-r ${r.color} ${r.width}`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="bg-white py-20">
+      {/* Features */}
+      <section id="features" className="relative py-24 border-t border-white/5">
         <div className="container">
-          <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
-            Powerful Features
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <Zap className="w-8 h-8 text-yellow-500" />,
-                title: 'Instant Analysis',
-                desc: 'Get comprehensive analysis in seconds using advanced AI',
-              },
-              {
-                icon: <Shield className="w-8 h-8 text-blue-600" />,
-                title: 'Secure',
-                desc: 'Your documents are encrypted and stored securely',
-              },
-              {
-                icon: <BarChart3 className="w-8 h-8 text-green-500" />,
-                title: 'Multi-Jurisdictional',
-                desc: 'Support for EU and US jurisdictions',
-              },
-              {
-                icon: <FileText className="w-8 h-8 text-purple-500" />,
-                title: 'Multiple Formats',
-                desc: 'Supports PDF, Word, and text documents',
-              },
-            ].map((feature, idx) => (
-              <div key={idx} className="card p-6 hover:shadow-lg transition">
-                <div className="mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">{feature.desc}</p>
+          <div className="text-center mb-14">
+            <p className="text-sm uppercase tracking-[0.2em] text-cyan-400 mb-3">Platform</p>
+            <h2 className="text-3xl sm:text-4xl font-bold">Powerful by default</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map(({ icon: Icon, title, desc }) => (
+              <div
+                key={title}
+                className="group card p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-400/40"
+              >
+                <div className="mb-5 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-400/20 to-violet-400/20 border border-white/10 group-hover:shadow-[0_0_24px_rgba(34,211,238,0.35)] transition">
+                  <Icon className="w-6 h-6 text-cyan-300" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{title}</h3>
+                <p className="text-slate-400 text-sm">{desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Key Features */}
-      <section className="container py-20">
-        <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">
-          What You Get
-        </h2>
-        <div className="grid md:grid-cols-2 gap-8">
-          {[
-            { title: 'Jurisdiction Detection', desc: 'Automatically identifies applicable jurisdictions' },
-            { title: 'Strengths & Weaknesses', desc: 'Detailed analysis of document strengths and weaknesses' },
-            { title: 'Legal Errors', desc: 'Identifies potential legal issues and errors' },
-            { title: 'Defense Strategy', desc: 'Provides recommended defense strategies' },
-            { title: 'Risk Assessment', desc: 'Evaluates risk levels from low to critical' },
-            { title: 'Multi-Language', desc: 'Supports Romanian, English, and other languages' },
-          ].map((item, idx) => (
-            <div key={idx} className="card p-6 border-l-4 border-blue-600">
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">{item.title}</h3>
-              <p className="text-gray-600">{item.desc}</p>
+      {/* What you get */}
+      <section className="relative container py-24">
+        <div className="text-center mb-14">
+          <p className="text-sm uppercase tracking-[0.2em] text-violet-400 mb-3">Every report</p>
+          <h2 className="text-3xl sm:text-4xl font-bold">What you get</h2>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {outputs.map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="card p-6 flex gap-4 transition hover:border-violet-400/40">
+              <Icon className="w-6 h-6 shrink-0 text-violet-300 mt-0.5" />
+              <div>
+                <h3 className="text-lg font-semibold mb-1">{title}</h3>
+                <p className="text-slate-400 text-sm">{desc}</p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16">
-        <div className="container text-center text-white">
-          <h2 className="text-4xl font-bold mb-4">Ready to Analyze Your Documents?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Get started for free. No credit card required.
-          </p>
-          <SignUpButton mode="modal">
-            <button className="btn bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8 py-3 rounded-md">
-              Create Free Account
-            </button>
-          </SignUpButton>
+      {/* CTA */}
+      <section className="relative container pb-24">
+        <div className="relative card glow overflow-hidden px-6 py-16 text-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/15 via-transparent to-violet-500/20" aria-hidden />
+          <div className="relative">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Ready to analyze your <span className="text-gradient">documents?</span>
+            </h2>
+            <p className="text-lg text-slate-400 mb-8">Get started for free. No credit card required.</p>
+            <SignUpButton mode="modal">
+              <button className="btn btn-primary btn-large">
+                Create Free Account <ArrowRight className="w-5 h-5" />
+              </button>
+            </SignUpButton>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-8">
+      <footer className="relative border-t border-white/10 py-12 text-slate-400">
         <div className="container">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             <div>
-              <h4 className="text-white font-bold mb-4">Legal Assistant</h4>
-              <p className="text-sm">AI-powered legal document analysis platform</p>
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="w-5 h-5 text-cyan-400" />
+                <span className="font-semibold text-white">LegalAssistant</span>
+              </div>
+              <p className="text-sm">AI-powered legal document analysis platform.</p>
             </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Product</h4>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-white">Features</a></li>
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">Documentation</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Company</h4>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-white">About</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Legal</h4>
-              <ul className="text-sm space-y-2">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
-              </ul>
-            </div>
+            {[
+              { title: 'Product', links: ['Features', 'Pricing', 'Documentation'] },
+              { title: 'Company', links: ['About', 'Blog', 'Contact'] },
+              { title: 'Legal', links: ['Privacy', 'Terms', 'Security'] },
+            ].map((col) => (
+              <div key={col.title}>
+                <h4 className="text-sm font-semibold text-white mb-4">{col.title}</h4>
+                <ul className="text-sm space-y-2">
+                  {col.links.map((l) => (
+                    <li key={l}>
+                      <a href="#" className="text-slate-400 hover:text-white">{l}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-          <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2024 Legal Assistant. All rights reserved.</p>
+          <div className="border-t border-white/10 pt-8 text-center text-sm">
+            <p>&copy; {new Date().getFullYear()} LegalAssistant. All rights reserved.</p>
           </div>
         </div>
       </footer>
