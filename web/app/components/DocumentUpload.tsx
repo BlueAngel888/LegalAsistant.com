@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, File, X } from 'lucide-react';
 import { DocumentType } from '@/lib/types';
+import { useI18n } from './I18nProvider';
 
 interface DocumentUploadProps {
   onUploadSuccess: (documentId: string) => void;
@@ -11,6 +12,7 @@ interface DocumentUploadProps {
 }
 
 export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploadProps) {
+  const { t } = useI18n();
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [documentType, setDocumentType] = useState<DocumentType>(DocumentType.CONTRACT);
@@ -35,7 +37,7 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
 
   const handleUpload = async () => {
     if (files.length === 0) {
-      onUploadError('Please select at least one file');
+      onUploadError(t.upload.selectAtLeastOne);
       return;
     }
 
@@ -54,13 +56,13 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || 'Upload failed');
+          throw new Error(error.error || t.upload.uploadFailed);
         }
 
         const data = await response.json();
 
         if (!data.success) {
-          throw new Error(data.error || 'Upload failed');
+          throw new Error(data.error || t.upload.uploadFailed);
         }
 
         onUploadSuccess(data.documentId);
@@ -68,7 +70,7 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
 
       setFiles([]);
     } catch (error) {
-      onUploadError(error instanceof Error ? error.message : 'Upload failed');
+      onUploadError(error instanceof Error ? error.message : t.upload.uploadFailed);
     } finally {
       setUploading(false);
     }
@@ -78,16 +80,16 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
     <div className="space-y-6">
       {/* Document Type Selection */}
       <div>
-        <label className="form-label">Document Type</label>
+        <label className="form-label">{t.upload.documentType}</label>
         <select
           value={documentType}
           onChange={(e) => setDocumentType(e.target.value as DocumentType)}
           className="form-input"
           disabled={uploading}
         >
-          {Object.entries(DocumentType).map(([key, value]) => (
+          {Object.values(DocumentType).map((value) => (
             <option key={value} value={value}>
-              {key.replace(/_/g, ' ')}
+              {t.documentTypes[value]}
             </option>
           ))}
         </select>
@@ -105,17 +107,17 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
         <input {...getInputProps()} disabled={uploading} />
         <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
         <p className="text-lg font-medium text-white mb-2">
-          {isDragActive ? 'Drop files here' : 'Drag and drop your documents here'}
+          {isDragActive ? t.upload.dropHere : t.upload.dragDrop}
         </p>
         <p className="text-sm text-slate-300">
-          or click to select files (PDF, Word, Text - max 50MB)
+          {t.upload.orClick}
         </p>
       </div>
 
       {/* Files List */}
       {files.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-white">Selected Files:</h3>
+          <h3 className="text-sm font-medium text-white">{t.upload.selectedFiles}</h3>
           <div className="space-y-2">
             {files.map((file, idx) => (
               <div
@@ -150,7 +152,7 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
         disabled={files.length === 0 || uploading}
         className="w-full btn btn-primary btn-large disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {uploading ? 'Uploading...' : `Upload ${files.length} File${files.length !== 1 ? 's' : ''}`}
+        {uploading ? t.upload.uploading : t.upload.uploadButton.replace('{count}', String(files.length))}
       </button>
     </div>
   );

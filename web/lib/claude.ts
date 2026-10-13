@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeAnalysisOutput, Jurisdiction, DocumentType } from './types';
+import { localeInfo, matchLocale } from './i18n/config';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
@@ -26,8 +27,9 @@ const ANALYSIS_TEMPLATE = `Analyze the following legal document and provide a co
 Document Content:
 {DOCUMENT_CONTENT}
 
-Language: {LANGUAGE}
 Suggested Jurisdiction: {JURISDICTION}
+
+Write every human-readable value (strengths, weaknesses, legalErrors, defenseStrategy, summary, recommendations) in {LANGUAGE}, whatever language the document itself is written in. Keep the JSON keys and the jurisdiction, documentType and riskLevel codes exactly as specified below, in English.
 
 Respond ONLY with a valid JSON object (no markdown, no code blocks) with this exact structure:
 {
@@ -64,7 +66,7 @@ export async function analyzeDocument(
 
     const userMessage = ANALYSIS_TEMPLATE
       .replace('{DOCUMENT_CONTENT}', documentContent.substring(0, 12000))
-      .replace('{LANGUAGE}', language)
+      .replace('{LANGUAGE}', languageName(language))
       .replace('{JURISDICTION}', jurisdiction || 'AUTO_DETECT');
 
     const response = await client.messages.create({
@@ -97,6 +99,11 @@ export async function analyzeDocument(
     console.error('Error analyzing document with Claude:', error);
     throw new Error(`Document analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+function languageName(language: string): string {
+  const locale = matchLocale(language);
+  return locale ? localeInfo[locale].englishName : language;
 }
 
 function parseAnalysisResponse(responseText: string): ClaudeAnalysisOutput {

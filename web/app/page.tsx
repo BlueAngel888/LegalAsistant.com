@@ -14,46 +14,40 @@ import {
   Sparkles,
   Lock,
 } from 'lucide-react';
+import { LanguageSwitcher } from '@/app/components/LanguageSwitcher';
+import { getDictionary } from '@/lib/i18n/server';
 
-const features = [
-  {
-    icon: Zap,
-    title: 'Instant Analysis',
-    desc: 'Comprehensive results in seconds, powered by Claude AI.',
-  },
-  {
-    icon: Lock,
-    title: 'Secure by Design',
-    desc: 'Your documents are encrypted and stored securely.',
-  },
-  {
-    icon: Globe2,
-    title: 'Multi-Jurisdictional',
-    desc: 'Built for EU and US legal frameworks.',
-  },
-  {
-    icon: FileText,
-    title: 'Any Format',
-    desc: 'PDF, Word and plain text documents.',
-  },
-];
+export default async function HomePage() {
+  const { t } = await getDictionary();
 
-const outputs = [
-  { icon: ScanSearch, title: 'Jurisdiction Detection', desc: 'Automatically identifies the applicable jurisdictions.' },
-  { icon: Scale, title: 'Strengths & Weaknesses', desc: 'A clear map of where your document stands firm and where it is exposed.' },
-  { icon: AlertTriangle, title: 'Legal Errors', desc: 'Flags potential legal issues, gaps and inconsistencies.' },
-  { icon: Target, title: 'Defense Strategy', desc: 'Recommended strategies tailored to your situation.' },
-  { icon: Gauge, title: 'Risk Assessment', desc: 'Risk levels scored from low to critical.' },
-  { icon: Languages, title: 'Multi-Language', desc: 'Romanian, English and other languages.' },
-];
+  const features = [
+    { icon: Zap, title: t.features.instantTitle, desc: t.features.instantDesc },
+    { icon: Lock, title: t.features.secureTitle, desc: t.features.secureDesc },
+    { icon: Globe2, title: t.features.jurisdictionsTitle, desc: t.features.jurisdictionsDesc },
+    { icon: FileText, title: t.features.formatTitle, desc: t.features.formatDesc },
+  ];
 
-const riskRows = [
-  { label: 'Termination clause', level: 'High', width: 'w-4/5', color: 'from-red-400 to-orange-400', text: 'text-red-300' },
-  { label: 'Liability cap', level: 'Medium', width: 'w-1/2', color: 'from-amber-300 to-yellow-400', text: 'text-amber-300' },
-  { label: 'Governing law', level: 'Low', width: 'w-1/4', color: 'from-emerald-300 to-cyan-400', text: 'text-emerald-300' },
-];
+  const outputs = [
+    { icon: ScanSearch, title: t.outputs.jurisdictionTitle, desc: t.outputs.jurisdictionDesc },
+    { icon: Scale, title: t.outputs.strengthsTitle, desc: t.outputs.strengthsDesc },
+    { icon: AlertTriangle, title: t.outputs.errorsTitle, desc: t.outputs.errorsDesc },
+    { icon: Target, title: t.outputs.strategyTitle, desc: t.outputs.strategyDesc },
+    { icon: Gauge, title: t.outputs.riskTitle, desc: t.outputs.riskDesc },
+    { icon: Languages, title: t.outputs.languagesTitle, desc: t.outputs.languagesDesc },
+  ];
 
-export default function HomePage() {
+  const riskRows = [
+    { label: t.mock.termination, level: t.risk.HIGH, width: 'w-4/5', color: 'from-red-400 to-orange-400', text: 'text-red-300' },
+    { label: t.mock.liability, level: t.risk.MEDIUM, width: 'w-1/2', color: 'from-amber-300 to-yellow-400', text: 'text-amber-300' },
+    { label: t.mock.governingLaw, level: t.risk.LOW, width: 'w-1/4', color: 'from-emerald-300 to-cyan-400', text: 'text-emerald-300' },
+  ];
+
+  const footerColumns = [
+    { title: t.footer.product, links: [t.footer.features, t.footer.pricing, t.footer.documentation] },
+    { title: t.footer.company, links: [t.footer.about, t.footer.blog, t.footer.contact] },
+    { title: t.footer.legal, links: [t.footer.privacy, t.footer.terms, t.footer.security] },
+  ];
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       <div className="pointer-events-none absolute inset-0 grid-bg" aria-hidden />
@@ -68,11 +62,12 @@ export default function HomePage() {
             </span>
           </div>
           <div className="flex gap-2 sm:gap-3">
+            <LanguageSwitcher />
             <SignInButton mode="modal">
-              <button className="btn btn-secondary">Sign In</button>
+              <button className="btn btn-secondary hidden sm:inline-flex">{t.nav.signIn}</button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button className="btn btn-primary">Get Started</button>
+              <button className="btn btn-primary">{t.nav.getStarted}</button>
             </SignUpButton>
           </div>
         </nav>
@@ -83,30 +78,29 @@ export default function HomePage() {
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           <div>
             <span className="badge-primary gap-1.5 mb-6">
-              <Sparkles className="w-3.5 h-3.5" /> Powered by Claude AI
+              <Sparkles className="w-3.5 h-3.5" /> {t.hero.badge}
             </span>
             <h1 className="text-4xl sm:text-6xl font-bold leading-[1.05] mb-6">
-              Legal document analysis,{' '}
-              <span className="text-gradient">reimagined.</span>
+              {t.hero.titleStart}{' '}
+              <span className="text-gradient">{t.hero.titleHighlight}</span>
             </h1>
             <p className="text-lg sm:text-xl text-slate-400 mb-10 max-w-xl">
-              Upload contracts, NDAs and legal documents. Get instant insight into strengths,
-              weaknesses, risks and defense strategies.
+              {t.hero.subtitle}
             </p>
             <div className="flex flex-wrap gap-4">
               <SignUpButton mode="modal">
                 <button className="btn btn-primary btn-large">
-                  Start Analyzing <ArrowRight className="w-5 h-5" />
+                  {t.hero.cta} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
                 </button>
               </SignUpButton>
               <a href="#features" className="btn btn-secondary btn-large hover:text-white">
-                Learn More
+                {t.hero.learnMore}
               </a>
             </div>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-slate-400">
-              <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-cyan-400" /> Encrypted storage</span>
-              <span className="flex items-center gap-2"><Globe2 className="w-4 h-4 text-cyan-400" /> EU &amp; US law</span>
-              <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-cyan-400" /> Results in seconds</span>
+              <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-cyan-400" /> {t.hero.trustEncrypted}</span>
+              <span className="flex items-center gap-2"><Globe2 className="w-4 h-4 text-cyan-400" /> {t.hero.trustLaw}</span>
+              <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-cyan-400" /> {t.hero.trustFast}</span>
             </div>
           </div>
 
@@ -121,10 +115,10 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white">Service_Agreement.pdf</p>
-                    <p className="text-xs text-slate-500">12 pages · EU jurisdiction</p>
+                    <p className="text-xs text-slate-500">{t.mock.fileMeta}</p>
                   </div>
                 </div>
-                <span className="badge-success">Analyzed</span>
+                <span className="badge-success">{t.mock.analyzed}</span>
               </div>
 
               <div className="relative h-36 rounded-xl border border-white/10 bg-slate-950/60 overflow-hidden mb-6 p-4 space-y-2.5">
@@ -156,8 +150,8 @@ export default function HomePage() {
       <section id="features" className="relative py-24 border-t border-white/5">
         <div className="container">
           <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-[0.2em] text-cyan-400 mb-3">Platform</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Powerful by default</h2>
+            <p className="text-sm uppercase tracking-[0.2em] text-cyan-400 mb-3">{t.features.eyebrow}</p>
+            <h2 className="text-3xl sm:text-4xl font-bold">{t.features.title}</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map(({ icon: Icon, title, desc }) => (
@@ -179,8 +173,8 @@ export default function HomePage() {
       {/* What you get */}
       <section className="relative container py-24">
         <div className="text-center mb-14">
-          <p className="text-sm uppercase tracking-[0.2em] text-violet-400 mb-3">Every report</p>
-          <h2 className="text-3xl sm:text-4xl font-bold">What you get</h2>
+          <p className="text-sm uppercase tracking-[0.2em] text-violet-400 mb-3">{t.outputs.eyebrow}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold">{t.outputs.title}</h2>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {outputs.map(({ icon: Icon, title, desc }) => (
@@ -201,12 +195,12 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/15 via-transparent to-violet-500/20" aria-hidden />
           <div className="relative">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Ready to analyze your <span className="text-gradient">documents?</span>
+              {t.cta.titleStart} <span className="text-gradient">{t.cta.titleHighlight}</span>
             </h2>
-            <p className="text-lg text-slate-400 mb-8">Get started for free. No credit card required.</p>
+            <p className="text-lg text-slate-400 mb-8">{t.cta.subtitle}</p>
             <SignUpButton mode="modal">
               <button className="btn btn-primary btn-large">
-                Create Free Account <ArrowRight className="w-5 h-5" />
+                {t.cta.button} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
               </button>
             </SignUpButton>
           </div>
@@ -222,13 +216,9 @@ export default function HomePage() {
                 <Shield className="w-5 h-5 text-cyan-400" />
                 <span className="font-semibold text-white">LegalAssistant</span>
               </div>
-              <p className="text-sm">AI-powered legal document analysis platform.</p>
+              <p className="text-sm">{t.footer.tagline}</p>
             </div>
-            {[
-              { title: 'Product', links: ['Features', 'Pricing', 'Documentation'] },
-              { title: 'Company', links: ['About', 'Blog', 'Contact'] },
-              { title: 'Legal', links: ['Privacy', 'Terms', 'Security'] },
-            ].map((col) => (
+            {footerColumns.map((col) => (
               <div key={col.title}>
                 <h4 className="text-sm font-semibold text-white mb-4">{col.title}</h4>
                 <ul className="text-sm space-y-2">
@@ -242,7 +232,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} LegalAssistant. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} LegalAssistant. {t.footer.rights}</p>
           </div>
         </div>
       </footer>

@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
 import { Shield, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { useI18n } from './I18nProvider';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useI18n();
 
   return (
     <header className="bg-slate-950/70 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
@@ -19,15 +22,16 @@ export function Header() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-8">
           <Link href="/dashboard" className="text-slate-300 hover:text-white">
-            Dashboard
+            {t.nav.dashboard}
           </Link>
           <Link href="/documents" className="text-slate-300 hover:text-white">
-            Documents
+            {t.nav.documents}
           </Link>
           <Link href="/pricing" className="text-slate-300 hover:text-white">
-            Pricing
+            {t.nav.pricing}
           </Link>
-          <div className="pl-8 border-l border-white/10">
+          <LanguageSwitcher />
+          <div className="ps-8 border-s border-white/10">
             <UserButton />
           </div>
         </div>
@@ -49,14 +53,15 @@ export function Header() {
           <div className="absolute top-full left-0 right-0 bg-white/5 border-b border-white/10 md:hidden">
             <div className="container py-4 space-y-4">
               <Link href="/dashboard" className="block text-slate-300 hover:text-white">
-                Dashboard
+                {t.nav.dashboard}
               </Link>
               <Link href="/documents" className="block text-slate-300 hover:text-white">
-                Documents
+                {t.nav.documents}
               </Link>
               <Link href="/pricing" className="block text-slate-300 hover:text-white">
-                Pricing
+                {t.nav.pricing}
               </Link>
+              <LanguageSwitcher />
               <div className="pt-4 border-t border-white/10">
                 <UserButton />
               </div>

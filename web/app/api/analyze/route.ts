@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAnalysis, getDocument, getUser, updateDocumentStatus } from '@/lib/db';
 import { analyzeDocument } from '@/lib/claude';
 import { AnalysisStatus } from '@/lib/types';
+import { matchLocale } from '@/lib/i18n/config';
+import { getLocale } from '@/lib/i18n/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +27,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { documentId, language, jurisdiction } = body;
+    const { documentId, jurisdiction } = body;
+    // Report language: explicit request, else the language the visitor picked on the site.
+    const language = matchLocale(body.language) ?? (await getLocale());
 
     if (!documentId) {
       return NextResponse.json(
@@ -63,7 +67,7 @@ export async function POST(request: NextRequest) {
     try {
       analysisResult = await analyzeDocument(
         document.content,
-        language || document.language || 'en',
+        language,
         jurisdiction,
       );
     } catch (error) {
@@ -91,7 +95,7 @@ export async function POST(request: NextRequest) {
         user.id,
         analysisResult.jurisdiction,
         analysisResult.documentType,
-        language || document.language || 'en',
+        language,
         analysisResult.strengths,
         analysisResult.weaknesses,
         analysisResult.legalErrors,

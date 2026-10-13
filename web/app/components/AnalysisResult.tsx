@@ -3,12 +3,17 @@
 import { AnalysisResult } from '@/lib/types';
 import { AlertCircle, CheckCircle, AlertTriangle, TrendingDown } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { localeInfo } from '@/lib/i18n/config';
+import { useI18n } from './I18nProvider';
 
 interface AnalysisResultProps {
   analysis: AnalysisResult;
 }
 
 export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
+  const { locale, t } = useI18n();
+  const dateTag = localeInfo[locale].tag;
+
   const getRiskColor = (level: string) => {
     switch (level) {
       case 'LOW':
@@ -43,13 +48,13 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
       <div className="card p-6">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-sm text-slate-300 mb-2">Document Type</h3>
+            <h3 className="text-sm text-slate-300 mb-2">{t.analysis.documentType}</h3>
             <p className="text-xl font-semibold text-white">
-              {analysis.documentType.replace(/_/g, ' ')}
+              {t.documentTypes[analysis.documentType] ?? analysis.documentType.replace(/_/g, ' ')}
             </p>
           </div>
           <div>
-            <h3 className="text-sm text-slate-300 mb-2">Jurisdiction</h3>
+            <h3 className="text-sm text-slate-300 mb-2">{t.analysis.jurisdiction}</h3>
             <p className="text-xl font-semibold text-white">
               {analysis.jurisdiction}
             </p>
@@ -62,7 +67,7 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">{getRiskIcon(analysis.riskLevel)}</div>
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-2">Risk Level: {analysis.riskLevel}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t.analysis.riskLevel}: {t.risk[analysis.riskLevel] ?? analysis.riskLevel}</h3>
             <p className="opacity-75">{analysis.summary}</p>
           </div>
         </div>
@@ -70,17 +75,17 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
 
       {/* Summary */}
       <div className="card p-6">
-        <h3 className="text-lg font-semibold mb-4 text-white">Analysis Summary</h3>
+        <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.summary}</h3>
         <p className="text-slate-200 leading-relaxed">{analysis.summary}</p>
         <p className="text-xs text-slate-400 mt-4">
-          Analyzed on {formatDate(analysis.createdAt)}
+          {t.analysis.analyzedOn} {formatDate(analysis.createdAt, dateTag)}
         </p>
       </div>
 
       {/* Strengths */}
       {analysis.strengths.length > 0 && (
-        <div className="card p-6 border-l-4 border-green-500">
-          <h3 className="text-lg font-semibold mb-4 text-white">Strengths</h3>
+        <div className="card p-6 border-s-4 border-green-500">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.strengths}</h3>
           <ul className="space-y-3">
             {analysis.strengths.map((strength, idx) => (
               <li key={idx} className="flex gap-3">
@@ -94,8 +99,8 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
 
       {/* Weaknesses */}
       {analysis.weaknesses.length > 0 && (
-        <div className="card p-6 border-l-4 border-yellow-500">
-          <h3 className="text-lg font-semibold mb-4 text-white">Weaknesses</h3>
+        <div className="card p-6 border-s-4 border-yellow-500">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.weaknesses}</h3>
           <ul className="space-y-3">
             {analysis.weaknesses.map((weakness, idx) => (
               <li key={idx} className="flex gap-3">
@@ -109,8 +114,8 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
 
       {/* Legal Errors */}
       {analysis.legalErrors.length > 0 && (
-        <div className="card p-6 border-l-4 border-red-500">
-          <h3 className="text-lg font-semibold mb-4 text-white">Legal Issues</h3>
+        <div className="card p-6 border-s-4 border-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.legalIssues}</h3>
           <ul className="space-y-3">
             {analysis.legalErrors.map((error, idx) => (
               <li key={idx} className="flex gap-3">
@@ -124,8 +129,8 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
 
       {/* Defense Strategy */}
       {analysis.defenseStrategy.length > 0 && (
-        <div className="card p-6 border-l-4 border-cyan-400">
-          <h3 className="text-lg font-semibold mb-4 text-white">Defense Strategy</h3>
+        <div className="card p-6 border-s-4 border-cyan-400">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.defenseStrategy}</h3>
           <ol className="space-y-3 list-decimal list-inside">
             {analysis.defenseStrategy.map((strategy, idx) => (
               <li key={idx} className="text-slate-200">
@@ -138,8 +143,8 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
 
       {/* Recommendations */}
       {analysis.recommendations.length > 0 && (
-        <div className="card p-6 border-l-4 border-purple-500">
-          <h3 className="text-lg font-semibold mb-4 text-white">Recommendations</h3>
+        <div className="card p-6 border-s-4 border-purple-500">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.recommendations}</h3>
           <ul className="space-y-3">
             {analysis.recommendations.map((rec, idx) => (
               <li key={idx} className="flex gap-3">
@@ -155,9 +160,9 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
 
       {/* Metadata */}
       <div className="text-xs text-slate-400 space-y-1">
-        <p>Analysis ID: {analysis.id}</p>
-        <p>Language: {analysis.language.toUpperCase()}</p>
-        <p>Created: {formatDate(analysis.createdAt)}</p>
+        <p>{t.analysis.analysisId}: {analysis.id}</p>
+        <p>{t.analysis.language}: {analysis.language.toUpperCase()}</p>
+        <p>{t.analysis.created}: {formatDate(analysis.createdAt, dateTag)}</p>
       </div>
     </div>
   );
