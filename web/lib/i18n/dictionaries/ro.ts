@@ -93,6 +93,13 @@ const ro: Dictionary = {
     PRIVACY_POLICY: 'Politică de confidențialitate',
     OTHER: 'Altul',
   },
+  dashboard: {
+    title: "Spațiul tău de lucru",
+    subtitle: "Încarcă un document juridic și primești o analiză AI în câteva secunde.",
+    analyzing: "Se analizează documentul…",
+    analyzeFailed: "Analiza a eșuat",
+    openApp: "Deschide panoul",
+  },
   upload: {
     documentType: 'Tipul documentului',
     dropHere: 'Plasează fișierele aici',

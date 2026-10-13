@@ -93,6 +93,13 @@ const tr: Dictionary = {
     PRIVACY_POLICY: 'Gizlilik politikası',
     OTHER: 'Diğer',
   },
+  dashboard: {
+    title: "Çalışma alanınız",
+    subtitle: "Bir hukuki belge yükleyin ve saniyeler içinde yapay zekâ analizi alın.",
+    analyzing: "Belgeniz analiz ediliyor…",
+    analyzeFailed: "Analiz başarısız oldu",
+    openApp: "Panoyu aç",
+  },
   upload: {
     documentType: 'Belge türü',
     dropHere: 'Dosyaları buraya bırakın',

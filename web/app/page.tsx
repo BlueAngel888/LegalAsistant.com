@@ -1,4 +1,5 @@
-import { SignUpButton, SignInButton } from '@clerk/nextjs';
+import { SignUpButton, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import Link from 'next/link';
 import {
   ArrowRight,
   Shield,
@@ -63,12 +64,18 @@ export default async function HomePage() {
           </div>
           <div className="flex gap-2 sm:gap-3">
             <LanguageSwitcher />
-            <SignInButton mode="modal">
-              <button className="btn btn-secondary hidden sm:inline-flex">{t.nav.signIn}</button>
-            </SignInButton>
-            <SignUpButton mode="modal">
-              <button className="btn btn-primary">{t.nav.getStarted}</button>
-            </SignUpButton>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="btn btn-secondary hidden sm:inline-flex">{t.nav.signIn}</button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="btn btn-primary">{t.nav.getStarted}</button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard" className="btn btn-primary hover:text-slate-950">{t.dashboard.openApp}</Link>
+              <div className="flex items-center"><UserButton /></div>
+            </SignedIn>
           </div>
         </nav>
       </header>
@@ -88,11 +95,18 @@ export default async function HomePage() {
               {t.hero.subtitle}
             </p>
             <div className="flex flex-wrap gap-4">
-              <SignUpButton mode="modal">
-                <button className="btn btn-primary btn-large">
+              <SignedOut>
+                <SignUpButton mode="modal">
+                  <button className="btn btn-primary btn-large">
+                    {t.hero.cta} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+                  </button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="btn btn-primary btn-large hover:text-slate-950">
                   {t.hero.cta} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
-                </button>
-              </SignUpButton>
+                </Link>
+              </SignedIn>
               <a href="#features" className="btn btn-secondary btn-large hover:text-white">
                 {t.hero.learnMore}
               </a>
@@ -198,11 +212,18 @@ export default async function HomePage() {
               {t.cta.titleStart} <span className="text-gradient">{t.cta.titleHighlight}</span>
             </h2>
             <p className="text-lg text-slate-400 mb-8">{t.cta.subtitle}</p>
-            <SignUpButton mode="modal">
-              <button className="btn btn-primary btn-large">
-                {t.cta.button} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
-              </button>
-            </SignUpButton>
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <button className="btn btn-primary btn-large">
+                  {t.cta.button} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard" className="btn btn-primary btn-large hover:text-slate-950">
+                {t.dashboard.openApp} <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+              </Link>
+            </SignedIn>
           </div>
         </div>
       </section>

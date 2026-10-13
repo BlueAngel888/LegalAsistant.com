@@ -96,6 +96,13 @@ const en = {
     PRIVACY_POLICY: 'Privacy policy',
     OTHER: 'Other',
   },
+  dashboard: {
+    title: "Your workspace",
+    subtitle: "Upload a legal document and get an AI analysis in seconds.",
+    analyzing: "Analyzing your document…",
+    analyzeFailed: "Analysis failed",
+    openApp: "Open dashboard",
+  },
   upload: {
     documentType: 'Document Type',
     dropHere: 'Drop files here',

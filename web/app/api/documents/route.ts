@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createDocument, createOrUpdateUser, getUser } from '@/lib/db';
 import { extractTextFromFile, isValidFileType, validateDocumentSize, getLanguageFromContent } from '@/lib/utils';
@@ -16,14 +16,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get or create user in database
-    const userHeader = request.headers.get('x-user-data');
+    // Get or create user in database (first upload after sign-up)
     let user = await getUser(clerkId);
 
-    if (!user && userHeader) {
+    if (!user) {
       try {
-        const userData = JSON.parse(userHeader);
-        user = await createOrUpdateUser(clerkId, userData.email, userData.name);
+        const clerkUser = await currentUser();
+        const email = clerkUser?.primaryEmailAddress?.emailAddress ?? '';
+        const name = [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(' ') || email;
+        user = await createOrUpdateUser(clerkId, email, name);
       } catch (e) {
         console.error('Error creating user:', e);
       }

@@ -93,6 +93,13 @@ const ar: Dictionary = {
     PRIVACY_POLICY: 'سياسة الخصوصية',
     OTHER: 'أخرى',
   },
+  dashboard: {
+    title: "مساحة عملك",
+    subtitle: "ارفع مستندًا قانونيًا واحصل على تحليل بالذكاء الاصطناعي خلال ثوانٍ.",
+    analyzing: "جارٍ تحليل المستند…",
+    analyzeFailed: "فشل التحليل",
+    openApp: "افتح لوحة التحكم",
+  },
   upload: {
     documentType: 'نوع المستند',
     dropHere: 'أفلت الملفات هنا',

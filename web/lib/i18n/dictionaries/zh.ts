@@ -92,6 +92,13 @@ const zh: Dictionary = {
     PRIVACY_POLICY: '隐私政策',
     OTHER: '其他',
   },
+  dashboard: {
+    title: "您的工作区",
+    subtitle: "上传法律文件，几秒内获得 AI 分析。",
+    analyzing: "正在分析您的文件…",
+    analyzeFailed: "分析失败",
+    openApp: "打开控制台",
+  },
   upload: {
     documentType: '文件类型',
     dropHere: '将文件拖放到此处',

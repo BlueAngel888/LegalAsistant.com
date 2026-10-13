@@ -93,6 +93,13 @@ const hi: Dictionary = {
     PRIVACY_POLICY: 'गोपनीयता नीति',
     OTHER: 'अन्य',
   },
+  dashboard: {
+    title: "आपका कार्यक्षेत्र",
+    subtitle: "कोई कानूनी दस्तावेज़ अपलोड करें और सेकंडों में AI विश्लेषण पाएं।",
+    analyzing: "आपके दस्तावेज़ का विश्लेषण हो रहा है…",
+    analyzeFailed: "विश्लेषण विफल रहा",
+    openApp: "डैशबोर्ड खोलें",
+  },
   upload: {
     documentType: 'दस्तावेज़ का प्रकार',
     dropHere: 'फ़ाइलें यहाँ छोड़ें',

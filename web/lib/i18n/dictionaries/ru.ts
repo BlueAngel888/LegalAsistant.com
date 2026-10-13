@@ -93,6 +93,13 @@ const ru: Dictionary = {
     PRIVACY_POLICY: 'Политика конфиденциальности',
     OTHER: 'Другое',
   },
+  dashboard: {
+    title: "Ваше рабочее пространство",
+    subtitle: "Загрузите юридический документ и получите ИИ-анализ за секунды.",
+    analyzing: "Анализируем документ…",
+    analyzeFailed: "Анализ не удался",
+    openApp: "Открыть панель",
+  },
   upload: {
     documentType: 'Тип документа',
     dropHere: 'Отпустите файлы здесь',

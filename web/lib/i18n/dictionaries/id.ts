@@ -93,6 +93,13 @@ const id: Dictionary = {
     PRIVACY_POLICY: 'Kebijakan privasi',
     OTHER: 'Lainnya',
   },
+  dashboard: {
+    title: "Ruang kerja Anda",
+    subtitle: "Unggah dokumen hukum dan dapatkan analisis AI dalam hitungan detik.",
+    analyzing: "Menganalisis dokumen Anda…",
+    analyzeFailed: "Analisis gagal",
+    openApp: "Buka dasbor",
+  },
   upload: {
     documentType: 'Jenis dokumen',
     dropHere: 'Lepaskan file di sini',

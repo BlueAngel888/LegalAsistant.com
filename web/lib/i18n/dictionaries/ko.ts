@@ -93,6 +93,13 @@ const ko: Dictionary = {
     PRIVACY_POLICY: '개인정보 처리방침',
     OTHER: '기타',
   },
+  dashboard: {
+    title: "내 작업 공간",
+    subtitle: "법률 문서를 업로드하면 몇 초 만에 AI 분석을 받을 수 있습니다.",
+    analyzing: "문서를 분석하는 중…",
+    analyzeFailed: "분석에 실패했습니다",
+    openApp: "대시보드 열기",
+  },
   upload: {
     documentType: '문서 유형',
     dropHere: '여기에 파일을 놓으세요',

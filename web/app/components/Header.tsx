@@ -24,12 +24,6 @@ export function Header() {
           <Link href="/dashboard" className="text-slate-300 hover:text-white">
             {t.nav.dashboard}
           </Link>
-          <Link href="/documents" className="text-slate-300 hover:text-white">
-            {t.nav.documents}
-          </Link>
-          <Link href="/pricing" className="text-slate-300 hover:text-white">
-            {t.nav.pricing}
-          </Link>
           <LanguageSwitcher />
           <div className="ps-8 border-s border-white/10">
             <UserButton />
@@ -54,12 +48,6 @@ export function Header() {
             <div className="container py-4 space-y-4">
               <Link href="/dashboard" className="block text-slate-300 hover:text-white">
                 {t.nav.dashboard}
-              </Link>
-              <Link href="/documents" className="block text-slate-300 hover:text-white">
-                {t.nav.documents}
-              </Link>
-              <Link href="/pricing" className="block text-slate-300 hover:text-white">
-                {t.nav.pricing}
               </Link>
               <LanguageSwitcher />
               <div className="pt-4 border-t border-white/10">

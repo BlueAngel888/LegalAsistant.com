@@ -32,7 +32,11 @@ export default async function RootLayout({
   const { tag, dir } = localeInfo[locale];
 
   return (
-    <ClerkProvider localization={clerkLocalizations[locale]}>
+    <ClerkProvider
+      localization={clerkLocalizations[locale]}
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/dashboard"
+    >
       <html lang={tag} dir={dir} suppressHydrationWarning>
         <head>
           <meta charSet="utf-8" />

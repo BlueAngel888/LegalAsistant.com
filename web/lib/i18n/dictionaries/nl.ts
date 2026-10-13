@@ -93,6 +93,13 @@ const nl: Dictionary = {
     PRIVACY_POLICY: 'Privacybeleid',
     OTHER: 'Overig',
   },
+  dashboard: {
+    title: "Je werkruimte",
+    subtitle: "Upload een juridisch document en krijg binnen seconden een AI-analyse.",
+    analyzing: "Je document wordt geanalyseerd…",
+    analyzeFailed: "Analyse mislukt",
+    openApp: "Dashboard openen",
+  },
   upload: {
     documentType: 'Documenttype',
     dropHere: 'Zet de bestanden hier neer',

@@ -93,6 +93,13 @@ const ja: Dictionary = {
     PRIVACY_POLICY: 'プライバシーポリシー',
     OTHER: 'その他',
   },
+  dashboard: {
+    title: "ワークスペース",
+    subtitle: "法的文書をアップロードすると、数秒で AI 分析が得られます。",
+    analyzing: "文書を分析しています…",
+    analyzeFailed: "分析に失敗しました",
+    openApp: "ダッシュボードを開く",
+  },
   upload: {
     documentType: '文書の種類',
     dropHere: 'ここにファイルをドロップ',

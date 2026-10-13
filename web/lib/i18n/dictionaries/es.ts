@@ -93,6 +93,13 @@ const es: Dictionary = {
     PRIVACY_POLICY: 'Política de privacidad',
     OTHER: 'Otro',
   },
+  dashboard: {
+    title: "Tu espacio de trabajo",
+    subtitle: "Sube un documento legal y obtén un análisis con IA en segundos.",
+    analyzing: "Analizando tu documento…",
+    analyzeFailed: "El análisis falló",
+    openApp: "Abrir panel",
+  },
   upload: {
     documentType: 'Tipo de documento',
     dropHere: 'Suelta los archivos aquí',

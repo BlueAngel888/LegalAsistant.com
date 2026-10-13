@@ -93,6 +93,13 @@ const de: Dictionary = {
     PRIVACY_POLICY: 'Datenschutzerklärung',
     OTHER: 'Sonstiges',
   },
+  dashboard: {
+    title: "Ihr Arbeitsbereich",
+    subtitle: "Laden Sie ein Rechtsdokument hoch und erhalten Sie in Sekunden eine KI-Analyse.",
+    analyzing: "Ihr Dokument wird analysiert…",
+    analyzeFailed: "Analyse fehlgeschlagen",
+    openApp: "Dashboard öffnen",
+  },
   upload: {
     documentType: 'Dokumenttyp',
     dropHere: 'Dateien hier ablegen',

@@ -93,6 +93,13 @@ const uk: Dictionary = {
     PRIVACY_POLICY: 'Політика конфіденційності',
     OTHER: 'Інше',
   },
+  dashboard: {
+    title: "Ваш робочий простір",
+    subtitle: "Завантажте юридичний документ і отримайте ШІ-аналіз за лічені секунди.",
+    analyzing: "Аналізуємо документ…",
+    analyzeFailed: "Аналіз не вдався",
+    openApp: "Відкрити панель",
+  },
   upload: {
     documentType: 'Тип документа',
     dropHere: 'Відпустіть файли тут',
