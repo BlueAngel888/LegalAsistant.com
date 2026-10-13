@@ -4,14 +4,9 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "env": [
-    "NEXT_PUBLIC_SUPABASE_URL",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
-    "CLERK_SECRET_KEY",
-    "ANTHROPIC_API_KEY"
+  "regions": [
+    "iad1"
   ],
-  "regions": ["iad1"],
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
