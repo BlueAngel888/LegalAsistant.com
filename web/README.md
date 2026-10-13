@@ -11,6 +11,7 @@ lawyer can verify it later.
 ## Quick start
 
 ```bash
+cd web
 npm install
 cp .env.example .env.local     # fill in the keys, see docs/ENVIRONMENT.md
 npm run dev                    # http://localhost:3000
@@ -33,7 +34,8 @@ npm run dev                    # http://localhost:3000
 Create an API key at <https://platform.claude.com> and set `ANTHROPIC_API_KEY`.
 
 ### 4. Deploy (Vercel)
-Import the repo in Vercel, add the same environment variables, deploy. No extra config is needed.
+Import the repo in Vercel and set **Root Directory = `web`** (the old Flask app stays at the repo root).
+Add the environment variables from `docs/ENVIRONMENT.md`, then deploy.
 Analysis runs in the background via Next.js `after()` with `maxDuration = 300`, which needs the
 Vercel Pro plan for runs over 60 s (Hobby caps functions at 60 s). See *Known limits*.
 
