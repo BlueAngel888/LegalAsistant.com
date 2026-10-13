@@ -1,42 +1,41 @@
--- Create analysis_results table
 CREATE TABLE IF NOT EXISTS analysis_results (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  jurisdiction VARCHAR(20) NOT NULL,
-  document_type VARCHAR(50) NOT NULL,
-  language VARCHAR(10) DEFAULT 'en',
-  strengths TEXT[] DEFAULT ARRAY[]::TEXT[],
-  weaknesses TEXT[] DEFAULT ARRAY[]::TEXT[],
-  legal_errors TEXT[] DEFAULT ARRAY[]::TEXT[],
-  defense_strategy TEXT[] DEFAULT ARRAY[]::TEXT[],
-  risk_level VARCHAR(20) NOT NULL,
-  summary TEXT NOT NULL,
-  recommendations TEXT[] DEFAULT ARRAY[]::TEXT[],
-  cached_at TIMESTAMP WITH TIME ZONE,
+  document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+  analysis_type TEXT NOT NULL,
+  status TEXT DEFAULT 'pending',
+  result JSONB,
+  summary TEXT,
+  key_findings TEXT,
+  risks TEXT,
+  recommendations TEXT,
+  processing_time_ms INTEGER,
+  error_message TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_analysis_results_document_id (document_id),
-  INDEX idx_analysis_results_user_id (user_id),
-  INDEX idx_analysis_results_created_at (created_at),
-  INDEX idx_analysis_results_risk_level (risk_level)
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Add RLS policies
+CREATE INDEX idx_analysis_results_user_id ON analysis_results (user_id);
+CREATE INDEX idx_analysis_results_document_id ON analysis_results (document_id);
+CREATE INDEX idx_analysis_results_status ON analysis_results (status);
+CREATE INDEX idx_analysis_results_created_at ON analysis_results (created_at);
+CREATE INDEX idx_analysis_results_analysis_type ON analysis_results (analysis_type);
+CREATE INDEX idx_analysis_results_user_id_created_at ON analysis_results (user_id, created_at);
+
 ALTER TABLE analysis_results ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own analysis results"
   ON analysis_results FOR SELECT
-  USING (user_id = (SELECT id FROM users WHERE clerk_id = auth.uid()::text LIMIT 1));
+  USING (auth.uid()::text = (SELECT clerk_id FROM users WHERE users.id = analysis_results.user_id));
 
-CREATE POLICY "Users can create analysis results"
+CREATE POLICY "Users can create analysis results for their documents"
   ON analysis_results FOR INSERT
-  WITH CHECK (user_id = (SELECT id FROM users WHERE clerk_id = auth.uid()::text LIMIT 1));
+  WITH CHECK (auth.uid()::text = (SELECT clerk_id FROM users WHERE users.id = analysis_results.user_id));
 
 CREATE POLICY "Users can update their own analysis results"
   ON analysis_results FOR UPDATE
-  USING (user_id = (SELECT id FROM users WHERE clerk_id = auth.uid()::text LIMIT 1));
+  USING (auth.uid()::text = (SELECT clerk_id FROM users WHERE users.id = analysis_results.user_id));
 
 CREATE POLICY "Users can delete their own analysis results"
   ON analysis_results FOR DELETE
-  USING (user_id = (SELECT id FROM users WHERE clerk_id = auth.uid()::text LIMIT 1));
+  USING (auth.uid()::text = (SELECT clerk_id FROM users WHERE users.id = analysis_results.user_id));
