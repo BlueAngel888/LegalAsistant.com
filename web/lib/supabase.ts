@@ -8,9 +8,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase credentials not configured. Some features may not work.');
 }
 
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+// Placeholders keep `next build` from crashing when env vars are missing;
+// real requests still need the real values set in Vercel.
+const url = supabaseUrl || 'http://localhost:54321';
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
+export const supabaseClient = createClient(url, supabaseAnonKey || 'missing-anon-key');
+
+export const supabaseAdmin = createClient(url, supabaseServiceRoleKey || 'missing-service-role-key');
 
 export type Database = any;
 

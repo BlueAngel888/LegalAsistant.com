@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    strict: true,
-  },
   experimental: {
     serverActions: {
       bodySizeLimit: '50mb',
@@ -20,4 +17,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

@@ -55,8 +55,8 @@ export async function extractTextFromFile(
 async function extractTextFromWord(file: File): Promise<string> {
   try {
     const buffer = await file.arrayBuffer();
-    const { extractText } = await import('mammoths');
-    const result = await extractText({ arrayBuffer: buffer });
+    const mammoth = await import('mammoth');
+    const result = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
     return result.value || '';
   } catch (error) {
     console.error('Error extracting text from Word document:', error);
