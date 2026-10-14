@@ -126,6 +126,10 @@ const pl: Dictionary = {
     language: 'Język',
     created: 'Utworzono',
     legalBasis: 'Podstawa prawna',
+    legalFramework: 'Zastosowane przepisy',
+    inForceOn: 'Obowiązujące na dzień',
+    publicInfo: 'Przydatne informacje publiczne',
+    source: 'Źródło',
   },
   compliance: {
     COMPLIANT: 'Zgodne z prawem',

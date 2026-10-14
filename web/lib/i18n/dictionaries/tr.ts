@@ -126,6 +126,10 @@ const tr: Dictionary = {
     language: 'Dil',
     created: 'Oluşturuldu',
     legalBasis: 'Yasal dayanak',
+    legalFramework: 'Uygulanan mevzuat',
+    inForceOn: 'Yürürlük tarihi',
+    publicInfo: 'Faydalı kamu bilgileri',
+    source: 'Kaynak',
   },
   compliance: {
     COMPLIANT: 'Yasaya uygun',

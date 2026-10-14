@@ -1,7 +1,7 @@
 'use client';
 
 import type { AnalysisPoint, AnalysisResult, ComplianceStatus } from '@/lib/types';
-import { AlertCircle, CheckCircle, AlertTriangle, TrendingDown, Scale } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, TrendingDown, Scale, BookOpen, Landmark } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { localeInfo } from '@/lib/i18n/config';
 import { useI18n } from './I18nProvider';
@@ -216,6 +216,47 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
                   <span className="text-slate-200">{rec.text}</span>
                   <PointLaw point={rec} />
                 </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Public information */}
+      {analysis.publicInfo.length > 0 && (
+        <div className="card p-6 border-s-4 !border-s-sky-400">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.publicInfo}</h3>
+          <ul className="space-y-3">
+            {analysis.publicInfo.map((info, idx) => (
+              <li key={idx} className="flex gap-3">
+                <Landmark className="w-5 h-5 text-sky-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="text-slate-200">{info.text}</span>
+                  {info.source && (
+                    <p className="mt-1 text-xs text-slate-400">
+                      {t.analysis.source}: <span className="text-slate-300">{info.source}</span>
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Legislation applied */}
+      {analysis.legalFramework.length > 0 && (
+        <div className="card p-6 border-s-4 !border-s-slate-400">
+          <h3 className="text-lg font-semibold text-white">{t.analysis.legalFramework}</h3>
+          <p className="text-xs text-slate-400 mt-1 mb-4">
+            {t.analysis.inForceOn}{' '}
+            {new Date(analysis.createdAt).toLocaleDateString(dateTag, { day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+          <ul className="space-y-2">
+            {analysis.legalFramework.map((act, idx) => (
+              <li key={idx} className="flex gap-3">
+                <BookOpen className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
+                <span className="text-slate-200 text-sm">{act}</span>
               </li>
             ))}
           </ul>

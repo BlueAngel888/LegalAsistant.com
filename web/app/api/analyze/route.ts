@@ -103,6 +103,8 @@ export async function POST(request: NextRequest) {
         analysisResult.riskLevel,
         analysisResult.summary,
         analysisResult.recommendations,
+        analysisResult.legalFramework,
+        analysisResult.publicInfo,
       );
 
       // Update document status to completed
@@ -144,6 +146,8 @@ export async function POST(request: NextRequest) {
           riskLevel: analysis.riskLevel,
           summary: analysis.summary,
           recommendations: analysis.recommendations,
+          legalFramework: analysis.legalFramework,
+          publicInfo: analysis.publicInfo,
           createdAt: analysis.createdAt,
         },
       },

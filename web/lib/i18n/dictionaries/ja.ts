@@ -126,6 +126,10 @@ const ja: Dictionary = {
     language: '言語',
     created: '作成日時',
     legalBasis: '法的根拠',
+    legalFramework: '適用法令',
+    inForceOn: '施行基準日',
+    publicInfo: '役立つ公開情報',
+    source: '出典',
   },
   compliance: {
     COMPLIANT: '適法',

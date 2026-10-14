@@ -126,6 +126,10 @@ const ru: Dictionary = {
     language: 'Язык',
     created: 'Создано',
     legalBasis: 'Правовое основание',
+    legalFramework: 'Применённое законодательство',
+    inForceOn: 'Действует на',
+    publicInfo: 'Полезная публичная информация',
+    source: 'Источник',
   },
   compliance: {
     COMPLIANT: 'Соответствует закону',

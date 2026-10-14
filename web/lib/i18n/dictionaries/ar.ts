@@ -126,6 +126,10 @@ const ar: Dictionary = {
     language: 'اللغة',
     created: 'تاريخ الإنشاء',
     legalBasis: 'الأساس القانوني',
+    legalFramework: 'التشريعات المطبقة',
+    inForceOn: 'سارية بتاريخ',
+    publicInfo: 'معلومات عامة مفيدة',
+    source: 'المصدر',
   },
   compliance: {
     COMPLIANT: 'مطابق للقانون',

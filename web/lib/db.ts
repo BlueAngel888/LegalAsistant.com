@@ -1,5 +1,5 @@
 import { supabaseClient, supabaseAdmin } from './supabase';
-import { toAnalysisPoints } from './analysis-points';
+import { toAnalysisPoints, toPublicInfo, toStringList } from './analysis-points';
 import {
   User,
   Document,
@@ -8,6 +8,7 @@ import {
   Jurisdiction,
   AnalysisStatus,
   AnalysisPoint,
+  PublicInfoItem,
 } from './types';
 
 export async function createOrUpdateUser(clerkId: string, email: string, name: string): Promise<User> {
@@ -135,6 +136,8 @@ export async function createAnalysis(
   riskLevel: string,
   summary: string,
   recommendations: AnalysisPoint[],
+  legalFramework: string[],
+  publicInfo: PublicInfoItem[],
 ): Promise<AnalysisResult> {
   const { data, error } = await supabaseClient
     .from('analysis_results')
@@ -151,6 +154,8 @@ export async function createAnalysis(
       risk_level: riskLevel,
       summary,
       recommendations,
+      legal_framework: legalFramework,
+      public_info: publicInfo,
       cached_at: new Date().toISOString(),
     })
     .select()
@@ -256,6 +261,8 @@ function mapAnalysisRow(row: any): AnalysisResult {
     riskLevel: row.risk_level,
     summary: row.summary,
     recommendations: toAnalysisPoints(row.recommendations),
+    legalFramework: toStringList(row.legal_framework),
+    publicInfo: toPublicInfo(row.public_info),
     cachedAt: row.cached_at ? new Date(row.cached_at) : undefined,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),

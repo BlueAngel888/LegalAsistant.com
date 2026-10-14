@@ -126,6 +126,10 @@ const id: Dictionary = {
     language: 'Bahasa',
     created: 'Dibuat',
     legalBasis: 'Dasar hukum',
+    legalFramework: 'Peraturan yang diterapkan',
+    inForceOn: 'Berlaku per',
+    publicInfo: 'Informasi publik yang berguna',
+    source: 'Sumber',
   },
   compliance: {
     COMPLIANT: 'Sesuai hukum',

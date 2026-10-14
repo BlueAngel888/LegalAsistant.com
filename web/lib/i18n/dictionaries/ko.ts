@@ -126,6 +126,10 @@ const ko: Dictionary = {
     language: '언어',
     created: '생성 일시',
     legalBasis: '법적 근거',
+    legalFramework: '적용 법령',
+    inForceOn: '시행 기준일',
+    publicInfo: '유용한 공개 정보',
+    source: '출처',
   },
   compliance: {
     COMPLIANT: '적법',

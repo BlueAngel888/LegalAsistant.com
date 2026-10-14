@@ -129,6 +129,10 @@ const en = {
     language: 'Language',
     created: 'Created',
     legalBasis: 'Legal basis',
+    legalFramework: 'Applicable legislation',
+    inForceOn: 'In force on',
+    publicInfo: 'Useful public information',
+    source: 'Source',
   },
   compliance: {
     COMPLIANT: 'Compliant',

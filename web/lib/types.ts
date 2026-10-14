@@ -69,6 +69,13 @@ export interface AnalysisPoint {
   status?: ComplianceStatus;
 }
 
+/** Public information relevant to the document, with where to find or verify it. */
+export interface PublicInfoItem {
+  text: string;
+  /** Official source, e.g. "ONRC – Registrul Comerțului" or "ANAF – verificare CUI". */
+  source: string;
+}
+
 export interface AnalysisResult {
   id: string;
   documentId: string;
@@ -83,6 +90,9 @@ export interface AnalysisResult {
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   summary: string;
   recommendations: AnalysisPoint[];
+  /** The acts the analysis applied, in the version in force on the analysis date. */
+  legalFramework: string[];
+  publicInfo: PublicInfoItem[];
   cachedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -125,4 +135,6 @@ export interface ClaudeAnalysisOutput {
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   summary: string;
   recommendations: AnalysisPoint[];
+  legalFramework: string[];
+  publicInfo: PublicInfoItem[];
 }

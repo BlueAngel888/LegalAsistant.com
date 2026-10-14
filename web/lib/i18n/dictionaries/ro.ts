@@ -126,6 +126,10 @@ const ro: Dictionary = {
     language: 'Limbă',
     created: 'Creat',
     legalBasis: 'Temei legal',
+    legalFramework: 'Legislația aplicată',
+    inForceOn: 'În vigoare la',
+    publicInfo: 'Informații publice utile',
+    source: 'Sursă',
   },
   compliance: {
     COMPLIANT: 'Conform legii',

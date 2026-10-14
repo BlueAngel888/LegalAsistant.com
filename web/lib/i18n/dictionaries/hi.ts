@@ -126,6 +126,10 @@ const hi: Dictionary = {
     language: 'भाषा',
     created: 'बनाया गया',
     legalBasis: 'कानूनी आधार',
+    legalFramework: 'लागू कानून',
+    inForceOn: 'इस तिथि को लागू',
+    publicInfo: 'उपयोगी सार्वजनिक जानकारी',
+    source: 'स्रोत',
   },
   compliance: {
     COMPLIANT: 'कानून के अनुरूप',

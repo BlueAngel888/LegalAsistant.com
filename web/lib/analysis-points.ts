@@ -1,4 +1,4 @@
-import type { AnalysisPoint, ComplianceStatus } from './types';
+import type { AnalysisPoint, ComplianceStatus, PublicInfoItem } from './types';
 
 const STATUSES: ComplianceStatus[] = ['COMPLIANT', 'NON_COMPLIANT', 'UNCLEAR'];
 
@@ -24,5 +24,20 @@ export function toAnalysisPoints(value: unknown): AnalysisPoint[] {
         ...(status && { status }),
       },
     ];
+  });
+}
+
+export function toStringList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string' && item.trim() !== '');
+}
+
+export function toPublicInfo(value: unknown): PublicInfoItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item): PublicInfoItem[] => {
+    if (!item || typeof item !== 'object' || typeof item.text !== 'string' || !item.text.trim()) {
+      return [];
+    }
+    return [{ text: item.text, source: typeof item.source === 'string' ? item.source : '' }];
   });
 }
