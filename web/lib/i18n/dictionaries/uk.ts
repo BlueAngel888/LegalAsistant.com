@@ -125,6 +125,16 @@ const uk: Dictionary = {
     analysisId: 'ID аналізу',
     language: 'Мова',
     created: 'Створено',
+    legalBasis: 'Правова підстава',
+    legalFramework: 'Застосоване законодавство',
+    inForceOn: 'Чинне на',
+    publicInfo: 'Корисна публічна інформація',
+    source: 'Джерело',
+  },
+  compliance: {
+    COMPLIANT: 'Відповідає закону',
+    NON_COMPLIANT: 'Не відповідає',
+    UNCLEAR: 'Потребує перевірки',
   },
 };
 

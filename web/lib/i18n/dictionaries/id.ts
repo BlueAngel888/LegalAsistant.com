@@ -125,6 +125,16 @@ const id: Dictionary = {
     analysisId: 'ID analisis',
     language: 'Bahasa',
     created: 'Dibuat',
+    legalBasis: 'Dasar hukum',
+    legalFramework: 'Peraturan yang diterapkan',
+    inForceOn: 'Berlaku per',
+    publicInfo: 'Informasi publik yang berguna',
+    source: 'Sumber',
+  },
+  compliance: {
+    COMPLIANT: 'Sesuai hukum',
+    NON_COMPLIANT: 'Tidak sesuai',
+    UNCLEAR: 'Perlu diperiksa',
   },
 };
 

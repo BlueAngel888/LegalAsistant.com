@@ -124,6 +124,16 @@ const zh: Dictionary = {
     analysisId: '分析 ID',
     language: '语言',
     created: '创建时间',
+    legalBasis: '法律依据',
+    legalFramework: '适用法律',
+    inForceOn: '生效日期',
+    publicInfo: '有用的公开信息',
+    source: '来源',
+  },
+  compliance: {
+    COMPLIANT: '合规',
+    NON_COMPLIANT: '不合规',
+    UNCLEAR: '待核实',
   },
 };
 

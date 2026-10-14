@@ -125,6 +125,16 @@ const pt: Dictionary = {
     analysisId: 'ID da análise',
     language: 'Idioma',
     created: 'Criado',
+    legalBasis: 'Base legal',
+    legalFramework: 'Legislação aplicada',
+    inForceOn: 'Em vigor em',
+    publicInfo: 'Informações públicas úteis',
+    source: 'Fonte',
+  },
+  compliance: {
+    COMPLIANT: 'Conforme',
+    NON_COMPLIANT: 'Não conforme',
+    UNCLEAR: 'A verificar',
   },
 };
 
