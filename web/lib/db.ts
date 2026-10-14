@@ -1,4 +1,5 @@
 import { supabaseClient, supabaseAdmin } from './supabase';
+import { toAnalysisPoints } from './analysis-points';
 import {
   User,
   Document,
@@ -6,6 +7,7 @@ import {
   DocumentType,
   Jurisdiction,
   AnalysisStatus,
+  AnalysisPoint,
 } from './types';
 
 export async function createOrUpdateUser(clerkId: string, email: string, name: string): Promise<User> {
@@ -126,13 +128,13 @@ export async function createAnalysis(
   jurisdiction: Jurisdiction,
   documentType: DocumentType,
   language: string,
-  strengths: string[],
-  weaknesses: string[],
-  legalErrors: string[],
-  defenseStrategy: string[],
+  strengths: AnalysisPoint[],
+  weaknesses: AnalysisPoint[],
+  legalErrors: AnalysisPoint[],
+  defenseStrategy: AnalysisPoint[],
   riskLevel: string,
   summary: string,
-  recommendations: string[],
+  recommendations: AnalysisPoint[],
 ): Promise<AnalysisResult> {
   const { data, error } = await supabaseClient
     .from('analysis_results')
@@ -247,13 +249,13 @@ function mapAnalysisRow(row: any): AnalysisResult {
     jurisdiction: row.jurisdiction,
     documentType: row.document_type,
     language: row.language,
-    strengths: row.strengths || [],
-    weaknesses: row.weaknesses || [],
-    legalErrors: row.legal_errors || [],
-    defenseStrategy: row.defense_strategy || [],
+    strengths: toAnalysisPoints(row.strengths),
+    weaknesses: toAnalysisPoints(row.weaknesses),
+    legalErrors: toAnalysisPoints(row.legal_errors),
+    defenseStrategy: toAnalysisPoints(row.defense_strategy),
     riskLevel: row.risk_level,
     summary: row.summary,
-    recommendations: row.recommendations || [],
+    recommendations: toAnalysisPoints(row.recommendations),
     cachedAt: row.cached_at ? new Date(row.cached_at) : undefined,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),

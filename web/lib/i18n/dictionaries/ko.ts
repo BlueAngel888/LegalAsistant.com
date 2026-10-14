@@ -125,6 +125,12 @@ const ko: Dictionary = {
     analysisId: '분석 ID',
     language: '언어',
     created: '생성 일시',
+    legalBasis: '법적 근거',
+  },
+  compliance: {
+    COMPLIANT: '적법',
+    NON_COMPLIANT: '위법',
+    UNCLEAR: '확인 필요',
   },
 };
 

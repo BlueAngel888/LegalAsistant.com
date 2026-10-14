@@ -125,6 +125,12 @@ const hi: Dictionary = {
     analysisId: 'विश्लेषण आईडी',
     language: 'भाषा',
     created: 'बनाया गया',
+    legalBasis: 'कानूनी आधार',
+  },
+  compliance: {
+    COMPLIANT: 'कानून के अनुरूप',
+    NON_COMPLIANT: 'कानून के विरुद्ध',
+    UNCLEAR: 'जाँच आवश्यक',
   },
 };
 

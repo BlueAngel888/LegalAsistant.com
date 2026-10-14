@@ -125,6 +125,12 @@ const ro: Dictionary = {
     analysisId: 'ID analiză',
     language: 'Limbă',
     created: 'Creat',
+    legalBasis: 'Temei legal',
+  },
+  compliance: {
+    COMPLIANT: 'Conform legii',
+    NON_COMPLIANT: 'Neconform',
+    UNCLEAR: 'De verificat',
   },
 };
 

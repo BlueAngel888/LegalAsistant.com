@@ -128,6 +128,12 @@ const en = {
     analysisId: 'Analysis ID',
     language: 'Language',
     created: 'Created',
+    legalBasis: 'Legal basis',
+  },
+  compliance: {
+    COMPLIANT: 'Compliant',
+    NON_COMPLIANT: 'Non-compliant',
+    UNCLEAR: 'To be checked',
   },
 };
 

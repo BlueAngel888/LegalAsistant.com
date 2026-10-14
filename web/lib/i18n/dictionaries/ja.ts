@@ -125,6 +125,12 @@ const ja: Dictionary = {
     analysisId: '分析 ID',
     language: '言語',
     created: '作成日時',
+    legalBasis: '法的根拠',
+  },
+  compliance: {
+    COMPLIANT: '適法',
+    NON_COMPLIANT: '違法',
+    UNCLEAR: '要確認',
   },
 };
 

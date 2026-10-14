@@ -125,6 +125,12 @@ const ru: Dictionary = {
     analysisId: 'ID анализа',
     language: 'Язык',
     created: 'Создано',
+    legalBasis: 'Правовое основание',
+  },
+  compliance: {
+    COMPLIANT: 'Соответствует закону',
+    NON_COMPLIANT: 'Не соответствует',
+    UNCLEAR: 'Требует проверки',
   },
 };
 

@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeAnalysisOutput, Jurisdiction, DocumentType } from './types';
 import { localeInfo, matchLocale } from './i18n/config';
+import { toAnalysisPoints } from './analysis-points';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
@@ -20,6 +21,8 @@ Your task is to analyze legal documents and provide:
 6. Risk assessment
 7. Actionable recommendations
 
+Tie every point you make to the specific law it rests on (article and act, e.g. "art. 1.823 Cod civil" or "Cal. Civ. Code § 1950.5"), and for each clause you assess say whether it complies with that law. Cite only provisions you are confident exist and apply in the detected jurisdiction; when you are not sure of the exact article, name the act and mark the clause UNCLEAR rather than inventing a citation.
+
 Always respond in valid JSON format.`;
 
 const ANALYSIS_TEMPLATE = `Analyze the following legal document and provide a comprehensive analysis in JSON format:
@@ -29,19 +32,24 @@ Document Content:
 
 Suggested Jurisdiction: {JURISDICTION}
 
-Write every human-readable value (strengths, weaknesses, legalErrors, defenseStrategy, summary, recommendations) in {LANGUAGE}, whatever language the document itself is written in. Keep the JSON keys and the jurisdiction, documentType and riskLevel codes exactly as specified below, in English.
+Write every human-readable value (each "text", and the summary) in {LANGUAGE}, whatever language the document itself is written in. Write each "legalBasis" as the citation is normally written in the jurisdiction (e.g. "art. 1.823 Cod civil" for Romania). Keep the JSON keys and the jurisdiction, documentType, riskLevel and status codes exactly as specified below, in English.
+
+Every point is an object:
+- "text": the finding, one or two sentences.
+- "legalBasis": the article and act it relies on; empty string only when no specific law applies.
+- "status" (strengths, weaknesses and legalErrors only): COMPLIANT if the clause is valid under that law, NON_COMPLIANT if it breaches it, UNCLEAR if its validity depends on facts or case law you cannot confirm.
 
 Respond ONLY with a valid JSON object (no markdown, no code blocks) with this exact structure:
 {
   "jurisdiction": "Jurisdiction code (EU_RO, USA_CA, etc.)",
   "documentType": "CONTRACT|NDA|EMPLOYMENT|LEASE|POLICY|TERMS_OF_SERVICE|PRIVACY_POLICY|OTHER",
-  "strengths": ["strength 1", "strength 2", ...],
-  "weaknesses": ["weakness 1", "weakness 2", ...],
-  "legalErrors": ["error 1", "error 2", ...],
-  "defenseStrategy": ["strategy 1", "strategy 2", ...],
+  "strengths": [{"text": "...", "legalBasis": "...", "status": "COMPLIANT|NON_COMPLIANT|UNCLEAR"}, ...],
+  "weaknesses": [{"text": "...", "legalBasis": "...", "status": "COMPLIANT|NON_COMPLIANT|UNCLEAR"}, ...],
+  "legalErrors": [{"text": "...", "legalBasis": "...", "status": "COMPLIANT|NON_COMPLIANT|UNCLEAR"}, ...],
+  "defenseStrategy": [{"text": "...", "legalBasis": "..."}, ...],
   "riskLevel": "LOW|MEDIUM|HIGH|CRITICAL",
   "summary": "2-3 sentence summary",
-  "recommendations": ["recommendation 1", "recommendation 2", ...]
+  "recommendations": [{"text": "...", "legalBasis": "..."}, ...]
 }`;
 
 interface CacheConfig {
@@ -71,7 +79,7 @@ export async function analyzeDocument(
 
     const response = await client.messages.create({
       model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 2048,
+      max_tokens: 4096,
       system: [
         {
           type: 'text',
@@ -121,13 +129,13 @@ function parseAnalysisResponse(responseText: string): ClaudeAnalysisOutput {
     return {
       jurisdiction: (data.jurisdiction || 'UNKNOWN') as Jurisdiction,
       documentType: (data.documentType || 'OTHER') as DocumentType,
-      strengths: Array.isArray(data.strengths) ? data.strengths : [],
-      weaknesses: Array.isArray(data.weaknesses) ? data.weaknesses : [],
-      legalErrors: Array.isArray(data.legalErrors) ? data.legalErrors : [],
-      defenseStrategy: Array.isArray(data.defenseStrategy) ? data.defenseStrategy : [],
+      strengths: toAnalysisPoints(data.strengths),
+      weaknesses: toAnalysisPoints(data.weaknesses),
+      legalErrors: toAnalysisPoints(data.legalErrors),
+      defenseStrategy: toAnalysisPoints(data.defenseStrategy),
       riskLevel: (data.riskLevel || 'MEDIUM') as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
       summary: data.summary || '',
-      recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
+      recommendations: toAnalysisPoints(data.recommendations),
     };
   } catch (error) {
     console.error('Failed to parse Claude response:', error);

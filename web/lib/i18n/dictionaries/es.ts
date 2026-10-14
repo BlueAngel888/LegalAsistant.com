@@ -125,6 +125,12 @@ const es: Dictionary = {
     analysisId: 'ID del análisis',
     language: 'Idioma',
     created: 'Creado',
+    legalBasis: 'Base legal',
+  },
+  compliance: {
+    COMPLIANT: 'Conforme a la ley',
+    NON_COMPLIANT: 'No conforme',
+    UNCLEAR: 'Por verificar',
   },
 };
 

@@ -125,6 +125,12 @@ const ar: Dictionary = {
     analysisId: 'معرّف التحليل',
     language: 'اللغة',
     created: 'تاريخ الإنشاء',
+    legalBasis: 'الأساس القانوني',
+  },
+  compliance: {
+    COMPLIANT: 'مطابق للقانون',
+    NON_COMPLIANT: 'غير مطابق',
+    UNCLEAR: 'يحتاج إلى تحقق',
   },
 };
 

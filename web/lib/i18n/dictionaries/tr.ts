@@ -125,6 +125,12 @@ const tr: Dictionary = {
     analysisId: 'Analiz kimliği',
     language: 'Dil',
     created: 'Oluşturuldu',
+    legalBasis: 'Yasal dayanak',
+  },
+  compliance: {
+    COMPLIANT: 'Yasaya uygun',
+    NON_COMPLIANT: 'Yasaya aykırı',
+    UNCLEAR: 'Kontrol edilmeli',
   },
 };
 

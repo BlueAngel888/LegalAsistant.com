@@ -57,6 +57,18 @@ export interface Document {
   status: AnalysisStatus;
 }
 
+/** Whether a clause complies with the law that governs it. */
+export type ComplianceStatus = 'COMPLIANT' | 'NON_COMPLIANT' | 'UNCLEAR';
+
+/** One point of an analysis, tied to the law it rests on. */
+export interface AnalysisPoint {
+  text: string;
+  /** The article or act this point relies on, e.g. "art. 1.823 Cod civil". Empty when none applies. */
+  legalBasis: string;
+  /** Set for points that judge a clause (strengths, weaknesses, legal issues). */
+  status?: ComplianceStatus;
+}
+
 export interface AnalysisResult {
   id: string;
   documentId: string;
@@ -64,13 +76,13 @@ export interface AnalysisResult {
   jurisdiction: Jurisdiction;
   documentType: DocumentType;
   language: string;
-  strengths: string[];
-  weaknesses: string[];
-  legalErrors: string[];
-  defenseStrategy: string[];
+  strengths: AnalysisPoint[];
+  weaknesses: AnalysisPoint[];
+  legalErrors: AnalysisPoint[];
+  defenseStrategy: AnalysisPoint[];
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   summary: string;
-  recommendations: string[];
+  recommendations: AnalysisPoint[];
   cachedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -106,11 +118,11 @@ export interface ClaudeAnalysisPayload {
 export interface ClaudeAnalysisOutput {
   jurisdiction: Jurisdiction;
   documentType: DocumentType;
-  strengths: string[];
-  weaknesses: string[];
-  legalErrors: string[];
-  defenseStrategy: string[];
+  strengths: AnalysisPoint[];
+  weaknesses: AnalysisPoint[];
+  legalErrors: AnalysisPoint[];
+  defenseStrategy: AnalysisPoint[];
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   summary: string;
-  recommendations: string[];
+  recommendations: AnalysisPoint[];
 }
