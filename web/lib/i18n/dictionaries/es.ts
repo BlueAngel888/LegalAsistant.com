@@ -63,7 +63,7 @@ const es: Dictionary = {
   cta: {
     titleStart: '¿Listo para analizar tus',
     titleHighlight: 'documentos?',
-    subtitle: 'Empieza gratis. No se necesita tarjeta de crédito.',
+    subtitle: "Cuenta gratuita. Cada análisis cuesta {price}, pago con tarjeta.",
     button: 'Crear cuenta gratuita',
   },
   footer: {
@@ -110,6 +110,16 @@ const es: Dictionary = {
     uploadButton: 'Subir archivos ({count})',
     selectAtLeastOne: 'Selecciona al menos un archivo',
     uploadFailed: 'Error al subir',
+  },
+  payment: {
+    productName: "Análisis de documento jurídico",
+    notice: "Cada análisis cuesta {price}, pagado de forma segura con tarjeta a través de Stripe antes de que empiece el análisis.",
+    payButton: "Pagar {price} y analizar",
+    redirecting: "Redirigiendo al pago seguro…",
+    cancelled: "Pago cancelado. Tu documento está guardado y puedes pagar cuando quieras.",
+    failed: "No se pudo iniciar el pago",
+    notConfirmed: "Aún no hemos podido confirmar tu pago. Inténtalo de nuevo en unos instantes.",
+    yourDocument: "Tu documento",
   },
   analysis: {
     documentType: 'Tipo de documento',

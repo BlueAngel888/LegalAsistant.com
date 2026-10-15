@@ -63,7 +63,7 @@ const de: Dictionary = {
   cta: {
     titleStart: 'Bereit, Ihre',
     titleHighlight: 'Dokumente zu analysieren?',
-    subtitle: 'Kostenlos starten. Keine Kreditkarte erforderlich.',
+    subtitle: "Kostenloses Konto. Jede Analyse kostet {price}, Zahlung per Karte.",
     button: 'Kostenloses Konto erstellen',
   },
   footer: {
@@ -110,6 +110,16 @@ const de: Dictionary = {
     uploadButton: 'Dateien hochladen ({count})',
     selectAtLeastOne: 'Bitte wählen Sie mindestens eine Datei aus',
     uploadFailed: 'Hochladen fehlgeschlagen',
+  },
+  payment: {
+    productName: "Analyse eines Rechtsdokuments",
+    notice: "Jede Analyse kostet {price} und wird vor Beginn sicher per Karte über Stripe bezahlt.",
+    payButton: "{price} zahlen und analysieren",
+    redirecting: "Weiterleitung zur sicheren Zahlung…",
+    cancelled: "Zahlung abgebrochen. Ihr Dokument ist gespeichert, Sie können jederzeit bezahlen.",
+    failed: "Die Zahlung konnte nicht gestartet werden",
+    notConfirmed: "Wir konnten Ihre Zahlung noch nicht bestätigen. Bitte versuchen Sie es gleich noch einmal.",
+    yourDocument: "Ihr Dokument",
   },
   analysis: {
     documentType: 'Dokumenttyp',

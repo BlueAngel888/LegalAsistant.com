@@ -63,7 +63,7 @@ const id: Dictionary = {
   cta: {
     titleStart: 'Siap menganalisis',
     titleHighlight: 'dokumen Anda?',
-    subtitle: 'Mulai gratis. Tanpa kartu kredit.',
+    subtitle: "Akun gratis. Setiap analisis {price}, dibayar dengan kartu.",
     button: 'Buat akun gratis',
   },
   footer: {
@@ -110,6 +110,16 @@ const id: Dictionary = {
     uploadButton: 'Unggah file ({count})',
     selectAtLeastOne: 'Pilih setidaknya satu file',
     uploadFailed: 'Unggahan gagal',
+  },
+  payment: {
+    productName: "Analisis dokumen hukum",
+    notice: "Setiap analisis seharga {price}, dibayar dengan aman menggunakan kartu melalui Stripe sebelum analisis dimulai.",
+    payButton: "Bayar {price} dan analisis",
+    redirecting: "Mengalihkan ke pembayaran aman…",
+    cancelled: "Pembayaran dibatalkan. Dokumen Anda tersimpan, Anda dapat membayar kapan saja.",
+    failed: "Pembayaran tidak dapat dimulai",
+    notConfirmed: "Kami belum dapat mengonfirmasi pembayaran Anda. Silakan coba lagi sebentar lagi.",
+    yourDocument: "Dokumen Anda",
   },
   analysis: {
     documentType: 'Jenis dokumen',

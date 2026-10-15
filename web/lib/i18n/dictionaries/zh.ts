@@ -62,7 +62,7 @@ const zh: Dictionary = {
   cta: {
     titleStart: '准备好分析您的',
     titleHighlight: '文件了吗？',
-    subtitle: '免费开始，无需信用卡。',
+    subtitle: "账户免费。每次分析 {price}，银行卡支付。",
     button: '创建免费账户',
   },
   footer: {
@@ -109,6 +109,16 @@ const zh: Dictionary = {
     uploadButton: '上传文件（{count}）',
     selectAtLeastOne: '请至少选择一个文件',
     uploadFailed: '上传失败',
+  },
+  payment: {
+    productName: "法律文件分析",
+    notice: "每次分析收费 {price}，在分析开始前通过 Stripe 以银行卡安全支付。",
+    payButton: "支付 {price} 并分析",
+    redirecting: "正在跳转到安全支付…",
+    cancelled: "支付已取消。您的文件已保存，可随时付款。",
+    failed: "无法发起支付",
+    notConfirmed: "暂时无法确认您的付款，请稍后重试。",
+    yourDocument: "您的文件",
   },
   analysis: {
     documentType: '文件类型',

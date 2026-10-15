@@ -63,7 +63,7 @@ const pl: Dictionary = {
   cta: {
     titleStart: 'Gotowy, by przeanalizować swoje',
     titleHighlight: 'dokumenty?',
-    subtitle: 'Zacznij za darmo. Karta kredytowa nie jest wymagana.',
+    subtitle: "Darmowe konto. Każda analiza kosztuje {price}, płatność kartą.",
     button: 'Utwórz darmowe konto',
   },
   footer: {
@@ -110,6 +110,16 @@ const pl: Dictionary = {
     uploadButton: 'Prześlij pliki ({count})',
     selectAtLeastOne: 'Wybierz co najmniej jeden plik',
     uploadFailed: 'Przesyłanie nie powiodło się',
+  },
+  payment: {
+    productName: "Analiza dokumentu prawnego",
+    notice: "Każda analiza kosztuje {price}, płatne bezpiecznie kartą przez Stripe przed rozpoczęciem analizy.",
+    payButton: "Zapłać {price} i analizuj",
+    redirecting: "Przekierowanie do bezpiecznej płatności…",
+    cancelled: "Płatność anulowana. Dokument jest zapisany, możesz zapłacić w dowolnym momencie.",
+    failed: "Nie udało się rozpocząć płatności",
+    notConfirmed: "Nie udało się jeszcze potwierdzić płatności. Spróbuj ponownie za chwilę.",
+    yourDocument: "Twój dokument",
   },
   analysis: {
     documentType: 'Rodzaj dokumentu',

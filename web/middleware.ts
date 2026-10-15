@@ -6,6 +6,8 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/pricing(.*)',
   '/about(.*)',
+  // Stripe calls the webhook without a Clerk session; it is verified by signature instead.
+  '/api/stripe/webhook',
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

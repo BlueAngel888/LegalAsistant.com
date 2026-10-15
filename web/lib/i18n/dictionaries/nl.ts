@@ -63,7 +63,7 @@ const nl: Dictionary = {
   cta: {
     titleStart: 'Klaar om je',
     titleHighlight: 'documenten te analyseren?',
-    subtitle: 'Begin gratis. Geen creditcard nodig.',
+    subtitle: "Gratis account. Elke analyse kost {price}, betaald per kaart.",
     button: 'Gratis account aanmaken',
   },
   footer: {
@@ -110,6 +110,16 @@ const nl: Dictionary = {
     uploadButton: 'Bestanden uploaden ({count})',
     selectAtLeastOne: 'Selecteer ten minste één bestand',
     uploadFailed: 'Uploaden mislukt',
+  },
+  payment: {
+    productName: "Analyse van juridisch document",
+    notice: "Elke analyse kost {price}, veilig per kaart betaald via Stripe voordat de analyse begint.",
+    payButton: "Betaal {price} en analyseer",
+    redirecting: "Doorsturen naar veilige betaling…",
+    cancelled: "Betaling geannuleerd. Uw document is opgeslagen, u kunt betalen wanneer u wilt.",
+    failed: "De betaling kon niet worden gestart",
+    notConfirmed: "We konden uw betaling nog niet bevestigen. Probeer het zo meteen opnieuw.",
+    yourDocument: "Uw document",
   },
   analysis: {
     documentType: 'Documenttype',

@@ -63,7 +63,7 @@ const tr: Dictionary = {
   cta: {
     titleStart: 'Belgelerinizi analiz etmeye',
     titleHighlight: 'hazır mısınız?',
-    subtitle: 'Ücretsiz başlayın. Kredi kartı gerekmez.',
+    subtitle: "Ücretsiz hesap. Her analiz {price}, kartla ödenir.",
     button: 'Ücretsiz hesap oluştur',
   },
   footer: {
@@ -110,6 +110,16 @@ const tr: Dictionary = {
     uploadButton: 'Dosyaları yükle ({count})',
     selectAtLeastOne: 'Lütfen en az bir dosya seçin',
     uploadFailed: 'Yükleme başarısız',
+  },
+  payment: {
+    productName: "Hukuki belge analizi",
+    notice: "Her analiz {price} tutarındadır ve analiz başlamadan önce Stripe üzerinden kartla güvenle ödenir.",
+    payButton: "{price} öde ve analiz et",
+    redirecting: "Güvenli ödemeye yönlendiriliyor…",
+    cancelled: "Ödeme iptal edildi. Belgeniz kaydedildi, istediğiniz zaman ödeyebilirsiniz.",
+    failed: "Ödeme başlatılamadı",
+    notConfirmed: "Ödemenizi henüz doğrulayamadık. Lütfen birazdan tekrar deneyin.",
+    yourDocument: "Belgeniz",
   },
   analysis: {
     documentType: 'Belge türü',
