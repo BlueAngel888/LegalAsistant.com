@@ -34,7 +34,7 @@ const ja: Dictionary = {
   },
   features: {
     eyebrow: 'プラットフォーム',
-    title: '最初からパワフル',
+    title: 'Powered by AI',
     instantTitle: '即時分析',
     instantDesc: 'Claude AI により、数秒で包括的な結果を提供します。',
     secureTitle: '安全な設計',

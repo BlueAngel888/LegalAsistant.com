@@ -34,7 +34,7 @@ const tr: Dictionary = {
   },
   features: {
     eyebrow: 'Platform',
-    title: 'Varsayılan olarak güçlü',
+    title: 'Powered by AI',
     instantTitle: 'Anında analiz',
     instantDesc: 'Claude AI sayesinde saniyeler içinde kapsamlı sonuçlar.',
     secureTitle: 'Tasarımdan güvenli',

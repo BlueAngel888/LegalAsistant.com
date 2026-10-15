@@ -34,7 +34,7 @@ const nl: Dictionary = {
   },
   features: {
     eyebrow: 'Platform',
-    title: 'Standaard krachtig',
+    title: 'Powered by AI',
     instantTitle: 'Directe analyse',
     instantDesc: 'Uitgebreide resultaten in seconden, aangedreven door Claude AI.',
     secureTitle: 'Veilig ontworpen',
