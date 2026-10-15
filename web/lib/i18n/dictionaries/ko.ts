@@ -63,7 +63,7 @@ const ko: Dictionary = {
   cta: {
     titleStart: '지금 바로',
     titleHighlight: '문서를 분석해 보세요',
-    subtitle: '무료로 시작하세요. 신용카드가 필요 없습니다.',
+    subtitle: "무료 계정. 분석 1회당 {price}, 카드 결제.",
     button: '무료 계정 만들기',
   },
   footer: {
@@ -110,6 +110,16 @@ const ko: Dictionary = {
     uploadButton: '파일 업로드 ({count})',
     selectAtLeastOne: '파일을 하나 이상 선택하세요',
     uploadFailed: '업로드 실패',
+  },
+  payment: {
+    productName: "법률 문서 분석",
+    notice: "분석 1회당 {price}이며, 분석 시작 전에 Stripe를 통해 카드로 안전하게 결제됩니다.",
+    payButton: "{price} 결제하고 분석하기",
+    redirecting: "안전한 결제 페이지로 이동 중…",
+    cancelled: "결제가 취소되었습니다. 문서는 저장되어 있으니 언제든지 결제하실 수 있습니다.",
+    failed: "결제를 시작할 수 없습니다",
+    notConfirmed: "아직 결제를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    yourDocument: "내 문서",
   },
   analysis: {
     documentType: '문서 유형',

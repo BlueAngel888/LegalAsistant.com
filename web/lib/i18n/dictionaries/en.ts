@@ -61,7 +61,7 @@ const en = {
   cta: {
     titleStart: 'Ready to analyze your',
     titleHighlight: 'documents?',
-    subtitle: 'Get started for free. No credit card required.',
+    subtitle: "Free account. Each analysis costs {price}, paid by card.",
     button: 'Create Free Account',
   },
   footer: {
@@ -113,6 +113,16 @@ const en = {
     uploadButton: 'Upload files ({count})',
     selectAtLeastOne: 'Please select at least one file',
     uploadFailed: 'Upload failed',
+  },
+  payment: {
+    productName: "Legal document analysis",
+    notice: "Each analysis costs {price}, paid securely by card through Stripe before the analysis starts.",
+    payButton: "Pay {price} and analyze",
+    redirecting: "Redirecting to secure payment…",
+    cancelled: "Payment cancelled. Your document is saved, so you can pay whenever you are ready.",
+    failed: "Payment could not be started",
+    notConfirmed: "We could not confirm your payment yet. Please try again in a moment.",
+    yourDocument: "Your document",
   },
   analysis: {
     documentType: 'Document Type',

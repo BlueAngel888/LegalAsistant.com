@@ -63,7 +63,7 @@ const ja: Dictionary = {
   cta: {
     titleStart: 'あなたの',
     titleHighlight: '文書を分析しませんか？',
-    subtitle: '無料で始められます。クレジットカードは不要です。',
+    subtitle: "アカウントは無料。分析は1回 {price}、カード払い。",
     button: '無料アカウントを作成',
   },
   footer: {
@@ -110,6 +110,16 @@ const ja: Dictionary = {
     uploadButton: 'ファイルをアップロード（{count}）',
     selectAtLeastOne: 'ファイルを 1 つ以上選択してください',
     uploadFailed: 'アップロードに失敗しました',
+  },
+  payment: {
+    productName: "法的文書の分析",
+    notice: "分析は1回 {price} で、分析開始前に Stripe を通じてカードで安全にお支払いいただきます。",
+    payButton: "{price} を支払って分析",
+    redirecting: "安全な決済ページへ移動しています…",
+    cancelled: "お支払いはキャンセルされました。文書は保存されているので、いつでもお支払いいただけます。",
+    failed: "決済を開始できませんでした",
+    notConfirmed: "お支払いをまだ確認できません。少し待ってからもう一度お試しください。",
+    yourDocument: "あなたの文書",
   },
   analysis: {
     documentType: '文書の種類',

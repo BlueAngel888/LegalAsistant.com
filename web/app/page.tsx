@@ -17,9 +17,11 @@ import {
 } from 'lucide-react';
 import { LanguageSwitcher } from '@/app/components/LanguageSwitcher';
 import { getDictionary } from '@/lib/i18n/server';
+import { localeInfo } from '@/lib/i18n/config';
+import { formatAnalysisPrice } from '@/lib/pricing';
 
 export default async function HomePage() {
-  const { t } = await getDictionary();
+  const { t, locale } = await getDictionary();
 
   const features = [
     { icon: Zap, title: t.features.instantTitle, desc: t.features.instantDesc },
@@ -211,7 +213,7 @@ export default async function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               {t.cta.titleStart} <span className="text-gradient">{t.cta.titleHighlight}</span>
             </h2>
-            <p className="text-lg text-slate-400 mb-8">{t.cta.subtitle}</p>
+            <p className="text-lg text-slate-400 mb-8">{t.cta.subtitle.replace('{price}', formatAnalysisPrice(localeInfo[locale].tag))}</p>
             <SignedOut>
               <SignUpButton mode="modal">
                 <button className="btn btn-primary btn-large">

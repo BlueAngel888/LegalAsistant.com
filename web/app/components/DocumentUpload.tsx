@@ -7,7 +7,7 @@ import { DocumentType } from '@/lib/types';
 import { useI18n } from './I18nProvider';
 
 interface DocumentUploadProps {
-  onUploadSuccess: (documentId: string) => void;
+  onUploadSuccess: (documentId: string, fileName: string) => void;
   onUploadError: (error: string) => void;
 }
 
@@ -65,7 +65,7 @@ export function DocumentUpload({ onUploadSuccess, onUploadError }: DocumentUploa
           throw new Error(data.error || t.upload.uploadFailed);
         }
 
-        onUploadSuccess(data.documentId);
+        onUploadSuccess(data.documentId, file.name);
       }
 
       setFiles([]);

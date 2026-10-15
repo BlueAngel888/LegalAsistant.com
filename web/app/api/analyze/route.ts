@@ -5,6 +5,7 @@ import { analyzeDocument } from '@/lib/claude';
 import { AnalysisStatus } from '@/lib/types';
 import { matchLocale } from '@/lib/i18n/config';
 import { getLocale } from '@/lib/i18n/server';
+import { claimPayment, findPaidPayment, linkPaymentToAnalysis, releasePayment } from '@/lib/payments';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { documentId, jurisdiction } = body;
+    const { documentId, jurisdiction, sessionId } = body;
     // Report language: explicit request, else the language the visitor picked on the site.
     const language = matchLocale(body.language) ?? (await getLocale());
 
@@ -55,6 +56,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Every analysis is paid for up front (99 EUR via Stripe Checkout).
+    const payment = await findPaidPayment(user.id, documentId, sessionId);
+
+    if (!payment || !(await claimPayment(payment.id))) {
+      return NextResponse.json(
+        { success: false, error: 'Payment required', paymentRequired: true },
+        { status: 402 },
+      );
+    }
+
     // Update document status to processing
     try {
       await updateDocumentStatus(documentId, AnalysisStatus.PROCESSING);
@@ -72,6 +83,7 @@ export async function POST(request: NextRequest) {
       );
     } catch (error) {
       console.error('Analysis error:', error);
+      await releasePayment(payment.id);
       try {
         await updateDocumentStatus(documentId, AnalysisStatus.FAILED);
       } catch (e) {
@@ -113,6 +125,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (error) {
       console.error('Error saving analysis:', error);
+      await releasePayment(payment.id);
       try {
         await updateDocumentStatus(documentId, AnalysisStatus.FAILED);
       } catch (e) {
@@ -127,6 +140,8 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    await linkPaymentToAnalysis(payment.id, analysis.id);
 
     return NextResponse.json(
       {

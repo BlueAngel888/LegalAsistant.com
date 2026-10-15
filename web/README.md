@@ -82,6 +82,20 @@ Configure the following environment variables in `.env.local`:
 2. Create an API key
 3. Set as `ANTHROPIC_API_KEY`
 
+#### Stripe Payments (99 EUR per analysis)
+Every analysis is paid up front through Stripe Checkout. Uploading is free; the analysis runs only after Stripe confirms the payment, and one payment buys exactly one analysis (if the analysis fails, the payment stays available for a retry).
+1. Go to the [Stripe Dashboard](https://dashboard.stripe.com) (test mode first)
+2. Developers > API keys: Secret key → `STRIPE_SECRET_KEY`
+3. Developers > Webhooks > Add endpoint:
+   - URL: `https://<your-domain>/api/stripe/webhook`
+   - Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`
+   - Signing secret → `STRIPE_WEBHOOK_SECRET`
+4. Payments are stored with the Supabase service role key, so `SUPABASE_SERVICE_ROLE_KEY` must be set too.
+
+The price lives in `lib/pricing.ts` (`ANALYSIS_PRICE_CENTS`).
+
+For local testing: `stripe listen --forward-to localhost:3000/api/stripe/webhook` prints a `whsec_` secret to use, and the test card `4242 4242 4242 4242` completes a payment.
+
 ### 4. Database Setup
 
 #### Option A: Using Supabase Dashboard
@@ -91,6 +105,7 @@ Configure the following environment variables in `.env.local`:
    - `supabase/migrations/001_create_users_table.sql`
    - `supabase/migrations/002_create_documents_table.sql`
    - `supabase/migrations/003_create_analysis_results_table.sql`
+   - `supabase/migrations/004_create_payments_table.sql`
 
 #### Option B: Using Supabase CLI
 
@@ -269,6 +284,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 CLERK_SECRET_KEY
 ANTHROPIC_API_KEY
+SUPABASE_SERVICE_ROLE_KEY
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+NEXT_PUBLIC_APP_URL
 ENABLE_PROMPT_CACHING=true
 ```
 

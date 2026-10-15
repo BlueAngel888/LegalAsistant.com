@@ -63,7 +63,7 @@ const ro: Dictionary = {
   cta: {
     titleStart: 'Gata să îți analizezi',
     titleHighlight: 'documentele?',
-    subtitle: 'Începe gratuit. Nu este necesar un card bancar.',
+    subtitle: "Cont gratuit. Fiecare analiză costă {price}, cu plata cu cardul.",
     button: 'Creează cont gratuit',
   },
   footer: {
@@ -110,6 +110,16 @@ const ro: Dictionary = {
     uploadButton: 'Încarcă fișierele ({count})',
     selectAtLeastOne: 'Selectează cel puțin un fișier',
     uploadFailed: 'Încărcarea a eșuat',
+  },
+  payment: {
+    productName: "Analiză document juridic",
+    notice: "Fiecare analiză costă {price}, plătiți în siguranță cu cardul prin Stripe înainte de începerea analizei.",
+    payButton: "Plătește {price} și analizează",
+    redirecting: "Te redirecționăm către plata securizată…",
+    cancelled: "Plata a fost anulată. Documentul este salvat, poți plăti oricând dorești.",
+    failed: "Plata nu a putut fi inițiată",
+    notConfirmed: "Nu am putut confirma încă plata. Te rugăm să încerci din nou peste câteva momente.",
+    yourDocument: "Documentul tău",
   },
   analysis: {
     documentType: 'Tipul documentului',

@@ -63,7 +63,7 @@ const ar: Dictionary = {
   cta: {
     titleStart: 'هل أنت مستعد لتحليل',
     titleHighlight: 'مستنداتك؟',
-    subtitle: 'ابدأ مجانًا. لا حاجة إلى بطاقة ائتمان.',
+    subtitle: "حساب مجاني. تكلفة كل تحليل {price}، بالدفع بالبطاقة.",
     button: 'أنشئ حسابًا مجانيًا',
   },
   footer: {
@@ -110,6 +110,16 @@ const ar: Dictionary = {
     uploadButton: 'رفع الملفات ({count})',
     selectAtLeastOne: 'يرجى اختيار ملف واحد على الأقل',
     uploadFailed: 'فشل الرفع',
+  },
+  payment: {
+    productName: "تحليل مستند قانوني",
+    notice: "تكلفة كل تحليل {price}، تُدفع بأمان بالبطاقة عبر Stripe قبل بدء التحليل.",
+    payButton: "ادفع {price} وحلّل",
+    redirecting: "جارٍ التحويل إلى الدفع الآمن…",
+    cancelled: "تم إلغاء الدفع. تم حفظ مستندك ويمكنك الدفع متى شئت.",
+    failed: "تعذّر بدء عملية الدفع",
+    notConfirmed: "لم نتمكن بعد من تأكيد الدفع. يرجى المحاولة مرة أخرى بعد قليل.",
+    yourDocument: "مستندك",
   },
   analysis: {
     documentType: 'نوع المستند',
