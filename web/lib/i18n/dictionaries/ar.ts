@@ -34,7 +34,7 @@ const ar: Dictionary = {
   },
   features: {
     eyebrow: 'المنصة',
-    title: 'قوية منذ البداية',
+    title: 'Powered by AI',
     instantTitle: 'تحليل فوري',
     instantDesc: 'نتائج شاملة خلال ثوانٍ بفضل Claude AI.',
     secureTitle: 'آمنة بطبيعتها',

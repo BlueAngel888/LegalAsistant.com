@@ -33,7 +33,7 @@ const zh: Dictionary = {
   },
   features: {
     eyebrow: '平台',
-    title: '开箱即用的强大能力',
+    title: 'Powered by AI',
     instantTitle: '即时分析',
     instantDesc: '依托 Claude AI，数秒内获得全面结果。',
     secureTitle: '安全至上',

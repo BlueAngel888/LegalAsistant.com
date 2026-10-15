@@ -34,7 +34,7 @@ const id: Dictionary = {
   },
   features: {
     eyebrow: 'Platform',
-    title: 'Andal sejak awal',
+    title: 'Powered by AI',
     instantTitle: 'Analisis instan',
     instantDesc: 'Hasil lengkap dalam hitungan detik, didukung Claude AI.',
     secureTitle: 'Aman sejak dirancang',

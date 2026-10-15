@@ -34,7 +34,7 @@ const ko: Dictionary = {
   },
   features: {
     eyebrow: '플랫폼',
-    title: '처음부터 강력하게',
+    title: 'Powered by AI',
     instantTitle: '즉시 분석',
     instantDesc: 'Claude AI로 몇 초 만에 종합적인 결과를 제공합니다.',
     secureTitle: '설계부터 안전하게',

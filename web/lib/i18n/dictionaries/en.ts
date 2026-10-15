@@ -32,7 +32,7 @@ const en = {
   },
   features: {
     eyebrow: 'Platform',
-    title: 'Powerful by default',
+    title: 'Powered by AI',
     instantTitle: 'Instant Analysis',
     instantDesc: 'Comprehensive results in seconds, powered by Claude AI.',
     secureTitle: 'Secure by Design',

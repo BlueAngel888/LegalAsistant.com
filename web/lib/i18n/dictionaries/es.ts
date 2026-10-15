@@ -34,7 +34,7 @@ const es: Dictionary = {
   },
   features: {
     eyebrow: 'Plataforma',
-    title: 'Potente desde el primer momento',
+    title: 'Powered by AI',
     instantTitle: 'Análisis instantáneo',
     instantDesc: 'Resultados completos en segundos, con Claude AI.',
     secureTitle: 'Seguro por diseño',

@@ -34,7 +34,7 @@ const ro: Dictionary = {
   },
   features: {
     eyebrow: 'Platformă',
-    title: 'Puternic din prima clipă',
+    title: 'Powered by AI',
     instantTitle: 'Analiză instantanee',
     instantDesc: 'Rezultate complete în câteva secunde, cu Claude AI.',
     secureTitle: 'Securitate integrată',
