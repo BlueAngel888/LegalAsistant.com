@@ -125,6 +125,16 @@ const nl: Dictionary = {
     analysisId: 'Analyse-ID',
     language: 'Taal',
     created: 'Aangemaakt',
+    legalBasis: 'Wettelijke grondslag',
+    legalFramework: 'Toegepaste wetgeving',
+    inForceOn: 'Geldend op',
+    publicInfo: 'Nuttige openbare informatie',
+    source: 'Bron',
+  },
+  compliance: {
+    COMPLIANT: 'In overeenstemming',
+    NON_COMPLIANT: 'Niet in overeenstemming',
+    UNCLEAR: 'Te controleren',
   },
 };
 
