@@ -130,6 +130,8 @@ const hi: Dictionary = {
     inForceOn: 'इस तिथि को लागू',
     publicInfo: 'उपयोगी सार्वजनिक जानकारी',
     source: 'स्रोत',
+    legalLimits: 'इस सेवा की कानूनी सीमाएँ',
+    officialSources: 'आधिकारिक स्रोत',
   },
   compliance: {
     COMPLIANT: 'कानून के अनुरूप',

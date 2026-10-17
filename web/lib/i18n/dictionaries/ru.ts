@@ -130,6 +130,8 @@ const ru: Dictionary = {
     inForceOn: 'Действует на',
     publicInfo: 'Полезная публичная информация',
     source: 'Источник',
+    legalLimits: 'Правовые ограничения этой услуги',
+    officialSources: 'Официальные источники',
   },
   compliance: {
     COMPLIANT: 'Соответствует закону',

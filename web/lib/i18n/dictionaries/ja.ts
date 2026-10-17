@@ -130,6 +130,8 @@ const ja: Dictionary = {
     inForceOn: '施行基準日',
     publicInfo: '役立つ公開情報',
     source: '出典',
+    legalLimits: '本サービスの法的制限',
+    officialSources: '公式情報源',
   },
   compliance: {
     COMPLIANT: '適法',

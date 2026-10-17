@@ -1,7 +1,8 @@
 'use client';
 
 import type { AnalysisPoint, AnalysisResult, ComplianceStatus } from '@/lib/types';
-import { AlertCircle, CheckCircle, AlertTriangle, TrendingDown, Scale, BookOpen, Landmark } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, TrendingDown, Scale, BookOpen, Landmark, ShieldAlert, ExternalLink } from 'lucide-react';
+import { isOfferableUkNiche, ukSourcesFor } from '@/lib/legal-basis/uk';
 import { formatDate } from '@/lib/utils';
 import { localeInfo } from '@/lib/i18n/config';
 import { useI18n } from './I18nProvider';
@@ -60,6 +61,7 @@ function PointLaw({ point }: { point: AnalysisPoint }) {
 export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
   const { locale, t } = useI18n();
   const dateTag = localeInfo[locale].tag;
+  const officialSources = isOfferableUkNiche(analysis.ukNiche) ? ukSourcesFor(analysis.ukNiche as string) : [];
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -127,6 +129,21 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
           {t.analysis.analyzedOn} {formatDate(analysis.createdAt, dateTag)}
         </p>
       </div>
+
+      {/* Legal limits of the service */}
+      {analysis.legalLimits.length > 0 && (
+        <div className="card p-6 border-s-4 !border-s-amber-400">
+          <h3 className="text-lg font-semibold mb-4 text-white">{t.analysis.legalLimits}</h3>
+          <ul className="space-y-3">
+            {analysis.legalLimits.map((limit, idx) => (
+              <li key={idx} className="flex gap-3">
+                <ShieldAlert className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-200">{limit}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Strengths */}
       {analysis.strengths.length > 0 && (
@@ -245,7 +262,7 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
       )}
 
       {/* Legislation applied */}
-      {analysis.legalFramework.length > 0 && (
+      {(analysis.legalFramework.length > 0 || officialSources.length > 0) && (
         <div className="card p-6 border-s-4 !border-s-slate-400">
           <h3 className="text-lg font-semibold text-white">{t.analysis.legalFramework}</h3>
           <p className="text-xs text-slate-400 mt-1 mb-4">
@@ -260,6 +277,26 @@ export function AnalysisResultComponent({ analysis }: AnalysisResultProps) {
               </li>
             ))}
           </ul>
+          {officialSources.length > 0 && (
+            <>
+              <h4 className="text-sm font-semibold text-slate-300 mt-5 mb-2">{t.analysis.officialSources}</h4>
+              <ul className="space-y-1.5">
+                {officialSources.map((src) => (
+                  <li key={src.id}>
+                    <a
+                      href={src.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-cyan-300 hover:text-cyan-200"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                      {src.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
 

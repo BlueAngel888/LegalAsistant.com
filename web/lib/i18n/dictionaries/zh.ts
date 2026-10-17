@@ -129,6 +129,8 @@ const zh: Dictionary = {
     inForceOn: '生效日期',
     publicInfo: '有用的公开信息',
     source: '来源',
+    legalLimits: '本服务的法律限制',
+    officialSources: '官方来源',
   },
   compliance: {
     COMPLIANT: '合规',

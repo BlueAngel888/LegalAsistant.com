@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { ClaudeAnalysisOutput, Jurisdiction, DocumentType } from './types';
 import { localeInfo, matchLocale } from './i18n/config';
 import { toAnalysisPoints, toPublicInfo, toStringList } from './analysis-points';
+import { isOfferableUkNiche, ukCatalogPrompt, ukLimitsFor } from './legal-basis/uk';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
@@ -10,6 +11,7 @@ const client = new Anthropic({
 const SYSTEM_PROMPT = `You are an expert legal document analyzer with deep knowledge of:
 - Contract law across EU jurisdictions (Germany, France, Italy, Spain, Romania, Netherlands, Belgium, Austria, Sweden)
 - US contract law (Federal, New York, California, Texas)
+- The law of England and Wales, within the UK service catalogue below
 - Document types: contracts, NDAs, employment agreements, leases, policies, terms of service, privacy policies
 
 Your task is to analyze legal documents and provide:
@@ -27,6 +29,16 @@ Apply the legislation of the detected jurisdiction as it is in force on the anal
 
 Also gather the public information that matters for the document: the official registers and authorities where its parties, assets and obligations can be checked (e.g. trade register, tax authority, land register, court portal, insolvency bulletin), the taxes, fees, registrations or notifications the law requires for it, and the public deadlines it triggers. Name the official source for each item. Do not invent facts about the specific parties; say what to check and where.
 
+UNITED KINGDOM. When the document is governed by the law of England and Wales (or is a UK document with no other governing law), use the jurisdiction code EU_GB and pick the matching niche id from the UK service catalogue below as "ukNiche":
+- Analyse only within that niche's scope and limits, and the limits that apply to every UK analysis. Never give advice the limits rule out (for example whether to bring or defend a tribunal or court claim, how to repay a credit debt, or drafting a lease to be executed as a deed); where the customer needs that, the recommendation is to see a regulated lawyer or free advice (Citizens Advice, Law Centres, Shelter, the scheme or tribunal's own guidance).
+- Cite the catalogue's legal basis first, and list in legalFramework every act you applied, with the version in force on the analysis date.
+- In "legalLimits", state in plain words, in the report language, each limit that applies to this analysis and what it means for the customer. Always include at least one.
+- If the document belongs to no niche that may be analysed (a niche that is not offered, criminal or family law, immigration, insolvency, a regulated claim, an emergency) or is governed by the law of Scotland or Northern Ireland, set "ukNiche" to "none": give only a neutral summary of what the document is, leave strengths, weaknesses, legalErrors and defenseStrategy empty, recommend a regulated lawyer or free legal help, and explain in legalLimits why this document is not covered.
+- Never call the service or its output by a protected title (solicitor, barrister, notary, trade mark attorney, patent attorney, licensed conveyancer, chartered legal executive).
+For documents outside the UK set "ukNiche" to null and "legalLimits" to [].
+
+${ukCatalogPrompt()}
+
 Always respond in valid JSON format.`;
 
 const ANALYSIS_TEMPLATE = `Analyze the following legal document and provide a comprehensive analysis in JSON format:
@@ -38,7 +50,7 @@ Suggested Jurisdiction: {JURISDICTION}
 
 Analysis date: {ANALYSIS_DATE}. Apply the law in force on this date.
 
-Write every human-readable value (each "text", the summary, legalFramework and each "source") in {LANGUAGE}, whatever language the document itself is written in. Write each "legalBasis" as the citation is normally written in the jurisdiction (e.g. "art. 1.823 Cod civil" for Romania). Keep the JSON keys and the jurisdiction, documentType, riskLevel and status codes exactly as specified below, in English.
+Write every human-readable value (each "text", the summary, legalFramework, legalLimits and each "source") in {LANGUAGE}, whatever language the document itself is written in. Write each "legalBasis" as the citation is normally written in the jurisdiction (e.g. "art. 1.823 Cod civil" for Romania). Keep the JSON keys and the jurisdiction, documentType, riskLevel and status codes exactly as specified below, in English.
 
 Every point is an object:
 - "text": the finding, one or two sentences.
@@ -57,7 +69,9 @@ Respond ONLY with a valid JSON object (no markdown, no code blocks) with this ex
   "summary": "2-3 sentence summary",
   "recommendations": [{"text": "...", "legalBasis": "..."}, ...],
   "legalFramework": ["each act applied, with the version in force on the analysis date, e.g. \"Codul civil (Legea 287/2009), forma consolidată în vigoare la 14.10.2026\""],
-  "publicInfo": [{"text": "public information relevant to this document, and what to check", "source": "official source (register, authority or website)"}, ...]
+  "publicInfo": [{"text": "public information relevant to this document, and what to check", "source": "official source (register, authority or website)"}, ...],
+  "ukNiche": "niche id from the UK service catalogue, \"none\", or null outside the UK",
+  "legalLimits": ["each legal limit that applies to this analysis and what it means for the customer"]
 }`;
 
 interface CacheConfig {
@@ -135,7 +149,7 @@ function parseAnalysisResponse(responseText: string): ClaudeAnalysisOutput {
 
     const data = JSON.parse(jsonStr);
 
-    return {
+    return applyUkLimits({
       jurisdiction: (data.jurisdiction || 'UNKNOWN') as Jurisdiction,
       documentType: (data.documentType || 'OTHER') as DocumentType,
       strengths: toAnalysisPoints(data.strengths),
@@ -147,7 +161,9 @@ function parseAnalysisResponse(responseText: string): ClaudeAnalysisOutput {
       recommendations: toAnalysisPoints(data.recommendations),
       legalFramework: toStringList(data.legalFramework),
       publicInfo: toPublicInfo(data.publicInfo),
-    };
+      ukNiche: typeof data.ukNiche === 'string' ? data.ukNiche : null,
+      legalLimits: toStringList(data.legalLimits),
+    });
   } catch (error) {
     console.error('Failed to parse Claude response:', error);
     return {
@@ -162,8 +178,38 @@ function parseAnalysisResponse(responseText: string): ClaudeAnalysisOutput {
       recommendations: [],
       legalFramework: [],
       publicInfo: [],
+      ukNiche: null,
+      legalLimits: [],
     };
   }
+}
+
+/**
+ * Enforces the UK limits whatever the model returned: a UK document outside
+ * the niches we may analyse keeps only its summary and pointers to regulated
+ * help, and an analysed niche always shows its legal limits.
+ */
+function applyUkLimits(analysis: ClaudeAnalysisOutput): ClaudeAnalysisOutput {
+  if (analysis.jurisdiction !== Jurisdiction.EU_GB) {
+    return { ...analysis, ukNiche: null, legalLimits: [] };
+  }
+  if (!isOfferableUkNiche(analysis.ukNiche)) {
+    return {
+      ...analysis,
+      ukNiche: 'none',
+      strengths: [],
+      weaknesses: [],
+      legalErrors: [],
+      defenseStrategy: [],
+      legalLimits: analysis.legalLimits.length
+        ? analysis.legalLimits
+        : ['This document is outside the services we may offer in England and Wales. Please see a regulated lawyer or free legal help (Citizens Advice, Law Centres).'],
+    };
+  }
+  return {
+    ...analysis,
+    legalLimits: analysis.legalLimits.length ? analysis.legalLimits : ukLimitsFor(analysis.ukNiche as string),
+  };
 }
 
 export function isCachingEnabled(): boolean {

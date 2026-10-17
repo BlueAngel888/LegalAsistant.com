@@ -130,6 +130,8 @@ const tr: Dictionary = {
     inForceOn: 'Yürürlük tarihi',
     publicInfo: 'Faydalı kamu bilgileri',
     source: 'Kaynak',
+    legalLimits: 'Bu hizmetin yasal sınırları',
+    officialSources: 'Resmî kaynaklar',
   },
   compliance: {
     COMPLIANT: 'Yasaya uygun',

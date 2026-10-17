@@ -130,6 +130,8 @@ const ro: Dictionary = {
     inForceOn: 'În vigoare la',
     publicInfo: 'Informații publice utile',
     source: 'Sursă',
+    legalLimits: 'Limitele legale ale serviciului',
+    officialSources: 'Surse oficiale',
   },
   compliance: {
     COMPLIANT: 'Conform legii',

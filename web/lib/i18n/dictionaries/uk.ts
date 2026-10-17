@@ -130,6 +130,8 @@ const uk: Dictionary = {
     inForceOn: 'Чинне на',
     publicInfo: 'Корисна публічна інформація',
     source: 'Джерело',
+    legalLimits: 'Правові обмеження цієї послуги',
+    officialSources: 'Офіційні джерела',
   },
   compliance: {
     COMPLIANT: 'Відповідає закону',

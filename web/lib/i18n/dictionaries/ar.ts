@@ -130,6 +130,8 @@ const ar: Dictionary = {
     inForceOn: 'سارية بتاريخ',
     publicInfo: 'معلومات عامة مفيدة',
     source: 'المصدر',
+    legalLimits: 'الحدود القانونية لهذه الخدمة',
+    officialSources: 'المصادر الرسمية',
   },
   compliance: {
     COMPLIANT: 'مطابق للقانون',

@@ -138,6 +138,8 @@ export async function createAnalysis(
   recommendations: AnalysisPoint[],
   legalFramework: string[],
   publicInfo: PublicInfoItem[],
+  ukNiche: string | null,
+  legalLimits: string[],
 ): Promise<AnalysisResult> {
   const { data, error } = await supabaseClient
     .from('analysis_results')
@@ -156,6 +158,8 @@ export async function createAnalysis(
       recommendations,
       legal_framework: legalFramework,
       public_info: publicInfo,
+      uk_niche: ukNiche,
+      legal_limits: legalLimits,
       cached_at: new Date().toISOString(),
     })
     .select()
@@ -263,6 +267,8 @@ function mapAnalysisRow(row: any): AnalysisResult {
     recommendations: toAnalysisPoints(row.recommendations),
     legalFramework: toStringList(row.legal_framework),
     publicInfo: toPublicInfo(row.public_info),
+    ukNiche: typeof row.uk_niche === 'string' ? row.uk_niche : null,
+    legalLimits: toStringList(row.legal_limits),
     cachedAt: row.cached_at ? new Date(row.cached_at) : undefined,
     createdAt: new Date(row.created_at),
     updatedAt: new Date(row.updated_at),

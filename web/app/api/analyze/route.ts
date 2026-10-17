@@ -105,6 +105,8 @@ export async function POST(request: NextRequest) {
         analysisResult.recommendations,
         analysisResult.legalFramework,
         analysisResult.publicInfo,
+        analysisResult.ukNiche,
+        analysisResult.legalLimits,
       );
 
       // Update document status to completed
@@ -148,6 +150,8 @@ export async function POST(request: NextRequest) {
           recommendations: analysis.recommendations,
           legalFramework: analysis.legalFramework,
           publicInfo: analysis.publicInfo,
+          ukNiche: analysis.ukNiche,
+          legalLimits: analysis.legalLimits,
           createdAt: analysis.createdAt,
         },
       },

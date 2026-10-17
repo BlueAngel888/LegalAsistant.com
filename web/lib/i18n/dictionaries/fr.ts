@@ -130,6 +130,8 @@ const fr: Dictionary = {
     inForceOn: 'En vigueur au',
     publicInfo: 'Informations publiques utiles',
     source: 'Source',
+    legalLimits: 'Limites légales de ce service',
+    officialSources: 'Sources officielles',
   },
   compliance: {
     COMPLIANT: 'Conforme',

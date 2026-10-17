@@ -130,6 +130,8 @@ const id: Dictionary = {
     inForceOn: 'Berlaku per',
     publicInfo: 'Informasi publik yang berguna',
     source: 'Sumber',
+    legalLimits: 'Batasan hukum layanan ini',
+    officialSources: 'Sumber resmi',
   },
   compliance: {
     COMPLIANT: 'Sesuai hukum',

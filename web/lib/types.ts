@@ -93,6 +93,10 @@ export interface AnalysisResult {
   /** The acts the analysis applied, in the version in force on the analysis date. */
   legalFramework: string[];
   publicInfo: PublicInfoItem[];
+  /** UK service niche the document falls in, "none" when it is not covered, null outside the UK. */
+  ukNiche: string | null;
+  /** Legal limits of the service that applied to this analysis. */
+  legalLimits: string[];
   cachedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -137,4 +141,6 @@ export interface ClaudeAnalysisOutput {
   recommendations: AnalysisPoint[];
   legalFramework: string[];
   publicInfo: PublicInfoItem[];
+  ukNiche: string | null;
+  legalLimits: string[];
 }

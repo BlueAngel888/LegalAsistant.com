@@ -130,6 +130,8 @@ const nl: Dictionary = {
     inForceOn: 'Geldend op',
     publicInfo: 'Nuttige openbare informatie',
     source: 'Bron',
+    legalLimits: 'Wettelijke grenzen van deze dienst',
+    officialSources: 'Officiële bronnen',
   },
   compliance: {
     COMPLIANT: 'In overeenstemming',

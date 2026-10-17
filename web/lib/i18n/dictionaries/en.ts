@@ -133,6 +133,8 @@ const en = {
     inForceOn: 'In force on',
     publicInfo: 'Useful public information',
     source: 'Source',
+    legalLimits: 'Legal limits of this service',
+    officialSources: 'Official sources',
   },
   compliance: {
     COMPLIANT: 'Compliant',
