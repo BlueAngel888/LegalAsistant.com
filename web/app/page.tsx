@@ -14,9 +14,11 @@ import {
   ScanSearch,
   Sparkles,
   Lock,
+  Mail,
 } from 'lucide-react';
 import { LanguageSwitcher } from '@/app/components/LanguageSwitcher';
 import { getDictionary } from '@/lib/i18n/server';
+import { CONTACT_EMAIL } from '@/lib/site';
 
 export default async function HomePage() {
   const { t } = await getDictionary();
@@ -238,6 +240,13 @@ export default async function HomePage() {
                 <span className="font-semibold text-white">LegalAssistant</span>
               </div>
               <p className="text-sm">{t.footer.tagline}</p>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="mt-4 inline-flex items-center gap-2 text-sm text-cyan-300 hover:text-white"
+              >
+                <Mail className="w-4 h-4" />
+                {CONTACT_EMAIL}
+              </a>
             </div>
             {footerColumns.map((col) => (
               <div key={col.title}>
@@ -245,7 +254,7 @@ export default async function HomePage() {
                 <ul className="text-sm space-y-2">
                   {col.links.map((l) => (
                     <li key={l}>
-                      <a href="#" className="text-slate-400 hover:text-white">{l}</a>
+                      <a href={l === t.footer.contact ? `mailto:${CONTACT_EMAIL}` : '#'} className="text-slate-400 hover:text-white">{l}</a>
                     </li>
                   ))}
                 </ul>
