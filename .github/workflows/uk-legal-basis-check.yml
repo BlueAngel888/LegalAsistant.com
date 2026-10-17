@@ -1,0 +1,49 @@
+name: UK legal basis check
+
+# Every morning, checks the official sources behind web/lib/legal-basis
+# and keeps one open issue listing the sources that changed since their
+# extracts were last reviewed. The issue closes once nothing differs.
+
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check official sources
+        id: check
+        working-directory: web
+        run: |
+          set +e
+          node scripts/check-uk-legal-basis.mjs --markdown "$RUNNER_TEMP/report.md"
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          [ "$code" -le 1 ]
+      - name: Open or update the review issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CODE: ${{ steps.check.outputs.code }}
+        run: |
+          title="UK legal basis: sources changed"
+          gh label create legal-basis-uk --color 5319e7 --description "UK niche legal basis review" 2>/dev/null || true
+          issue=$(gh issue list --label legal-basis-uk --state open --json number --jq '.[0].number')
+          if [ "$CODE" = "1" ]; then
+            if [ -n "$issue" ]; then
+              gh issue edit "$issue" --body-file "$RUNNER_TEMP/report.md"
+            else
+              gh issue create --title "$title" --label legal-basis-uk --body-file "$RUNNER_TEMP/report.md"
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "All sources match their reviewed versions."
+          fi

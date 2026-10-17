@@ -1,0 +1,258 @@
+{
+  "_comment": "Legal basis per UK niche (England and Wales only). Each `legalBasis` entry names the provision, the source id from uk-sources.json, and what it means for the document. Extracts are checked daily against the official sources; `verifiedAt` is the date the extracts were last confirmed against the version in force. Not confirmed by a UK lawyer.",
+  "jurisdiction": "England and Wales",
+  "verifiedAt": "2026-10-17",
+  "globalLimits": [
+    { "rule": "Never exercise a right of audience, conduct litigation, prepare reserved instruments (land transfers, leases executed as deeds), prepare probate papers, carry out notarial activities or administer oaths. The customer files and signs their own court documents.", "sources": ["lsa2007", "mazur-ca"] },
+    { "rule": "No claims management (advising, investigating or representing a claimant) for personal injury, financial services or products (incl. s.75 Consumer Credit Act and insurance refusals), housing disrepair, specified benefits (industrial injuries), criminal injury or employment-related claims.", "sources": ["rao-claims"] },
+    { "rule": "No advice on how to repay or deal with debts under credit agreements (debt counselling); give only general information.", "sources": ["rao-debt", "perg17"] },
+    { "rule": "Do not contact HMRC on the customer's behalf.", "sources": ["hmrc-adviser-reg"] },
+    { "rule": "Do not use protected titles (solicitor, barrister, notary, trade mark attorney, patent attorney, licensed conveyancer, chartered legal executive).", "sources": ["lsa2007"] },
+    { "rule": "Scotland is out of scope; Northern Ireland needs a separate check. Flag where Welsh law differs.", "sources": ["rhwa2016", "rra-wales"] }
+  ],
+  "niches": [
+    {
+      "id": "council-pcn",
+      "nameRo": "Amenzi de la consiliu (parcare, bandă de autobuz, intersecții)",
+      "status": "allowed",
+      "scope": "Explain a council Penalty Charge Notice and draft the customer's own representations to the council and appeal to the adjudicator (London Tribunals in London; Traffic Penalty Tribunal elsewhere in England and in Wales).",
+      "limits": ["The customer submits representations and appeals in their own name."],
+      "legalBasis": [
+        { "provision": "Traffic Management Act 2004, Part 6", "source": "tma2004", "point": "Civil enforcement of parking, bus lane and moving traffic contraventions by local authorities." },
+        { "provision": "SI 2022/576, reg. 5 and 7, Sch. 1", "source": "si2022-576", "point": "Representations against an enforcement notice, appeal to an adjudicator and adjudication procedure in England; covers parking (incl. London), bus lanes and moving traffic outside London." },
+        { "provision": "Traffic Penalty Tribunal", "source": "tpt", "point": "Appeals are free; covers England outside London and Wales." }
+      ]
+    },
+    {
+      "id": "speeding-nip",
+      "nameRo": "Notificări pentru viteză",
+      "status": "postponed",
+      "scope": "Speeding is a criminal offence (Notice of Intended Prosecution, s.172 driver identification, fixed penalty, speed awareness course, magistrates' court).",
+      "limits": ["Criminal law is on the avoid-at-launch list. Not offered for now."],
+      "legalBasis": [
+        { "provision": "Road Traffic Offenders Act 1988, s.1 and Part III", "source": "rtoa1988", "point": "Notice of intended prosecution and fixed penalties." },
+        { "provision": "Road Traffic Act 1988, s.172", "source": "rta1988-s172", "point": "Duty to identify the driver; failing to do so is an offence." }
+      ]
+    },
+    {
+      "id": "deposit-dispute",
+      "nameRo": "Dispute pe garanția la chirie",
+      "status": "allowed",
+      "scope": "Explain the deposit rules and draft the tenant's or landlord's evidence statement for the scheme's free dispute resolution (ADR).",
+      "limits": ["A court claim under s.214 is filed by the customer; we only help prepare it.", "Wales: deposits are governed by the Renting Homes (Wales) Act 2016 for occupation contracts."],
+      "legalBasis": [
+        { "provision": "Housing Act 2004, s.213(3), (5)-(7)", "source": "ha2004-deposits", "point": "Deposit must be protected and prescribed information given within 30 days of receipt; only money deposits." },
+        { "provision": "Housing Act 2004, s.214 (as amended by the Renters' Rights Act 2025)", "source": "ha2004-deposits", "point": "Court may order repayment and a sum of 1 to 3 times the deposit; claims also possible after the tenancy ended." },
+        { "provision": "Tenant Fees Act 2019, Sch. 1", "source": "tfa2019", "point": "Caps tenancy deposits (5 weeks' rent below £50,000 annual rent) and bans most fees." },
+        { "provision": "Renting Homes (Wales) Act 2016", "source": "rhwa2016", "point": "Applies instead in Wales." }
+      ]
+    },
+    {
+      "id": "small-landlord-rra",
+      "nameRo": "Verificare pentru proprietari mici, după noua lege a chiriilor",
+      "status": "allowed_with_limits",
+      "scope": "Review a landlord's tenancy documents and notices against the Renters' Rights Act 2025: periodic tenancies, rent increases by s.13 notice, pet requests, possession grounds, private rented sector database.",
+      "limits": ["England only for the Renters' Rights Act; in Wales only the anti-discrimination provisions apply, the rest is the Renting Homes (Wales) Act 2016.", "Do not prepare tenancies to be executed as deeds (reserved instrument activity).", "Possession claims are filed by the landlord; urgent possession disputes are referred to a lawyer."],
+      "legalBasis": [
+        { "provision": "Renters' Rights Act 2025", "source": "rra2025", "point": "Main tenancy reforms in force in England from 1 May 2026 (end of s.21, periodic tenancies, rent increase, pets, rent in advance, bidding, discrimination)." },
+        { "provision": "Housing Act 1988, s.13 and Sch. 2 (as amended)", "source": "ha1988", "point": "Rent increase procedure and possession grounds." },
+        { "provision": "Private rented sector database", "source": "rra-timeline", "point": "Launches 15 December 2026 (West Midlands first); all landlords registered by 14 November 2027. Ombudsman expected 2028." },
+        { "provision": "Renters' Rights Act in Wales", "source": "rra-wales", "point": "Only anti-discrimination rules (children, benefits) extend to Wales." }
+      ]
+    },
+    {
+      "id": "subscriptions",
+      "nameRo": "Anulare abonamente și scrisori de reclamație",
+      "status": "allowed_with_limits",
+      "scope": "Explain the customer's cancellation rights and draft cancellation or complaint letters for subscriptions (streaming, gyms, boxes, software).",
+      "limits": ["Not for financial products (credit, insurance, investments): complaints about these are claims management.", "The new subscription regime is not yet in force: GOV.UK says January 2027 with no exact day. Until it starts, use the current law."],
+      "legalBasis": [
+        { "provision": "Consumer Contracts Regulations 2013, Part 3", "source": "ccr2013", "point": "14-day cancellation right for distance and off-premises contracts." },
+        { "provision": "Consumer Rights Act 2015, Part 2", "source": "cra2015", "point": "Unfair terms (e.g. hidden auto-renewal, cancellation barriers) are not binding on the consumer." },
+        { "provision": "DMCC Act 2024, Part 4 Chapter 2 (subscription contracts)", "source": "dmcc2024", "point": "Reminder notices, renewal cooling-off, easy exit. Not yet in force." },
+        { "provision": "GOV.UK 9 August 2026", "source": "subs-jan2027", "point": "New rules to come into force in January 2027 (earlier response of 2 April 2026 said spring 2027)." }
+      ]
+    },
+    {
+      "id": "faulty-goods",
+      "nameRo": "Reclamații pentru produse defecte și rambursări",
+      "status": "allowed_with_limits",
+      "scope": "Explain consumer rights for faulty goods, digital content and services, and draft the complaint or rejection letter to the trader.",
+      "limits": ["Do not advise on s.75 Consumer Credit Act or chargeback claims against card issuers (financial services claims management)."],
+      "legalBasis": [
+        { "provision": "Consumer Rights Act 2015, ss.9-11 and 19-24", "source": "cra2015", "point": "Goods must be of satisfactory quality, fit for purpose, as described; short-term right to reject (30 days), repair or replacement, price reduction or final rejection." },
+        { "provision": "Consumer Rights Act 2015, ss.34-36, 42-44 (digital content), 49-57 (services)", "source": "cra2015", "point": "Equivalent remedies for digital content and services." },
+        { "provision": "Consumer Credit Act 1974, s.75", "source": "cca1974-s75", "point": "Excluded: claims under s.75 are a regulated claims management sector." }
+      ]
+    },
+    {
+      "id": "pip-appeal",
+      "nameRo": "Contestații PIP (reconsiderare și apel)",
+      "status": "allowed_with_limits",
+      "scope": "Explain a PIP decision letter against the descriptors and help the claimant write their own mandatory reconsideration request and tribunal appeal statement.",
+      "limits": ["PIP is not a 'specified benefit' in the claims management rules (those are industrial injuries benefits), so it is outside FCA claims management; industrial injuries benefit is excluded.", "Vulnerable customers: low price or free tier, and always point to free help (Citizens Advice, welfare rights).", "The claimant files and attends the tribunal themselves."],
+      "legalBasis": [
+        { "provision": "Welfare Reform Act 2012, Part 4", "source": "wra2012", "point": "Personal Independence Payment." },
+        { "provision": "Social Security (PIP) Regulations 2013, Sch. 1", "source": "pip-regs", "point": "Daily living and mobility activities and descriptors." },
+        { "provision": "SI 2013/381, reg. 7", "source": "da-regs2013", "point": "Mandatory reconsideration before appeal." },
+        { "provision": "Social Security Act 1998, s.12", "source": "ssa1998", "point": "Right of appeal to the First-tier Tribunal." },
+        { "provision": "FTT (Social Entitlement Chamber) Rules 2008", "source": "ftt-sec-rules", "point": "Tribunal procedure and time limits." },
+        { "provision": "FSMA RAO art. 89F(2)(f), 89K", "source": "rao-claims", "point": "Specified benefit = industrial injuries benefits; PIP is not listed." }
+      ]
+    },
+    {
+      "id": "ir35-review",
+      "nameRo": "Verificare contracte pentru IR35 (contractori)",
+      "status": "allowed_with_limits",
+      "scope": "Explain how the clauses of a contractor agreement relate to the IR35 status factors (control, substitution, mutuality of obligation).",
+      "limits": ["Explaining the document only; no status determination or tax advice presented as definitive.", "Never contact HMRC for the customer."],
+      "legalBasis": [
+        { "provision": "ITEPA 2003, Part 2 Chapter 8", "source": "itepa-ch8", "point": "Intermediaries rules where the client is small." },
+        { "provision": "ITEPA 2003, Part 2 Chapter 10", "source": "itepa-ch10", "point": "Off-payroll working where the client is a public authority or medium/large; client issues the status determination." },
+        { "provision": "Mandatory tax adviser registration", "source": "hmrc-adviser-reg", "point": "Anyone interacting with HMRC for clients must register; we do not interact with HMRC." }
+      ]
+    },
+    {
+      "id": "website-terms-privacy",
+      "nameRo": "Termeni și condiții și politici de confidențialitate pentru site-uri",
+      "status": "allowed",
+      "scope": "Review or draft website terms, consumer terms of sale, privacy and cookie policies for UK businesses.",
+      "limits": [],
+      "legalBasis": [
+        { "provision": "Consumer Rights Act 2015, Part 2", "source": "cra2015", "point": "Fairness and transparency of consumer terms." },
+        { "provision": "Consumer Contracts Regulations 2013, Sch. 2", "source": "ccr2013", "point": "Pre-contract information and cancellation information for online sales." },
+        { "provision": "Electronic Commerce Regulations 2002, regs. 6 and 9", "source": "ecommerce2002", "point": "Information about the business and the ordering process." },
+        { "provision": "UK GDPR arts. 12-14", "source": "uk-gdpr", "point": "Information to give in a privacy notice." },
+        { "provision": "Data Protection Act 2018; Data (Use and Access) Act 2025", "source": "duaa2025", "point": "UK data protection framework as amended; check commencement of each DUAA change." },
+        { "provision": "PECR 2003, reg. 6", "source": "pecr2003", "point": "Consent for cookies and similar technologies (exceptions as amended by DUAA 2025)." }
+      ]
+    },
+    {
+      "id": "employer-contracts",
+      "nameRo": "Verificare contracte de muncă pentru angajatori",
+      "status": "allowed_with_limits",
+      "scope": "Review employment contracts, written statements, handbooks and policies for employers against current law and the Employment Rights Act 2025 timetable.",
+      "limits": ["Document review and drafting only; no advice on defending or bringing tribunal claims."],
+      "legalBasis": [
+        { "provision": "Employment Rights Act 1996, ss.1-7B", "source": "era1996", "point": "Written statement of particulars from day one." },
+        { "provision": "Employment Rights Act 1996, s.108 (as amended by ERA 2025)", "source": "era1996", "point": "Unfair dismissal qualifying period falls to 6 months from 1 January 2027; compensation cap removed." },
+        { "provision": "Equality Act 2010, s.40A (as amended by ERA 2025)", "source": "eqa2010", "point": "From 30 October 2026 employers must take all reasonable steps to prevent sexual harassment, incl. by third parties." },
+        { "provision": "Employment Rights Act 2025", "source": "era2025", "point": "Tribunal time limit 6 months from 1 October 2026; fire and rehire automatically unfair from 1 January 2027; trade union information duty." },
+        { "provision": "Acas implementation timeline", "source": "acas-era2025", "point": "Official dates; some changes still subject to consultation." },
+        { "provision": "National Minimum Wage Act 1998", "source": "nmwa1998", "point": "Pay clauses." },
+        { "provision": "Working Time Regulations 1998", "source": "wtr1998", "point": "Working hours, rest and holiday clauses." }
+      ]
+    },
+    {
+      "id": "commercial-lease",
+      "nameRo": "Contracte de închiriere comercială pentru magazine și birouri mici",
+      "status": "allowed_with_limits",
+      "scope": "Explain and flag risks in a draft or signed commercial lease (rent review, repair, break clauses, security of tenure).",
+      "limits": ["Review only. Preparing a lease executed as a deed (over 3 years) for a fee is a reserved instrument activity.", "No Land Registry applications."],
+      "legalBasis": [
+        { "provision": "Legal Services Act 2007, Sch. 2 para. 5", "source": "lsa2007", "point": "Reserved instrument activities: preparing instruments relating to real estate; excludes agreements not executed as deeds." },
+        { "provision": "Law of Property Act 1925, ss.52 and 54(2)", "source": "lpa1925-s52", "point": "Leases over 3 years must be made by deed." },
+        { "provision": "Landlord and Tenant Act 1954, Part II, incl. s.38A", "source": "lta1954", "point": "Security of tenure for business tenants and contracting out." }
+      ]
+    },
+    {
+      "id": "influencer-contracts",
+      "nameRo": "Contracte pentru influenceri și creatori",
+      "status": "allowed",
+      "scope": "Review brand collaboration agreements: deliverables, IP and usage rights, exclusivity, payment, disclosure obligations.",
+      "limits": [],
+      "legalBasis": [
+        { "provision": "DMCC Act 2024, Part 4 Chapter 1 and Sch. 20", "source": "dmcc2024", "point": "Unfair commercial practices; hidden advertising is banned." },
+        { "provision": "CMA guidance for content creators", "source": "cma-influencers", "point": "How to label paid and gifted content." },
+        { "provision": "CAP Code, section 2", "source": "cap-code", "point": "Marketing must be obviously identifiable as such (regulator code, not legislation)." }
+      ]
+    },
+    {
+      "id": "diy-will-review",
+      "nameRo": "Verificarea testamentelor făcute singur",
+      "status": "allowed_with_limits",
+      "scope": "Check a self-made will for formal validity and common drafting errors.",
+      "limits": ["Wills are not reserved instruments, but probate papers are: no grant of probate or letters of administration work.", "Contentious estates and Inheritance Act claims are referred to a lawyer."],
+      "legalBasis": [
+        { "provision": "Wills Act 1837, ss.9, 15 and 18", "source": "wills1837", "point": "Formalities (writing, signature, two witnesses), gifts to witnesses void, revocation by marriage." },
+        { "provision": "Administration of Justice Act 1982, ss.20-21", "source": "aja1982", "point": "Rectification and interpretation of wills." },
+        { "provision": "Inheritance (Provision for Family and Dependants) Act 1975", "source": "ipfda1975", "point": "Risk of claims by family and dependants." },
+        { "provision": "Legal Services Act 2007, Sch. 2 paras. 5(3) and 6", "source": "lsa2007", "point": "Wills excluded from reserved instruments; probate activities reserved." }
+      ]
+    },
+    {
+      "id": "court-claims",
+      "nameRo": "Cereri în instanță (parcare, datorii)",
+      "status": "allowed_with_limits",
+      "scope": "Explain a county court money claim and help the defendant prepare their own acknowledgment and defence, for private parking and consumer disputes.",
+      "limits": ["The customer files and signs everything themselves (conduct of litigation is reserved).", "Claims for credit card, loan or other credit debts: general information only; advice on how to deal with or repay the debt is debt counselling (FCA)."],
+      "legalBasis": [
+        { "provision": "CPR Part 15", "source": "cpr15", "point": "Defence must be filed within 14 days of service of particulars (28 days after acknowledgment)." },
+        { "provision": "CPR Part 27", "source": "cpr27", "point": "Small claims track procedure." },
+        { "provision": "Pre-Action Protocol for Debt Claims", "source": "pap-debt", "point": "Steps the creditor must follow before suing an individual." },
+        { "provision": "Legal Services Act 2007, Sch. 2 para. 4; Mazur [2026] EWCA Civ 369", "source": "mazur-ca", "point": "Pre-litigation work and advice in connection with proceedings are unlikely to be conduct of litigation." },
+        { "provision": "FSMA RAO art. 39E; PERG 17", "source": "rao-debt", "point": "Debt counselling is regulated; mere information is not." }
+      ]
+    },
+    {
+      "id": "renting",
+      "nameRo": "Chirii (chiriași și proprietari mici)",
+      "status": "allowed_with_limits",
+      "scope": "Explain tenancy agreements, rent increase notices and possession notices for tenants and small landlords.",
+      "limits": ["No housing disrepair claims (mould, damp): FCA claims management. We may explain the repair obligations in the document only.", "Eviction and possession hearings are urgent: refer to a lawyer or free help (Shelter, Citizens Advice).", "Wales: Renting Homes (Wales) Act 2016."],
+      "legalBasis": [
+        { "provision": "Housing Act 1988 as amended by the Renters' Rights Act 2025", "source": "ha1988", "point": "Assured periodic tenancies, s.13 rent increases, possession grounds (England, from 1 May 2026)." },
+        { "provision": "Landlord and Tenant Act 1985, s.11", "source": "lta1985", "point": "Landlord's repairing obligations (explain only)." },
+        { "provision": "Tenant Fees Act 2019", "source": "tfa2019", "point": "Banned payments and deposit cap." },
+        { "provision": "FSMA RAO art. 89J", "source": "rao-claims", "point": "Housing disrepair claims are regulated claims management." }
+      ]
+    },
+    {
+      "id": "employment-docs",
+      "nameRo": "Contracte de muncă și concedieri (angajați)",
+      "status": "allowed_with_limits",
+      "scope": "Explain an employee's contract, restrictive covenants, disciplinary or dismissal letters and settlement agreements.",
+      "limits": ["Explaining the document only. Advising whether or how to bring a tribunal claim is employment-related claims management (FCA)."],
+      "legalBasis": [
+        { "provision": "Employment Rights Act 1996", "source": "era1996", "point": "Written particulars, notice, unfair dismissal (6-month qualifying period from 1 January 2027)." },
+        { "provision": "Employment Rights Act 2025", "source": "era2025", "point": "Implementation dates per Acas." },
+        { "provision": "FSMA RAO art. 89M", "source": "rao-claims", "point": "Advising or representing on employment-related claims is regulated." }
+      ]
+    },
+    {
+      "id": "private-parking",
+      "nameRo": "Amenzi de parcare (înainte de instanță)",
+      "status": "allowed",
+      "scope": "Explain private parking charge notices and council PCNs and draft the customer's appeal (operator, POPLA or IAS; council and tribunal for PCNs).",
+      "limits": ["The government Private Parking Code of Practice is withdrawn pending review; the trade association codes apply meanwhile."],
+      "legalBasis": [
+        { "provision": "Protection of Freedoms Act 2012, Sch. 4", "source": "pofa2012-sch4", "point": "Conditions for keeper liability for private parking charges (notice contents and time limits)." },
+        { "provision": "Private Parking Code of Practice", "source": "parking-code", "point": "Withdrawn on 7 June 2022 pending review." },
+        { "provision": "Traffic Management Act 2004, Part 6; SI 2022/576", "source": "tma2004", "point": "Council PCNs, see niche council-pcn." }
+      ]
+    },
+    {
+      "id": "consumer-complaints",
+      "nameRo": "Reclamații de consumator",
+      "status": "allowed_with_limits",
+      "scope": "Draft complaints to traders about goods, services, digital content and unfair terms.",
+      "limits": ["No complaints or claims about financial products or services (bank charges, mis-sold loans or insurance, s.75)."],
+      "legalBasis": [
+        { "provision": "Consumer Rights Act 2015", "source": "cra2015", "point": "Statutory rights and remedies, unfair terms." },
+        { "provision": "Consumer Contracts Regulations 2013", "source": "ccr2013", "point": "Information and cancellation rights." },
+        { "provision": "DMCC Act 2024, Part 4 Chapter 1", "source": "dmcc2024", "point": "Unfair commercial practices (misleading actions and omissions, aggressive practices)." }
+      ]
+    },
+    {
+      "id": "commercial-contracts",
+      "nameRo": "Contracte comerciale, NDA-uri",
+      "status": "allowed",
+      "scope": "Review and draft B2B contracts and NDAs governed by the law of England and Wales.",
+      "limits": ["Not contracts for the sale or disposition of land or deeds relating to real estate (reserved instruments)."],
+      "legalBasis": [
+        { "provision": "Legal Services Act 2007, Sch. 2 para. 5(3)", "source": "lsa2007", "point": "Agreements not executed as deeds are outside reserved instrument activities." },
+        { "provision": "Unfair Contract Terms Act 1977, ss.2-3, 11", "source": "ucta1977", "point": "B2B exclusion clauses must be reasonable; Consumer Rights Act 2015 governs consumer contracts." }
+      ]
+    }
+  ]
+}
