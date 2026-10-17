@@ -125,6 +125,18 @@ const ko: Dictionary = {
     analysisId: '분석 ID',
     language: '언어',
     created: '생성 일시',
+    legalBasis: '법적 근거',
+    legalFramework: '적용 법령',
+    inForceOn: '시행 기준일',
+    publicInfo: '유용한 공개 정보',
+    source: '출처',
+    legalLimits: '이 서비스의 법적 한계',
+    officialSources: '공식 출처',
+  },
+  compliance: {
+    COMPLIANT: '적법',
+    NON_COMPLIANT: '위법',
+    UNCLEAR: '확인 필요',
   },
 };
 

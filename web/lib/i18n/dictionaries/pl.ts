@@ -125,6 +125,18 @@ const pl: Dictionary = {
     analysisId: 'ID analizy',
     language: 'Język',
     created: 'Utworzono',
+    legalBasis: 'Podstawa prawna',
+    legalFramework: 'Zastosowane przepisy',
+    inForceOn: 'Obowiązujące na dzień',
+    publicInfo: 'Przydatne informacje publiczne',
+    source: 'Źródło',
+    legalLimits: 'Granice prawne tej usługi',
+    officialSources: 'Oficjalne źródła',
+  },
+  compliance: {
+    COMPLIANT: 'Zgodne z prawem',
+    NON_COMPLIANT: 'Niezgodne z prawem',
+    UNCLEAR: 'Do sprawdzenia',
   },
 };
 

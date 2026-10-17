@@ -128,6 +128,18 @@ const en = {
     analysisId: 'Analysis ID',
     language: 'Language',
     created: 'Created',
+    legalBasis: 'Legal basis',
+    legalFramework: 'Applicable legislation',
+    inForceOn: 'In force on',
+    publicInfo: 'Useful public information',
+    source: 'Source',
+    legalLimits: 'Legal limits of this service',
+    officialSources: 'Official sources',
+  },
+  compliance: {
+    COMPLIANT: 'Compliant',
+    NON_COMPLIANT: 'Non-compliant',
+    UNCLEAR: 'To be checked',
   },
 };
 

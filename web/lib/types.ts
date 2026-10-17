@@ -57,6 +57,25 @@ export interface Document {
   status: AnalysisStatus;
 }
 
+/** Whether a clause complies with the law that governs it. */
+export type ComplianceStatus = 'COMPLIANT' | 'NON_COMPLIANT' | 'UNCLEAR';
+
+/** One point of an analysis, tied to the law it rests on. */
+export interface AnalysisPoint {
+  text: string;
+  /** The article or act this point relies on, e.g. "art. 1.823 Cod civil". Empty when none applies. */
+  legalBasis: string;
+  /** Set for points that judge a clause (strengths, weaknesses, legal issues). */
+  status?: ComplianceStatus;
+}
+
+/** Public information relevant to the document, with where to find or verify it. */
+export interface PublicInfoItem {
+  text: string;
+  /** Official source, e.g. "ONRC – Registrul Comerțului" or "ANAF – verificare CUI". */
+  source: string;
+}
+
 export interface AnalysisResult {
   id: string;
   documentId: string;
@@ -64,13 +83,20 @@ export interface AnalysisResult {
   jurisdiction: Jurisdiction;
   documentType: DocumentType;
   language: string;
-  strengths: string[];
-  weaknesses: string[];
-  legalErrors: string[];
-  defenseStrategy: string[];
+  strengths: AnalysisPoint[];
+  weaknesses: AnalysisPoint[];
+  legalErrors: AnalysisPoint[];
+  defenseStrategy: AnalysisPoint[];
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   summary: string;
-  recommendations: string[];
+  recommendations: AnalysisPoint[];
+  /** The acts the analysis applied, in the version in force on the analysis date. */
+  legalFramework: string[];
+  publicInfo: PublicInfoItem[];
+  /** UK service niche the document falls in, "none" when it is not covered, null outside the UK. */
+  ukNiche: string | null;
+  /** Legal limits of the service that applied to this analysis. */
+  legalLimits: string[];
   cachedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -106,11 +132,15 @@ export interface ClaudeAnalysisPayload {
 export interface ClaudeAnalysisOutput {
   jurisdiction: Jurisdiction;
   documentType: DocumentType;
-  strengths: string[];
-  weaknesses: string[];
-  legalErrors: string[];
-  defenseStrategy: string[];
+  strengths: AnalysisPoint[];
+  weaknesses: AnalysisPoint[];
+  legalErrors: AnalysisPoint[];
+  defenseStrategy: AnalysisPoint[];
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   summary: string;
-  recommendations: string[];
+  recommendations: AnalysisPoint[];
+  legalFramework: string[];
+  publicInfo: PublicInfoItem[];
+  ukNiche: string | null;
+  legalLimits: string[];
 }
